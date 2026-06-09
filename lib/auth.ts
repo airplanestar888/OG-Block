@@ -1,6 +1,11 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import Twitter from "next-auth/providers/twitter";
 
+function normalizeXAvatarUrl(url?: string | null) {
+  if (!url) return undefined;
+  return url.replace("_normal.", "_400x400.");
+}
+
 export const authConfig = {
   providers: [
     Twitter({
@@ -13,7 +18,7 @@ export const authConfig = {
           id: data.id,
           name: data.name,
           email: null,
-          image: data.profile_image_url,
+          image: normalizeXAvatarUrl(data.profile_image_url),
           username: data.username
         };
       }
@@ -40,7 +45,9 @@ export const authConfig = {
         token.xUserId = xProfile.data?.id || xProfile.id || token.sub;
         token.xHandle = xProfile.data?.username || xProfile.username || xProfile.screen_name;
         token.xName = xProfile.data?.name || xProfile.name || token.name || undefined;
-        token.xAvatar = xProfile.data?.profile_image_url || xProfile.profile_image_url || xProfile.image || token.picture || undefined;
+        token.xAvatar = normalizeXAvatarUrl(
+          xProfile.data?.profile_image_url || xProfile.profile_image_url || xProfile.image || token.picture
+        );
       }
       return token;
     },
