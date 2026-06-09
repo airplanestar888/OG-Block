@@ -23,3 +23,35 @@ a {
 .focus-ring {
   @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-baseblue focus-visible:ring-offset-2;
 }
+
+.glass-panel {
+  animation: float-panel 7s ease-in-out infinite;
+}
+
+.hero-orbit {
+  animation: pulse-orbit 5s ease-in-out infinite;
+}
+
+@keyframes float-panel {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-orbit {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 82, 255, 0.18);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 0 18px rgba(0, 82, 255, 0);
+    transform: scale(1.08);
+  }
+}

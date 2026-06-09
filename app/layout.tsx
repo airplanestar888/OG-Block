@@ -4,7 +4,7 @@ import { Providers } from "@/components/providers";
 import { SiteNav } from "@/components/site-nav";
 
 export const metadata: Metadata = {
-  title: "Base Culture Score",
+  title: "OG-Block",
   description: "X identity, verified Base NFT ownership, and public social rank.",
   other: {
     "talentapp:project_verification":
