@@ -1,5 +1,6 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import type { PublicScoreProfile } from "@/lib/types";
+import { shortAddress } from "@/lib/address";
 
 type LeaderboardRow = {
   rank: number | null;
@@ -13,11 +14,6 @@ type LeaderboardRow = {
     x_avatar: string | null;
   } | null;
 };
-
-function shortAddress(address: string | null) {
-  if (!address) return null;
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
 
 export async function getPublicProfileByHandle(handle: string): Promise<PublicScoreProfile | null> {
   const supabase = getSupabaseAdmin();

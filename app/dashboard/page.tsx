@@ -4,6 +4,9 @@ import { auth } from "@/lib/auth";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { WalletScorePanel } from "@/components/wallet-score-panel";
+import { shortAddress } from "@/lib/address";
+import { getHoldingScoreBreakdown } from "@/lib/display";
+import type { NftHolding } from "@/lib/types";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -68,6 +71,10 @@ export default async function DashboardPage() {
               {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Refresh score after wallet verification."}
             </p>
           </div>
+          <div className="rounded-md border border-black/10 bg-black/[0.03] px-3 py-2 text-right text-xs text-black/60">
+            <p>Wallet</p>
+            <p className="font-mono font-semibold text-ink">{shortAddress(wallet?.address) || "-"}</p>
+          </div>
         </div>
         <div className="mt-4 overflow-hidden rounded-lg border border-black/10">
           <table className="w-full text-left text-sm">
@@ -76,22 +83,44 @@ export default async function DashboardPage() {
                 <th className="px-4 py-3 font-medium">Contract</th>
                 <th className="px-4 py-3 font-medium">Token ID</th>
                 <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Score impact</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/10">
-              {(holdings || []).map((holding) => {
-                const metadata = holding.metadata_json as { name?: string } | null;
+              {(holdings || []).map((holding, index) => {
+                const metadata = holding.metadata_json as { name?: string; attributes?: unknown[] } | null;
+                const scoreBreakdown = getHoldingScoreBreakdown(
+                  {
+                    contractAddress: holding.contract_address,
+                    tokenId: holding.token_id,
+                    metadata: metadata || {}
+                  } satisfies NftHolding,
+                  index
+                );
+
                 return (
                   <tr key={`${holding.contract_address}-${holding.token_id}`}>
-                    <td className="px-4 py-3 font-mono text-xs">{holding.contract_address}</td>
+                    <td className="px-4 py-3 font-mono text-xs">{shortAddress(holding.contract_address)}</td>
                     <td className="px-4 py-3">{holding.token_id}</td>
                     <td className="px-4 py-3">{metadata?.name || "NFT"}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-md bg-baseblue/10 px-2 py-1 font-semibold text-baseblue">
+                          +{scoreBreakdown.total}
+                        </span>
+                        {scoreBreakdown.parts.map((part) => (
+                          <span key={part.label} className="rounded-md bg-black/[0.04] px-2 py-1 text-xs text-black/65">
+                            {part.label} +{part.points}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
               {(holdings || []).length === 0 ? (
                 <tr>
-                  <td className="px-4 py-6 text-center text-black/55" colSpan={3}>
+                  <td className="px-4 py-6 text-center text-black/55" colSpan={4}>
                     No holdings saved yet.
                   </td>
                 </tr>
@@ -99,6 +128,21 @@ export default async function DashboardPage() {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="grid gap-4 md:grid-cols-5">
+        {[
+          ["Membership", "NFT OG-Block acts as identity access."],
+          ["Score", "Point total becomes social status."],
+          ["Leaderboard", "Rank makes holder competition visible."],
+          ["X Visibility", "Extension brings the badge onto X profiles."],
+          ["Rewards", "Roles, allowlists, and perks make score matter."]
+        ].map(([title, copy]) => (
+          <div key={title} className="rounded-lg border border-black/10 bg-white p-4 shadow-sm">
+            <h3 className="text-sm font-semibold text-ink">{title}</h3>
+            <p className="mt-2 text-xs leading-5 text-black/60">{copy}</p>
+          </div>
+        ))}
       </section>
     </main>
   );

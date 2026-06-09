@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
 import { base } from "wagmi/chains";
+import { shortAddress } from "@/lib/address";
 
 type WalletScorePanelProps = {
   xUserId: string;
@@ -84,7 +85,7 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
         <div>
           <h2 className="font-semibold text-ink">Wallet</h2>
           <p className="mt-1 text-sm text-black/60">
-            {verifiedWallet ? `Verified: ${verifiedWallet}` : address ? `Connected: ${address}` : "Connect Base and sign a message."}
+            {verifiedWallet ? `Verified: ${shortAddress(verifiedWallet)}` : address ? `Connected: ${shortAddress(address)}` : "Connect Base and sign a message."}
           </p>
         </div>
         {isConnected ? (
