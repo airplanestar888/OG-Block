@@ -108,7 +108,7 @@ export default async function DashboardPage() {
                 </div>
 
                 <div className="min-w-52 rounded-lg border border-black/10 bg-white p-3">
-                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0000ff]">Score impact</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Score impact</p>
                   <p className="mt-2 text-3xl font-semibold text-black">+{scoreBreakdown.total}</p>
                   <div className="mt-3 space-y-1">
                     {scoreBreakdown.parts.map((part) => (
