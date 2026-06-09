@@ -111,6 +111,10 @@ a {
   animation: pulse-orbit 5s ease-in-out infinite;
 }
 
+.culture-frame {
+  animation: culture-drift 9s ease-in-out infinite;
+}
+
 @keyframes float-panel {
   0%,
   100% {
@@ -132,5 +136,16 @@ a {
   50% {
     box-shadow: 0 0 0 18px rgba(0, 82, 255, 0);
     transform: scale(1.08);
+  }
+}
+
+@keyframes culture-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(-8px, -8px, 0);
   }
 }
