@@ -5,7 +5,18 @@ export const authConfig = {
   providers: [
     Twitter({
       clientId: process.env.X_CLIENT_ID,
-      clientSecret: process.env.X_CLIENT_SECRET
+      clientSecret: process.env.X_CLIENT_SECRET,
+      profile(profile) {
+        const data = profile.data || profile;
+
+        return {
+          id: data.id,
+          name: data.name,
+          email: null,
+          image: data.profile_image_url,
+          username: data.username
+        };
+      }
     })
   ],
   callbacks: {
