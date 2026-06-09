@@ -66,67 +66,68 @@ export default async function DashboardPage() {
       <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-ink">Owned collection NFTs</h2>
+            <h2 className="font-semibold text-ink">On-chain collection receipt</h2>
             <p className="mt-1 text-sm text-black/60">
-              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Refresh score after wallet verification."}
+              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify wallet to generate your receipt."}
             </p>
           </div>
-          <div className="rounded-md border border-black/10 bg-black/[0.03] px-3 py-2 text-right text-xs text-black/60">
-            <p>Wallet</p>
-            <p className="font-mono font-semibold text-ink">{shortAddress(wallet?.address) || "-"}</p>
+          <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-black/10 text-center text-xs">
+            <ReceiptStat label="Items" value={(holdings || []).length} />
+            <ReceiptStat label="Score" value={score?.score ?? 0} />
+            <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
           </div>
         </div>
-        <div className="mt-4 overflow-hidden rounded-lg border border-black/10">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-black/[0.03] text-black/60">
-              <tr>
-                <th className="px-4 py-3 font-medium">Contract</th>
-                <th className="px-4 py-3 font-medium">Token ID</th>
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Score impact</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/10">
-              {(holdings || []).map((holding, index) => {
-                const metadata = holding.metadata_json as { name?: string; attributes?: unknown[] } | null;
-                const scoreBreakdown = getHoldingScoreBreakdown(
-                  {
-                    contractAddress: holding.contract_address,
-                    tokenId: holding.token_id,
-                    metadata: metadata || {}
-                  } satisfies NftHolding,
-                  index
-                );
 
-                return (
-                  <tr key={`${holding.contract_address}-${holding.token_id}`}>
-                    <td className="px-4 py-3 font-mono text-xs">{shortAddress(holding.contract_address)}</td>
-                    <td className="px-4 py-3">{holding.token_id}</td>
-                    <td className="px-4 py-3">{metadata?.name || "NFT"}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-md bg-baseblue/10 px-2 py-1 font-semibold text-baseblue">
-                          +{scoreBreakdown.total}
-                        </span>
-                        {scoreBreakdown.parts.map((part) => (
-                          <span key={part.label} className="rounded-md bg-black/[0.04] px-2 py-1 text-xs text-black/65">
-                            {part.label} +{part.points}
-                          </span>
-                        ))}
+        <div className="mt-5 grid gap-3">
+          {(holdings || []).map((holding, index) => {
+            const metadata = holding.metadata_json as { name?: string; attributes?: unknown[] } | null;
+            const scoreBreakdown = getHoldingScoreBreakdown(
+              {
+                contractAddress: holding.contract_address,
+                tokenId: holding.token_id,
+                metadata: metadata || {}
+              } satisfies NftHolding,
+              index
+            );
+            const traits = getTraitSummary(metadata?.attributes);
+
+            return (
+              <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-lg border border-dashed border-black/15 bg-[#fbfcff] p-4 md:grid-cols-[1fr_auto]">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
+                      Item {index + 1}
+                    </span>
+                    <h3 className="font-semibold text-ink">{metadata?.name || "OG-Block NFT"}</h3>
+                  </div>
+                  <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                    <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />
+                    <ReceiptLine label="Token ID" value={holding.token_id} />
+                    <ReceiptLine label="Traits" value={traits || "No trait metadata"} />
+                  </dl>
+                </div>
+
+                <div className="min-w-52 rounded-lg border border-black/10 bg-white p-3">
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0000ff]">Score impact</p>
+                  <p className="mt-2 text-3xl font-semibold text-black">+{scoreBreakdown.total}</p>
+                  <div className="mt-3 space-y-1">
+                    {scoreBreakdown.parts.map((part) => (
+                      <div key={part.label} className="flex justify-between gap-3 text-xs text-black/62">
+                        <span>{part.label}</span>
+                        <span className="font-semibold text-black">+{part.points}</span>
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
-              {(holdings || []).length === 0 ? (
-                <tr>
-                  <td className="px-4 py-6 text-center text-black/55" colSpan={4}>
-                    No holdings saved yet.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+
+          {(holdings || []).length === 0 ? (
+            <div className="rounded-lg border border-dashed border-black/15 bg-[#fbfcff] px-4 py-8 text-center text-sm text-black/55">
+              No collection receipt yet.
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -146,6 +147,39 @@ export default async function DashboardPage() {
       </section>
     </main>
   );
+}
+
+function ReceiptStat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="border-r border-black/10 bg-black/[0.03] px-4 py-3 last:border-r-0">
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/50">{label}</p>
+      <p className="mt-1 font-semibold text-ink">{value}</p>
+    </div>
+  );
+}
+
+function ReceiptLine({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div>
+      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-black/45">{label}</dt>
+      <dd className={`mt-1 text-black/75 ${mono ? "font-mono text-xs" : ""}`}>{value}</dd>
+    </div>
+  );
+}
+
+function getTraitSummary(attributes: unknown) {
+  if (!Array.isArray(attributes)) return "";
+
+  return attributes
+    .map((attribute) => {
+      if (!attribute || typeof attribute !== "object") return "";
+      const trait = attribute as { trait_type?: unknown; value?: unknown };
+      if (typeof trait.trait_type !== "string" || typeof trait.value !== "string") return "";
+      return `${trait.trait_type}: ${trait.value}`;
+    })
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(" / ");
 }
 
 function Stat({ label, value }: { label: string; value: string | number }) {

@@ -5,7 +5,7 @@ import { signIn, signOut } from "next-auth/react";
 export function SignInButton() {
   return (
     <button
-      className="focus-ring bg-ink px-3 py-2 font-medium text-white hover:bg-black"
+      className="focus-ring bg-ink px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] text-white hover:bg-black"
       onClick={() => signIn("twitter", { callbackUrl: "/dashboard" })}
       type="button"
     >
@@ -17,7 +17,7 @@ export function SignInButton() {
 export function SignOutButton() {
   return (
     <button
-      className="focus-ring border border-black/15 px-3 py-2 font-medium hover:bg-black/5"
+      className="focus-ring border border-black/15 px-3 py-2 text-xs font-bold uppercase tracking-[0.08em] hover:bg-black/5"
       onClick={() => signOut({ callbackUrl: "/" })}
       type="button"
     >

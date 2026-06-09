@@ -57,8 +57,8 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="absolute left-4 top-8 border border-black/10 bg-white/76 p-3 shadow-[0_22px_70px_rgba(0,0,0,0.10)] backdrop-blur-xl">
-            <Image src="/og-block-logo.png" alt="OG-Block logo" width={84} height={84} priority />
+          <div className="absolute left-6 top-8 border border-black/10 bg-white/70 p-2 shadow-[0_16px_48px_rgba(0,0,0,0.08)] backdrop-blur-xl">
+            <Image src="/og-block-logo.png" alt="OG-Block logo" width={58} height={58} priority />
           </div>
 
           <div className="absolute bottom-8 left-0 grid w-[min(420px,86vw)] grid-cols-3 border border-black/10 bg-white/76 shadow-[0_24px_80px_rgba(0,0,255,0.11)] backdrop-blur-xl">
