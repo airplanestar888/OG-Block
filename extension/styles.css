@@ -1,0 +1,31 @@
+.base-culture-score-badge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+  font-family:
+    TwitterChirp,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.base-culture-score-pill {
+  align-items: center;
+  background: rgba(0, 82, 255, 0.12);
+  border: 1px solid rgba(0, 82, 255, 0.28);
+  border-radius: 999px;
+  color: rgb(0, 54, 168);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  padding: 4px 8px;
+}
+
+.base-culture-score-og {
+  background: rgba(0, 196, 140, 0.14);
+  border-color: rgba(0, 196, 140, 0.34);
+  color: rgb(0, 112, 80);
+}
