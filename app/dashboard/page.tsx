@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOrCreateCurrentUser } from "@/lib/users";
@@ -90,6 +91,7 @@ export default async function DashboardPage() {
               index
             );
             const traits = getTraitSummary(metadata?.attributes);
+            const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
 
             return (
               <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-lg border border-dashed border-black/15 bg-[#fbfcff] p-4 md:grid-cols-[1fr_auto]">
@@ -105,6 +107,14 @@ export default async function DashboardPage() {
                     <ReceiptLine label="Token ID" value={holding.token_id} />
                     <ReceiptLine label="Traits" value={traits || "No trait metadata"} />
                   </dl>
+                  <Link
+                    className="mt-4 inline-flex rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 hover:border-baseblue hover:text-baseblue"
+                    href={explorerUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Show onchain
+                  </Link>
                 </div>
 
                 <div className="min-w-52 rounded-lg border border-black/10 bg-white p-3">
@@ -133,6 +143,10 @@ export default async function DashboardPage() {
 
     </main>
   );
+}
+
+function getBaseExplorerNftUrl(contractAddress: string, tokenId: string) {
+  return `https://basescan.org/nft/${contractAddress}/${tokenId}`;
 }
 
 function ReceiptStat({ label, value }: { label: string; value: string | number }) {

@@ -13,6 +13,10 @@ type WalletScorePanelProps = {
 
 export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletScorePanelProps) {
   const { address, isConnected } = useAccount();
+  const connectedAddress = address?.toLowerCase();
+  const verifiedAddress = verifiedWallet?.toLowerCase();
+  const isDifferentWallet = Boolean(connectedAddress && verifiedAddress && connectedAddress !== verifiedAddress);
+  const canVerifyWallet = isConnected && (!verifiedWallet || isDifferentWallet);
   const chainId = useChainId();
   const { connect, connectors, isPending: connectPending } = useConnect();
   const { disconnect } = useDisconnect();
@@ -85,7 +89,11 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
         <div>
           <h2 className="font-semibold text-ink">Wallet</h2>
           <p className="mt-1 text-sm text-black/60">
-            {verifiedWallet ? `Verified: ${shortAddress(verifiedWallet)}` : address ? `Connected: ${shortAddress(address)}` : "Connect Base and sign a message."}
+            {verifiedWallet
+              ? `Verified: ${shortAddress(verifiedWallet)}${isDifferentWallet ? ` / Connected: ${shortAddress(address)}` : ""}`
+              : address
+                ? `Connected: ${shortAddress(address)}`
+                : "Connect Base and sign a message."}
           </p>
         </div>
         {isConnected ? (
@@ -110,11 +118,11 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
       <div className="mt-4 flex flex-wrap gap-3">
         <button
           className={`focus-ring rounded-md px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${verifiedWallet ? "bg-baseblue text-white" : "bg-ink text-white"}`}
-          disabled={!isConnected || busy || Boolean(verifiedWallet)}
+          disabled={!canVerifyWallet || busy}
           onClick={verifyWallet}
           type="button"
         >
-          {verifiedWallet ? "Wallet verified" : "Verify and score"}
+          {isDifferentWallet ? "Change wallet and score" : verifiedWallet ? "Wallet verified" : "Verify and score"}
         </button>
         <button
           className="focus-ring rounded-md border border-black/15 px-4 py-2 text-sm font-semibold hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
