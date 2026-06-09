@@ -35,16 +35,29 @@ export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
 
+function shouldFilterContract(contractAddress: string) {
+  const normalized = contractAddress.toLowerCase();
+  return normalized !== "all" && normalized !== "0x0000000000000000000000000000000000000000";
+}
+
 class MockNftProvider implements NftProvider {
   async getHoldings(address: string, contractAddress: string): Promise<NftHolding[]> {
     if (!address) return [];
     return [
       {
-        contractAddress,
+        contractAddress: shouldFilterContract(contractAddress) ? contractAddress : "0x8a90cab2b38dba80c64b7734e58ee1db38b8992e",
         tokenId: "42",
         metadata: {
           name: "Base Culture #42",
           attributes: [{ trait_type: "Edition", value: "Genesis" }]
+        }
+      },
+      {
+        contractAddress: shouldFilterContract(contractAddress) ? contractAddress : "0x6fd053bff10512d743fa36c859e49351a4920df6",
+        tokenId: "711",
+        metadata: {
+          name: "Onchain Identity #711",
+          attributes: [{ trait_type: "Status", value: "OG" }]
         }
       }
     ];
@@ -56,7 +69,9 @@ class AlchemyNftProvider implements NftProvider {
     if (!env.NFT_PROVIDER_API_KEY) throw new Error("NFT_PROVIDER_API_KEY is required for Alchemy");
     const url = new URL(`https://base-mainnet.g.alchemy.com/nft/v3/${env.NFT_PROVIDER_API_KEY}/getNFTsForOwner`);
     url.searchParams.set("owner", address);
-    url.searchParams.set("contractAddresses[]", contractAddress);
+    if (shouldFilterContract(contractAddress)) {
+      url.searchParams.set("contractAddresses[]", contractAddress);
+    }
     url.searchParams.set("withMetadata", "true");
     url.searchParams.set("pageSize", "100");
 
@@ -74,13 +89,19 @@ class AlchemyNftProvider implements NftProvider {
     return (payload.ownedNfts || []).map((nft) => ({
       contractAddress: nft.contract?.address || contractAddress,
       tokenId: nft.tokenId || "0",
-      metadata: nft.raw?.metadata || { name: nft.name }
+      metadata: {
+        ...(nft.raw?.metadata || {}),
+        name: nft.raw?.metadata?.name || nft.name
+      }
     }));
   }
 }
 
 class RpcNftProvider implements NftProvider {
   async getHoldings(address: string, contractAddress: string): Promise<NftHolding[]> {
+    if (!shouldFilterContract(contractAddress)) {
+      throw new Error("RPC provider requires TARGET_NFT_CONTRACT_ADDRESS. Use NFT_PROVIDER=alchemy for all wallet NFTs.");
+    }
     const client = createPublicClient({ chain: baseChain, transport: http(env.BASE_RPC_URL) });
     const contract = getContract({
       address: contractAddress as Address,

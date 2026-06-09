@@ -33,7 +33,7 @@ Edit [lib/config/score-rules.ts](lib/config/score-rules.ts) to change:
 - Points for project NFT, additional NFTs, rare traits, and early token IDs
 - Rare trait definitions
 
-NFT fetching is behind [lib/nft/providers.ts](lib/nft/providers.ts). `NFT_PROVIDER=mock` is useful for local UI testing. `alchemy` and `rpc` are implemented; `simplehash` and `reservoir` can be added behind the same interface.
+NFT fetching is behind [lib/nft/providers.ts](lib/nft/providers.ts). `NFT_PROVIDER=mock` is useful for local UI testing. `alchemy` fetches real Base NFT holdings for a wallet. Set `TARGET_NFT_CONTRACT_ADDRESS=all` to score every NFT in the wallet, or set it to one contract address to score only that collection. `rpc` is implemented for enumerable contracts only; `simplehash` and `reservoir` can be added behind the same interface.
 
 ## API
 

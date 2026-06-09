@@ -52,7 +52,7 @@ export async function calculateScore(userId: string, walletAddress: string): Pro
 export async function persistScore(userId: string, walletAddress: string, result: ScoreResult) {
   const supabase = getSupabaseAdmin();
 
-  await supabase.from("nft_holdings").delete().eq("user_id", userId).eq("contract_address", scoreRules.targetCollection);
+  await supabase.from("nft_holdings").delete().eq("user_id", userId);
 
   if (result.holdings.length > 0) {
     const { error: holdingsError } = await supabase.from("nft_holdings").insert(
