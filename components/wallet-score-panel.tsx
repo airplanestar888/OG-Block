@@ -109,7 +109,7 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
       </div>
       <div className="mt-4 flex flex-wrap gap-3">
         <button
-          className={`focus-ring rounded-md px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${verifiedWallet ? "bg-[#0000ff] text-white" : "bg-ink text-white"}`}
+          className={`focus-ring rounded-md px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${verifiedWallet ? "bg-baseblue text-white" : "bg-ink text-white"}`}
           disabled={!isConnected || busy || Boolean(verifiedWallet)}
           onClick={verifyWallet}
           type="button"

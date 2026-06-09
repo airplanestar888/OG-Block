@@ -66,7 +66,7 @@ export default async function DashboardPage() {
       <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="font-semibold text-ink">On-chain collection receipt</h2>
+            <h2 className="font-semibold text-ink">Blockchain Legacy</h2>
             <p className="mt-1 text-sm text-black/60">
               {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify wallet to generate your receipt."}
             </p>
@@ -131,20 +131,6 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-5">
-        {[
-          ["Membership", "NFT OG-Block acts as identity access."],
-          ["Score", "Point total becomes social status."],
-          ["Leaderboard", "Rank makes holder competition visible."],
-          ["X Visibility", "Extension brings the badge onto X profiles."],
-          ["Rewards", "Roles, allowlists, and perks make score matter."]
-        ].map(([title, copy]) => (
-          <div key={title} className="rounded-lg border border-black/10 bg-white p-4 shadow-sm">
-            <h3 className="text-sm font-semibold text-ink">{title}</h3>
-            <p className="mt-2 text-xs leading-5 text-black/60">{copy}</p>
-          </div>
-        ))}
-      </section>
     </main>
   );
 }
