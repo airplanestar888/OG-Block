@@ -31,6 +31,51 @@ const erc721EnumerableAbi = [
   }
 ] as const;
 
+const erc721OwnershipAbi = [
+  {
+    type: "function",
+    name: "ownerOf",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ name: "", type: "address" }]
+  },
+  {
+    type: "function",
+    name: "tokenURI",
+    stateMutability: "view",
+    inputs: [{ name: "tokenId", type: "uint256" }],
+    outputs: [{ name: "", type: "string" }]
+  }
+] as const;
+
+const erc1155OwnershipAbi = [
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [
+      { name: "account", type: "address" },
+      { name: "id", type: "uint256" }
+    ],
+    outputs: [{ name: "", type: "uint256" }]
+  },
+  {
+    type: "function",
+    name: "uri",
+    stateMutability: "view",
+    inputs: [{ name: "id", type: "uint256" }],
+    outputs: [{ name: "", type: "string" }]
+  }
+] as const;
+
+type AlchemyTransfer = {
+  category?: "erc721" | "erc1155";
+  erc721TokenId?: string;
+  erc1155Metadata?: Array<{ tokenId?: string }>;
+  tokenId?: string;
+  rawContract?: { address?: string };
+};
+
 export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
@@ -76,7 +121,9 @@ class AlchemyNftProvider implements NftProvider {
     url.searchParams.set("pageSize", "100");
 
     const response = await fetch(url);
-    if (!response.ok) throw new Error(`Alchemy NFT request failed: ${response.status}`);
+    if (!response.ok) {
+      return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
+    }
     const payload = (await response.json()) as {
       ownedNfts?: Array<{
         contract?: { address?: string };
@@ -95,6 +142,134 @@ class AlchemyNftProvider implements NftProvider {
       }
     }));
   }
+}
+
+async function getHoldingsFromAlchemyTransfers(address: string, contractAddress: string, apiKey: string) {
+  const rpcUrl = `https://base-mainnet.g.alchemy.com/v2/${apiKey}`;
+  const normalizedWallet = address.toLowerCase();
+  const candidateMap = new Map<string, { contractAddress: string; tokenId: string; category: "erc721" | "erc1155" }>();
+  let pageKey: string | undefined;
+
+  for (let page = 0; page < 4; page += 1) {
+    const params: Record<string, unknown> = {
+      fromBlock: "0x0",
+      toBlock: "latest",
+      toAddress: address,
+      category: ["erc721", "erc1155"],
+      maxCount: "0x64"
+    };
+    if (pageKey) params.pageKey = pageKey;
+
+    const response = await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: page + 1,
+        method: "alchemy_getAssetTransfers",
+        params: [params]
+      })
+    });
+
+    if (!response.ok) throw new Error(`Alchemy transfer request failed: ${response.status}`);
+    const payload = (await response.json()) as {
+      result?: { transfers?: AlchemyTransfer[]; pageKey?: string };
+      error?: { message?: string };
+    };
+    if (payload.error) throw new Error(payload.error.message || "Alchemy transfer request failed");
+
+    for (const transfer of payload.result?.transfers || []) {
+      const transferContract = transfer.rawContract?.address?.toLowerCase();
+      if (!transferContract) continue;
+      if (shouldFilterContract(contractAddress) && transferContract !== contractAddress.toLowerCase()) continue;
+
+      const tokenIds =
+        transfer.category === "erc1155"
+          ? (transfer.erc1155Metadata || []).map((item) => item.tokenId).filter(Boolean)
+          : [transfer.erc721TokenId || transfer.tokenId].filter(Boolean);
+
+      for (const tokenIdHex of tokenIds) {
+        const tokenId = tokenIdFromHex(tokenIdHex!);
+        candidateMap.set(`${transferContract}:${tokenId}:${transfer.category || "erc721"}`, {
+          contractAddress: transferContract,
+          tokenId,
+          category: transfer.category || "erc721"
+        });
+      }
+    }
+
+    pageKey = payload.result?.pageKey;
+    if (!pageKey) break;
+  }
+
+  const client = createPublicClient({ chain: baseChain, transport: http(rpcUrl) });
+  const holdings: NftHolding[] = [];
+
+  for (const candidate of candidateMap.values()) {
+    if (holdings.length >= 100) break;
+    try {
+      const tokenId = BigInt(candidate.tokenId);
+      let metadataUri = "";
+
+      if (candidate.category === "erc1155") {
+        const contract = getContract({
+          address: candidate.contractAddress as Address,
+          abi: erc1155OwnershipAbi,
+          client
+        });
+        const balance = await contract.read.balanceOf([address as Address, tokenId]);
+        if (balance === 0n) continue;
+        metadataUri = await contract.read.uri([tokenId]);
+      } else {
+        const contract = getContract({
+          address: candidate.contractAddress as Address,
+          abi: erc721OwnershipAbi,
+          client
+        });
+        const owner = await contract.read.ownerOf([tokenId]);
+        if (owner.toLowerCase() !== normalizedWallet) continue;
+        metadataUri = await contract.read.tokenURI([tokenId]);
+      }
+
+      const metadata = await fetchNftMetadata(metadataUri, candidate.tokenId);
+      holdings.push({
+        contractAddress: candidate.contractAddress,
+        tokenId: candidate.tokenId,
+        metadata
+      });
+    } catch {
+      continue;
+    }
+  }
+
+  return holdings;
+}
+
+function tokenIdFromHex(tokenId: string) {
+  if (tokenId.startsWith("0x")) return BigInt(tokenId).toString();
+  return tokenId;
+}
+
+async function fetchNftMetadata(uri: string, tokenId: string) {
+  const url = normalizeMetadataUri(uri, tokenId);
+  if (!url) return {};
+
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!response.ok) return {};
+    return (await response.json()) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+function normalizeMetadataUri(uri: string, tokenId: string) {
+  if (!uri) return "";
+  const normalizedTokenId = BigInt(tokenId).toString(16).padStart(64, "0");
+  const expanded = uri.replace("{id}", normalizedTokenId);
+  if (expanded.startsWith("ipfs://")) return `https://ipfs.io/ipfs/${expanded.slice("ipfs://".length)}`;
+  if (expanded.startsWith("http://") || expanded.startsWith("https://")) return expanded;
+  return "";
 }
 
 class RpcNftProvider implements NftProvider {
