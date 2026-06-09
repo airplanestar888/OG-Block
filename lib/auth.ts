@@ -22,13 +22,14 @@ export const authConfig = {
           username?: string;
           screen_name?: string;
           name?: string;
+          image?: string;
           profile_image_url?: string;
         };
 
         token.xUserId = xProfile.data?.id || xProfile.id || token.sub;
         token.xHandle = xProfile.data?.username || xProfile.username || xProfile.screen_name;
         token.xName = xProfile.data?.name || xProfile.name || token.name || undefined;
-        token.xAvatar = xProfile.data?.profile_image_url || xProfile.profile_image_url || token.picture || undefined;
+        token.xAvatar = xProfile.data?.profile_image_url || xProfile.profile_image_url || xProfile.image || token.picture || undefined;
       }
       return token;
     },
