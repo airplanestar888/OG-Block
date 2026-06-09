@@ -20,6 +20,15 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
 
+  async function refreshScoreAfterVerification() {
+    setStatus("Wallet verified. Calculating score...");
+    const response = await fetch("/api/score/refresh", { method: "POST" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error || "Score refresh failed");
+    setStatus(`Score refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
+    window.location.reload();
+  }
+
   async function verifyWallet() {
     if (!address) return;
     setBusy(true);
@@ -41,11 +50,11 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
       const response = await fetch("/api/wallet/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, chainId, message, signature })
+        body: JSON.stringify({ address, chainId: base.id, message, signature })
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Wallet verification failed");
-      setStatus("Wallet verified. Refreshing score is available now.");
+      await refreshScoreAfterVerification();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet verification failed");
     } finally {
@@ -100,11 +109,11 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
       <div className="mt-4 flex flex-wrap gap-3">
         <button
           className="focus-ring rounded-md bg-ink px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!isConnected || busy}
+          disabled={!isConnected || busy || Boolean(verifiedWallet)}
           onClick={verifyWallet}
           type="button"
         >
-          Verify wallet
+          {verifiedWallet ? "Wallet verified" : "Verify and score"}
         </button>
         <button
           className="focus-ring rounded-md border border-black/15 px-4 py-2 text-sm font-semibold hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
