@@ -7,91 +7,167 @@ export default async function HomePage() {
   const session = await auth();
 
   return (
-    <main className="relative min-h-[calc(100vh-73px)] overflow-hidden bg-[#f7f8fb]">
+    <main className="relative min-h-screen overflow-hidden bg-white">
       <PixelField />
-      <section className="relative mx-auto grid max-w-7xl gap-8 px-5 pb-5 pt-7 md:grid-cols-[0.86fr_1.14fr] md:items-center lg:px-8">
-        <div className="relative z-10 max-w-lg">
-          <div className="mb-5 inline-flex items-center gap-2 border border-baseblue/15 bg-white/70 px-3 py-2 text-[0.68rem] font-semibold uppercase text-baseblue/80 shadow-sm backdrop-blur">
-            <span className="h-2 w-2 bg-baseblue" />
-            Base NFT social score
-          </div>
 
-          <h1 className="font-display text-[clamp(3rem,5.2vw,5.1rem)] font-semibold leading-[0.94] text-black/88">
-            Own status.
-            <br />
-            Prove culture.
-          </h1>
+      {/* ── HERO ─────────────────────────────────────────── */}
+      <section className="relative mx-auto max-w-6xl px-5 pb-10 pt-12 sm:px-8 lg:pt-16">
 
-          <p className="mt-5 max-w-md text-[0.98rem] leading-7 text-black/58">
-            OG-Block links your X identity, verified Base wallet, and NFT holdings into a score people can see, compete for, and use for rewards.
-          </p>
+        {/* Two-column grid: left text fixed, right image fills rest */}
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[380px_1fr] lg:gap-14 xl:grid-cols-[420px_1fr]">
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              className="focus-ring bg-baseblue px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_42px_rgba(0,82,255,0.18)] hover:bg-blue-700"
-              href={session ? "/dashboard" : "/login"}
+          {/* ── LEFT PANE ── */}
+          <aside className="flex flex-col gap-7">
+
+            {/* Headline */}
+            <div className="reveal reveal-d1 flex flex-col gap-3">
+              <h1
+                className="leading-[0.94] text-[#0A0B0D]"
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  fontSize: "clamp(3.2rem, 6.58vw, 4.89rem)",
+                  letterSpacing: "0.01em",
+                }}
+              >
+                Own status.<br />
+                Prove culture.
+              </h1>
+              <p
+                className="text-[0.95rem] leading-[1.5] text-[#0A0B0D]/50"
+                style={{ letterSpacing: "-0.01em" }}
+              >
+                Link your X identity, Base wallet, and NFT holdings into a
+                public social score on Base.
+              </p>
+            </div>
+
+            {/* CTAs */}
+            <div className="reveal reveal-d2 flex flex-wrap gap-3">
+              <Link
+                href={session ? "/dashboard" : "/login"}
+                className="focus-ring inline-flex h-11 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.875rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80"
+              >
+                {session ? "Open dashboard" : "Start with X"}
+              </Link>
+              <Link
+                href="/leaderboard"
+                className="focus-ring inline-flex h-11 items-center justify-center rounded-[12px] border border-[rgba(10,11,13,0.12)] bg-white px-5 text-[0.875rem] font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D]"
+              >
+                View leaderboard
+              </Link>
+            </div>
+          </aside>
+
+          {/* ── RIGHT PANE — NFT image + score below ── */}
+          <div className="reveal reveal-d2 flex flex-col gap-3">
+
+            {/* Image */}
+            <div
+              className="w-full overflow-hidden rounded-[18px] bg-[#f0f0f0]"
+              style={{ maxHeight: "462px" }}
             >
-              {session ? "Open dashboard" : "Start with X"}
-            </Link>
-            <Link
-              className="focus-ring border border-black/12 bg-white/72 px-5 py-3 text-sm font-semibold text-black/78 shadow-sm backdrop-blur hover:border-black/30"
-              href="/leaderboard"
-            >
-              View leaderboard
-            </Link>
-          </div>
-        </div>
-
-        <div className="relative z-10">
-          <div className="culture-frame relative ml-auto w-full border border-black/10 bg-white/38 shadow-[0_34px_100px_rgba(0,82,255,0.10)] backdrop-blur-2xl">
-            <div className="relative m-3 overflow-hidden bg-white">
               <Image
-                className="h-auto w-full grayscale opacity-90"
+                className="nft-img h-full w-full object-cover grayscale"
                 src="/og-nft-grid.png"
-                alt="OG-Block NFT collection preview"
+                alt="OG-Block NFT collection"
                 width={1776}
                 height={864}
                 priority
+                style={{ display: "block" }}
               />
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(247,248,251,0.58),transparent_26%,transparent_76%,rgba(0,82,255,0.09))]" />
             </div>
-          </div>
 
-          <div className="absolute left-5 top-6 shadow-[0_16px_48px_rgba(0,0,0,0.08)]">
-            <Image src="/og-block-logo.png" alt="OG-Block logo" width={82} height={82} priority />
-          </div>
+            {/* Score card — compact, below image */}
+            <div className="flex items-stretch overflow-hidden rounded-[14px] border border-[rgba(10,11,13,0.08)] bg-white shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+              {/* Label pill */}
+              <div className="flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-4 py-3">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0000FF]" />
+                <span className="whitespace-nowrap text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/36">
+                  NFT Score
+                </span>
+              </div>
+              {/* Metrics inline */}
+              <div className="flex flex-1 divide-x divide-[rgba(10,11,13,0.07)]">
+                <ScoreMetric label="Score"  value="250" />
+                <ScoreMetric label="Rank"   value="#12" />
+                <ScoreMetric label="Status" value="OG" isLast />
+              </div>
+              {/* Live dot */}
+              <div className="flex items-center gap-1.5 border-l border-[rgba(10,11,13,0.07)] px-4">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#00c48c]" />
+                <span className="text-[0.6rem] font-semibold text-[#0A0B0D]/36">Live</span>
+              </div>
+            </div>
 
-          <div className="absolute bottom-5 left-0 grid w-[min(390px,86vw)] grid-cols-3 border border-black/10 bg-white/76 shadow-[0_24px_80px_rgba(0,82,255,0.11)] backdrop-blur-xl">
-            <Metric label="Score" value="250" />
-            <Metric label="Rank" value="#12" />
-            <Metric label="Status" value="OG" />
           </div>
         </div>
       </section>
 
-      <section className="relative mx-auto grid max-w-7xl gap-px border-y border-black/10 bg-black/10 md:grid-cols-5">
-        {[
-          ["Membership", "NFT as identity access"],
-          ["Score", "Social status from holdings"],
-          ["Leaderboard", "Competition by rank"],
-          ["X visibility", "Badge where culture lives"],
-          ["Rewards", "Roles and allowlists"]
-        ].map(([title, copy]) => (
-          <div key={title} className="bg-white/70 p-4 backdrop-blur">
-            <h2 className="text-sm font-semibold text-black">{title}</h2>
-            <p className="mt-2 text-xs leading-5 text-black/58">{copy}</p>
-          </div>
-        ))}
+      {/* ── FEATURES ─────────────────────────────────────── */}
+      <section className="relative mx-auto max-w-6xl px-5 pb-20 pt-4 sm:px-8">
+        <div className="reveal reveal-d3 border-t border-[rgba(10,11,13,0.08)]">
+          {[
+            { num: "01", title: "Membership",  copy: "NFT as identity access" },
+            { num: "02", title: "Score",        copy: "Social status from your holdings" },
+            { num: "03", title: "Leaderboard",  copy: "Compete publicly by rank" },
+            { num: "04", title: "X Visibility", copy: "Badge where culture lives" },
+            { num: "05", title: "Rewards",      copy: "Roles and allowlists for OGs" },
+          ].map(({ num, title, copy }) => (
+            <div
+              key={title}
+              className="feature-row flex items-center justify-between gap-6 py-4 sm:py-5"
+            >
+              <div className="flex items-center gap-5">
+                <span className="w-7 shrink-0 text-[0.68rem] font-semibold tabular-nums text-[#0A0B0D]/22">
+                  {num}
+                </span>
+                <div>
+                  <p
+                    className="text-[0.9rem] font-semibold text-[#0A0B0D]"
+                    style={{ letterSpacing: "-0.01em" }}
+                  >
+                    {title}
+                  </p>
+                  <p className="mt-0.5 text-[0.78rem] text-[#0A0B0D]/44">{copy}</p>
+                </div>
+              </div>
+              <svg
+                width="14" height="14" viewBox="0 0 14 14" fill="none"
+                className="shrink-0 text-[#0A0B0D]/18"
+                aria-hidden="true"
+              >
+                <path
+                  d="M2 7h10M8 3l4 4-4 4"
+                  stroke="currentColor" strokeWidth="1.4"
+                  strokeLinecap="round" strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+/* ── Score metric cell — compact inline version ──── */
+function ScoreMetric({
+  label,
+  value,
+  isLast = false,
+}: {
+  label: string;
+  value: string;
+  isLast?: boolean;
+}) {
   return (
-    <div className="border-r border-black/10 p-4 last:border-r-0">
-      <p className="text-[0.68rem] font-semibold uppercase text-baseblue">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-black">{value}</p>
+    <div className="flex flex-col justify-center px-4 py-3">
+      <p className="text-[0.55rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF]/60">
+        {label}
+      </p>
+      <p className="mt-0.5 text-[1.1rem] font-bold leading-none tracking-tight text-[#0A0B0D]">
+        {value}
+      </p>
     </div>
   );
 }
