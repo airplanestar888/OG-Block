@@ -35,6 +35,12 @@ Edit [lib/config/score-rules.ts](lib/config/score-rules.ts) to change:
 
 NFT fetching is behind [lib/nft/providers.ts](lib/nft/providers.ts). `NFT_PROVIDER=mock` is useful for local UI testing. `alchemy` fetches real Base NFT holdings for a wallet. Set `TARGET_NFT_CONTRACT_ADDRESS=all` to score every NFT in the wallet, or set it to one contract address to score only that collection. `rpc` is implemented for enumerable contracts only; `simplehash` and `reservoir` can be added behind the same interface.
 
+Scam/spam filtering can be tuned with env vars:
+
+- `NFT_EXCLUDE_SPAM=true` asks Alchemy to remove NFTs it classifies as spam.
+- `NFT_REQUIRE_VERIFIED_CONTRACT=true` only scores NFT contracts verified on Sourcify for Base.
+- `NFT_MIN_FLOOR_PRICE_ETH=0.001` only scores collections with an available floor at or above that ETH value.
+
 ## API
 
 - `GET /api/me`

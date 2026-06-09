@@ -76,6 +76,19 @@ type AlchemyTransfer = {
   rawContract?: { address?: string };
 };
 
+type AlchemyOwnedNft = {
+  contract?: {
+    address?: string;
+    openSeaMetadata?: {
+      floorPrice?: number | null;
+      safelistRequestStatus?: string | null;
+    };
+  };
+  tokenId?: string;
+  raw?: { metadata?: Record<string, unknown> };
+  name?: string;
+};
+
 export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
@@ -119,28 +132,27 @@ class AlchemyNftProvider implements NftProvider {
     }
     url.searchParams.set("withMetadata", "true");
     url.searchParams.set("pageSize", "100");
+    if (env.NFT_EXCLUDE_SPAM) {
+      url.searchParams.append("excludeFilters[]", "SPAM");
+    }
 
     const response = await fetch(url);
     if (!response.ok) {
       return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
     }
-    const payload = (await response.json()) as {
-      ownedNfts?: Array<{
-        contract?: { address?: string };
-        tokenId?: string;
-        raw?: { metadata?: Record<string, unknown> };
-        name?: string;
-      }>;
-    };
+    const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[] };
+    const verifiedContracts = await getVerifiedContractMap((payload.ownedNfts || []).map((nft) => nft.contract?.address));
 
-    return (payload.ownedNfts || []).map((nft) => ({
-      contractAddress: nft.contract?.address || contractAddress,
-      tokenId: nft.tokenId || "0",
-      metadata: {
-        ...(nft.raw?.metadata || {}),
-        name: nft.raw?.metadata?.name || nft.name
-      }
-    }));
+    return (payload.ownedNfts || [])
+      .filter((nft) => isGenuineAlchemyNft(nft, verifiedContracts))
+      .map((nft) => ({
+        contractAddress: nft.contract?.address || contractAddress,
+        tokenId: nft.tokenId || "0",
+        metadata: {
+          ...(nft.raw?.metadata || {}),
+          name: nft.raw?.metadata?.name || nft.name
+        }
+      }));
   }
 }
 
@@ -204,9 +216,11 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
 
   const client = createPublicClient({ chain: baseChain, transport: http(rpcUrl) });
   const holdings: NftHolding[] = [];
+  const verifiedContracts = await getVerifiedContractMap([...candidateMap.values()].map((candidate) => candidate.contractAddress));
 
   for (const candidate of candidateMap.values()) {
     if (holdings.length >= 100) break;
+    if (env.NFT_REQUIRE_VERIFIED_CONTRACT && !verifiedContracts.get(candidate.contractAddress.toLowerCase())) continue;
     try {
       const tokenId = BigInt(candidate.tokenId);
       let metadataUri = "";
@@ -243,6 +257,42 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
   }
 
   return holdings;
+}
+
+function isGenuineAlchemyNft(nft: AlchemyOwnedNft, verifiedContracts: Map<string, boolean>) {
+  const contractAddress = nft.contract?.address?.toLowerCase();
+  if (!contractAddress) return false;
+
+  if (env.NFT_REQUIRE_VERIFIED_CONTRACT && !verifiedContracts.get(contractAddress)) return false;
+
+  const floorPrice = nft.contract?.openSeaMetadata?.floorPrice;
+  if (env.NFT_MIN_FLOOR_PRICE_ETH > 0) {
+    return typeof floorPrice === "number" && floorPrice >= env.NFT_MIN_FLOOR_PRICE_ETH;
+  }
+
+  return true;
+}
+
+async function getVerifiedContractMap(contractAddresses: Array<string | undefined>) {
+  const uniqueContracts = [...new Set(contractAddresses.filter(Boolean).map((address) => address!.toLowerCase()))];
+  const verifiedMap = new Map<string, boolean>();
+
+  if (!env.NFT_REQUIRE_VERIFIED_CONTRACT) return verifiedMap;
+
+  await Promise.all(
+    uniqueContracts.map(async (contractAddress) => {
+      try {
+        const response = await fetch(`https://sourcify.dev/server/v2/contract/8453/${contractAddress}`, {
+          signal: AbortSignal.timeout(5000)
+        });
+        verifiedMap.set(contractAddress, response.ok);
+      } catch {
+        verifiedMap.set(contractAddress, false);
+      }
+    })
+  );
+
+  return verifiedMap;
 }
 
 function tokenIdFromHex(tokenId: string) {
