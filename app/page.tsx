@@ -10,22 +10,26 @@ export default async function HomePage() {
     <main className="relative min-h-screen overflow-hidden bg-white">
       <PixelField />
 
-      {/* ── HERO ─────────────────────────────────────────── */}
-      <section className="relative mx-auto max-w-6xl px-5 pb-10 pt-12 sm:px-8 lg:pt-16">
+      {/* ── HERO ─────────────────────────────────────── */}
+      <section
+        className="page-container relative"
+        style={{
+          paddingTop:    "var(--hero-pt)",
+          paddingBottom: "var(--hero-pb)",
+        }}
+      >
+        <div className="hero-grid">
 
-        {/* Two-column grid: left text fixed, right image fills rest */}
-        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[380px_1fr] lg:gap-14 xl:grid-cols-[420px_1fr]">
-
-          {/* ── LEFT PANE ── */}
-          <aside className="flex flex-col gap-7">
+          {/* ── LEFT — copy ── */}
+          <aside className="flex flex-col gap-6 sm:gap-7">
 
             {/* Headline */}
             <div className="reveal reveal-d1 flex flex-col gap-3">
               <h1
                 className="leading-[0.94] text-[#0A0B0D]"
                 style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  fontSize: "clamp(3.2rem, 6.58vw, 4.89rem)",
+                  fontFamily:    "'Bebas Neue', sans-serif",
+                  fontSize:      "clamp(3.2rem, 6.58vw, 4.89rem)",
                   letterSpacing: "0.01em",
                 }}
               >
@@ -33,8 +37,8 @@ export default async function HomePage() {
                 Prove culture.
               </h1>
               <p
-                className="text-[0.95rem] leading-[1.5] text-[#0A0B0D]/50"
-                style={{ letterSpacing: "-0.01em" }}
+                className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/50 sm:text-[0.95rem]"
+                style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
               >
                 Link your X identity, Base wallet, and NFT holdings into a
                 public social score on Base.
@@ -42,30 +46,27 @@ export default async function HomePage() {
             </div>
 
             {/* CTAs */}
-            <div className="reveal reveal-d2 flex flex-wrap gap-3">
+            <div className="reveal reveal-d2 flex flex-wrap gap-2.5 sm:gap-3">
               <Link
                 href={session ? "/dashboard" : "/login"}
-                className="focus-ring inline-flex h-11 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.875rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80"
+                className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
               >
                 {session ? "Open dashboard" : "Start with X"}
               </Link>
               <Link
                 href="/leaderboard"
-                className="focus-ring inline-flex h-11 items-center justify-center rounded-[12px] border border-[rgba(10,11,13,0.12)] bg-white px-5 text-[0.875rem] font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D]"
+                className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] border border-[rgba(10,11,13,0.12)] bg-white px-5 text-[0.85rem] font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D] sm:h-11 sm:text-[0.875rem]"
               >
                 View leaderboard
               </Link>
             </div>
           </aside>
 
-          {/* ── RIGHT PANE — NFT image + score below ── */}
-          <div className="reveal reveal-d2 flex flex-col gap-3">
+          {/* ── RIGHT — NFT image + score ── */}
+          <div className="reveal reveal-d2 flex flex-col gap-2.5">
 
             {/* Image */}
-            <div
-              className="w-full overflow-hidden rounded-[18px] bg-[#f0f0f0]"
-              style={{ maxHeight: "462px" }}
-            >
+            <div className="nft-image-wrap">
               <Image
                 className="nft-img h-full w-full object-cover grayscale"
                 src="/og-nft-grid.png"
@@ -73,29 +74,31 @@ export default async function HomePage() {
                 width={1776}
                 height={864}
                 priority
-                style={{ display: "block" }}
               />
             </div>
 
-            {/* Score card — compact, below image */}
+            {/* Score strip */}
             <div className="flex items-stretch overflow-hidden rounded-[14px] border border-[rgba(10,11,13,0.08)] bg-white shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
-              {/* Label pill */}
-              <div className="flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-4 py-3">
+
+              {/* Label — hidden xs */}
+              <div className="score-label-col flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-3 py-2.5 sm:px-4 sm:py-3">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0000FF]" />
-                <span className="whitespace-nowrap text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/36">
+                <span className="whitespace-nowrap text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/36 sm:text-[0.6rem]">
                   NFT Score
                 </span>
               </div>
-              {/* Metrics inline */}
+
+              {/* Metrics */}
               <div className="flex flex-1 divide-x divide-[rgba(10,11,13,0.07)]">
                 <ScoreMetric label="Score"  value="250" />
                 <ScoreMetric label="Rank"   value="#12" />
-                <ScoreMetric label="Status" value="OG" isLast />
+                <ScoreMetric label="Status" value="OG"  />
               </div>
-              {/* Live dot */}
-              <div className="flex items-center gap-1.5 border-l border-[rgba(10,11,13,0.07)] px-4">
+
+              {/* Live — hidden xs */}
+              <div className="score-live-col flex items-center gap-1.5 border-l border-[rgba(10,11,13,0.07)] px-3 sm:px-4">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#00c48c]" />
-                <span className="text-[0.6rem] font-semibold text-[#0A0B0D]/36">Live</span>
+                <span className="text-[0.58rem] font-semibold text-[#0A0B0D]/36 sm:text-[0.6rem]">Live</span>
               </div>
             </div>
 
@@ -103,8 +106,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURES ─────────────────────────────────────── */}
-      <section className="relative mx-auto max-w-6xl px-5 pb-20 pt-4 sm:px-8">
+      {/* ── FEATURES ─────────────────────────────────── */}
+      <section className="page-container relative pb-16 pt-2 sm:pb-20 sm:pt-4">
         <div className="reveal reveal-d3 border-t border-[rgba(10,11,13,0.08)]">
           {[
             { num: "01", title: "Membership",  copy: "NFT as identity access" },
@@ -115,24 +118,24 @@ export default async function HomePage() {
           ].map(({ num, title, copy }) => (
             <div
               key={title}
-              className="feature-row flex items-center justify-between gap-6 py-4 sm:py-5"
+              className="feature-row flex items-center justify-between gap-4 py-4 sm:gap-6 sm:py-5"
             >
-              <div className="flex items-center gap-5">
-                <span className="w-7 shrink-0 text-[0.68rem] font-semibold tabular-nums text-[#0A0B0D]/22">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <span className="w-6 shrink-0 text-[0.65rem] font-semibold tabular-nums text-[#0A0B0D]/22 sm:w-7 sm:text-[0.68rem]">
                   {num}
                 </span>
                 <div>
                   <p
-                    className="text-[0.9rem] font-semibold text-[#0A0B0D]"
+                    className="text-[0.88rem] font-semibold text-[#0A0B0D] sm:text-[0.9rem]"
                     style={{ letterSpacing: "-0.01em" }}
                   >
                     {title}
                   </p>
-                  <p className="mt-0.5 text-[0.78rem] text-[#0A0B0D]/44">{copy}</p>
+                  <p className="mt-0.5 text-[0.75rem] text-[#0A0B0D]/44 sm:text-[0.78rem]">{copy}</p>
                 </div>
               </div>
               <svg
-                width="14" height="14" viewBox="0 0 14 14" fill="none"
+                width="13" height="13" viewBox="0 0 14 14" fill="none"
                 className="shrink-0 text-[#0A0B0D]/18"
                 aria-hidden="true"
               >
@@ -150,22 +153,14 @@ export default async function HomePage() {
   );
 }
 
-/* ── Score metric cell — compact inline version ──── */
-function ScoreMetric({
-  label,
-  value,
-  isLast = false,
-}: {
-  label: string;
-  value: string;
-  isLast?: boolean;
-}) {
+/* ── Score metric cell ───────────────────────────── */
+function ScoreMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col justify-center px-4 py-3">
-      <p className="text-[0.55rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF]/60">
+    <div className="flex flex-col justify-center px-3 py-2.5 sm:px-4 sm:py-3">
+      <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF]/60 sm:text-[0.55rem]">
         {label}
       </p>
-      <p className="mt-0.5 text-[1.1rem] font-bold leading-none tracking-tight text-[#0A0B0D]">
+      <p className="mt-0.5 text-[0.95rem] font-bold leading-none tracking-tight text-[#0A0B0D] sm:text-[1.1rem]">
         {value}
       </p>
     </div>

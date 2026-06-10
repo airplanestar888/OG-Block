@@ -4,23 +4,31 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap');
 
+/* ─── Tokens ─────────────────────────────────────── */
 :root {
-  --blue: #0000FF;
+  --blue:      #0000FF;
   --blue-dark: #141CB5;
-  --ink: #0A0B0D;
-  --muted: rgba(10, 11, 13, 0.45);
-  --border: rgba(10, 11, 13, 0.08);
-  --surface: #ffffff;
+  --ink:       #0A0B0D;
+  --muted:     rgba(10, 11, 13, 0.45);
+  --border:    rgba(10, 11, 13, 0.08);
+  --surface:   #ffffff;
+
+  /* Fluid spacing tokens */
+  --page-px:   clamp(1.1rem, 4vw, 2rem);
+  --hero-pt:   clamp(2rem, 5vw, 4rem);
+  --hero-pb:   clamp(1.5rem, 4vw, 2.5rem);
 }
 
-* {
+/* ─── Reset ──────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {
   scroll-behavior: smooth;
+  /* Prevent font size inflation on mobile */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -30,77 +38,70 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
+  /* Safe area for notched phones */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
+img, video {
+  max-width: 100%;
+  display: block;
+}
+
+/* ─── Focus ring ─────────────────────────────────── */
 .focus-ring {
   @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-[#0000FF] focus-visible:ring-offset-2;
 }
 
-/* ─── Typography ─────────────────────────────────── */
-.font-display {
-  font-family: 'Inter', sans-serif;
-  letter-spacing: -0.03em;
-  line-height: 0.92;
-  font-weight: 800;
+/* ─── Page container ─────────────────────────────── */
+.page-container {
+  width: 100%;
+  max-width: 72rem;           /* 1152px */
+  margin-inline: auto;
+  padding-inline: var(--page-px);
 }
 
-/* ─── NFT card image fade-in ─────────────────────── */
+/* ─── NFT image reveal ───────────────────────────── */
 @keyframes img-reveal {
   from { opacity: 0; transform: scale(1.02); }
   to   { opacity: 1; transform: scale(1); }
 }
-
 .nft-img {
   animation: img-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ─── Feature row hover ──────────────────────────── */
-.feature-row {
-  border-bottom: 1px solid var(--border);
-  transition: background 0.16s;
-}
-.feature-row:last-child {
-  border-bottom: none;
-}
-.feature-row:hover {
-  background: #f7f8fa;
-}
-
-/* ─── Metric card ────────────────────────────────── */
-.metric-item {
-  border-right: 1px solid var(--border);
-  transition: background 0.14s;
-}
-.metric-item:last-child {
-  border-right: none;
-}
-
 /* ─── Scroll reveal ──────────────────────────────── */
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(28px); }
+  from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.reveal {
-  animation: slide-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+.reveal    { animation: slide-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .reveal-d1 { animation-delay: 0.08s; }
-.reveal-d2 { animation-delay: 0.16s; }
-.reveal-d3 { animation-delay: 0.24s; }
-.reveal-d4 { animation-delay: 0.32s; }
-.reveal-d5 { animation-delay: 0.40s; }
+.reveal-d2 { animation-delay: 0.15s; }
+.reveal-d3 { animation-delay: 0.22s; }
+.reveal-d4 { animation-delay: 0.30s; }
 
-/* ─── Image frame ────────────────────────────────── */
-.nft-frame {
-  border-radius: 18px;
-  overflow: hidden;
-  background: #f0f0f0;
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .nft-img { animation: none !important; }
 }
 
-/* ─── Pixel field (subtle, not distracting) ──────── */
+/* ─── Feature rows ───────────────────────────────── */
+.feature-row {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  cursor: default;
+}
+.feature-row:last-child { border-bottom: none; }
+@media (hover: hover) {
+  .feature-row:hover { background: #f7f8fa; }
+}
+
+/* ─── Pixel / parallax field ─────────────────────── */
 .pixel-field {
   --cursor-x: 50%;
   --cursor-y: 50%;
@@ -111,7 +112,6 @@ button, a {
   z-index: 0;
 }
 
-/* Reactive grid that follows cursor */
 .pixel-field::before {
   content: "";
   position: absolute;
@@ -125,13 +125,94 @@ button, a {
     rgba(0,0,0,0.7),
     transparent 100%
   );
-  transition: mask-image 0.05s;
 }
 
-/* Individual parallax pixels */
+/* Pixels hidden on touch devices — no cursor */
+@media (hover: none) {
+  .pixel-field { display: none; }
+}
+
 .pixel-field__bit {
   position: absolute;
   will-change: transform;
   transform: translate(-50%, -50%);
   border-radius: 1px;
+}
+
+/* ─── Navbar responsive ──────────────────────────── */
+
+/* Collapse nav links on very small screens */
+@media (max-width: 639px) {
+  .nav-links { display: none; }
+}
+
+/* ─── Hero layout ────────────────────────────────── */
+
+/* Mobile-first: single column */
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 2.5rem);
+}
+
+/* md (768px) — tablet portrait: still single column but wider */
+@media (min-width: 768px) {
+  .hero-grid {
+    gap: 2.5rem;
+  }
+}
+
+/* lg (1024px) — side by side: fixed left + fluid right */
+@media (min-width: 1024px) {
+  .hero-grid {
+    grid-template-columns: 360px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+}
+
+/* xl (1280px) */
+@media (min-width: 1280px) {
+  .hero-grid {
+    grid-template-columns: 400px 1fr;
+    gap: 4rem;
+  }
+}
+
+/* 2xl / FHD (1536px+) */
+@media (min-width: 1536px) {
+  .hero-grid {
+    grid-template-columns: 440px 1fr;
+    gap: 5rem;
+  }
+}
+
+/* ─── NFT image max-height per breakpoint ─────────── */
+.nft-image-wrap {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f0f0f0;
+  /* Mobile: natural aspect ratio */
+  max-height: 240px;
+}
+@media (min-width: 480px)  { .nft-image-wrap { max-height: 300px; } }
+@media (min-width: 768px)  { .nft-image-wrap { max-height: 380px; } }
+@media (min-width: 1024px) { .nft-image-wrap { max-height: 420px; } }
+@media (min-width: 1280px) { .nft-image-wrap { max-height: 462px; } }
+@media (min-width: 1536px) { .nft-image-wrap { max-height: 520px; } }
+
+/* ─── Score strip responsive ─────────────────────── */
+/* On very small screens hide the label & live text */
+@media (max-width: 479px) {
+  .score-label-col { display: none; }
+  .score-live-col  { display: none; }
+}
+
+/* ─── Utilities ──────────────────────────────────── */
+.font-display {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+  font-weight: 800;
 }
