@@ -366,18 +366,23 @@ async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
 async function getContractCreatorFromBasescan(contractAddress: string): Promise<ContractCreator | null> {
   try {
     const response = await fetch(`https://basescan.org/address/${contractAddress}`, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 OG-Block score refresh"
+      },
       signal: AbortSignal.timeout(8000)
     });
     if (!response.ok) return null;
 
     const html = await response.text();
     const creatorSection = html.match(/Contract Creator[\s\S]{0,3000}/i)?.[0] || "";
-    const creatorMatch = creatorSection.match(/href=['"]\/address\/(0x[a-fA-F0-9]{40})['"][\s\S]{0,500}?>([^<]+)<\/a>/i);
+    const creatorMatch =
+      creatorSection.match(/href=['"]\/address\/(0x[a-fA-F0-9]{40})['"][\s\S]{0,500}?>([^<]+)<\/a>/i) ||
+      html.match(/href=['"]\/address\/(0x[a-fA-F0-9]{40})['"][^>]*title=['"]([^'"]*\([^)]*\))['"][\s\S]{0,200}?>([^<]+)<\/a>/i);
     if (!creatorMatch) return null;
 
     return {
       address: creatorMatch[1],
-      name: decodeHtmlEntities(creatorMatch[2].trim())
+      name: decodeHtmlEntities((creatorMatch[3] || creatorMatch[2]).trim())
     };
   } catch {
     return null;
