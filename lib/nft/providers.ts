@@ -93,6 +93,16 @@ type AlchemyOwnedNft = {
   name?: string;
 };
 
+type BasescanSourceCodeResponse = {
+  status?: string;
+  message?: string;
+  result?: Array<{
+    SourceCode?: string;
+    ABI?: string;
+    ContractName?: string;
+  }>;
+};
+
 export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
@@ -286,18 +296,38 @@ async function getVerifiedContractMap(contractAddresses: Array<string | undefine
 
   await Promise.all(
     uniqueContracts.map(async (contractAddress) => {
-      try {
-        const response = await fetch(`https://sourcify.dev/server/v2/contract/8453/${contractAddress}`, {
-          signal: AbortSignal.timeout(5000)
-        });
-        verifiedMap.set(contractAddress, response.ok);
-      } catch {
-        verifiedMap.set(contractAddress, false);
-      }
+      verifiedMap.set(contractAddress, await isContractSourceVerifiedOnBasescan(contractAddress));
     })
   );
 
   return verifiedMap;
+}
+
+async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
+  if (!env.BASESCAN_API_KEY) return false;
+
+  const url = new URL("https://api.basescan.org/api");
+  url.searchParams.set("module", "contract");
+  url.searchParams.set("action", "getsourcecode");
+  url.searchParams.set("address", contractAddress);
+  url.searchParams.set("apikey", env.BASESCAN_API_KEY);
+
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    if (!response.ok) return false;
+
+    const payload = (await response.json()) as BasescanSourceCodeResponse;
+    const source = Array.isArray(payload.result) ? payload.result[0] : null;
+    if (!source) return false;
+
+    const sourceCode = source.SourceCode?.trim();
+    const abi = source.ABI?.trim();
+    const contractName = source.ContractName?.trim();
+
+    return Boolean(sourceCode && contractName && abi && abi !== "Contract source code not verified");
+  } catch {
+    return false;
+  }
 }
 
 function tokenIdFromHex(tokenId: string) {
