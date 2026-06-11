@@ -49,8 +49,14 @@ export async function calculateScore(userId: string, walletAddress: string): Pro
   };
 }
 
-export async function persistScore(userId: string, walletAddress: string, result: ScoreResult) {
+export async function persistScore(
+  userId: string,
+  walletAddress: string,
+  result: ScoreResult,
+  options: { recalculateRank?: boolean } = {}
+) {
   const supabase = getSupabaseAdmin();
+  const shouldRecalculateRank = options.recalculateRank ?? true;
 
   await supabase.from("nft_holdings").delete().eq("user_id", userId);
 
@@ -78,7 +84,9 @@ export async function persistScore(userId: string, walletAddress: string, result
   );
   if (scoreError) throw scoreError;
 
-  await recalculateRanks();
+  if (shouldRecalculateRank) {
+    await recalculateRanks();
+  }
 }
 
 export async function recalculateRanks() {

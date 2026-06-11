@@ -69,3 +69,12 @@ The extension only calls `GET /api/profile/:handle` and injects public score dat
 3. Set the same env vars in Vercel.
 4. Set `NEXTAUTH_URL` and `PUBLIC_APP_URL` to the deployed URL.
 5. Configure X OAuth callback for `/api/auth/callback/twitter`.
+
+## Daily score refresh
+
+Vercel Cron calls `GET /api/cron/refresh-scores` once per day using [vercel.json](vercel.json). The schedule is `0 18 * * *`, which runs at 01:00 WIB because Vercel cron schedules use UTC.
+
+Set these env vars in Vercel:
+
+- `CRON_SECRET`: long random secret used to authorize the cron endpoint.
+- `CRON_REFRESH_LIMIT=50`: maximum latest verified wallets refreshed per cron run.
