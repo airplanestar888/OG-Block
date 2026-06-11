@@ -38,8 +38,8 @@ NFT fetching is behind [lib/nft/providers.ts](lib/nft/providers.ts). `NFT_PROVID
 Scam/spam filtering can be tuned with env vars:
 
 - `NFT_EXCLUDE_SPAM=true` asks Alchemy to remove NFTs it classifies as spam.
-- `NFT_REQUIRE_VERIFIED_CONTRACT=true` only scores NFT contracts with verified source code on Basescan. This is enabled by default because wallet-wide scoring can otherwise include scam airdrops.
-- `BASESCAN_API_KEY` is required when `NFT_REQUIRE_VERIFIED_CONTRACT=true`; without it, contracts are treated as unverified.
+- `NFT_REQUIRE_VERIFIED_CONTRACT=true` only scores NFT contracts with verified source code on Base through Etherscan API v2 (`chainid=8453`). This is enabled by default because wallet-wide scoring can otherwise include scam airdrops.
+- `BASESCAN_API_KEY` is required when `NFT_REQUIRE_VERIFIED_CONTRACT=true`; use a BaseScan/Etherscan API v2 key. Without it, contracts are treated as unverified.
 - `NFT_MIN_FLOOR_PRICE_ETH=0.001` only scores collections with an available floor at or above that ETH value.
 
 ## API

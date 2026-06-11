@@ -306,7 +306,8 @@ async function getVerifiedContractMap(contractAddresses: Array<string | undefine
 async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
   if (!env.BASESCAN_API_KEY) return false;
 
-  const url = new URL("https://api.basescan.org/api");
+  const url = new URL("https://api.etherscan.io/v2/api");
+  url.searchParams.set("chainid", "8453");
   url.searchParams.set("module", "contract");
   url.searchParams.set("action", "getsourcecode");
   url.searchParams.set("address", contractAddress);
