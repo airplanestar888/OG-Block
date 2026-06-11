@@ -151,7 +151,7 @@ class AlchemyNftProvider implements NftProvider {
     }
     url.searchParams.set("withMetadata", "true");
     url.searchParams.set("pageSize", "100");
-    if (env.NFT_EXCLUDE_SPAM) {
+    if (env.NFT_EXCLUDE_SPAM && !env.NFT_REQUIRE_VERIFIED_CONTRACT) {
       url.searchParams.append("excludeFilters[]", "SPAM");
     }
 
@@ -295,6 +295,7 @@ function isGenuineAlchemyNft(nft: AlchemyOwnedNft, verifiedContracts: Map<string
   if (!contractAddress) return false;
 
   if (env.NFT_REQUIRE_VERIFIED_CONTRACT && !verifiedContracts.get(contractAddress)) return false;
+  if (env.NFT_REQUIRE_VERIFIED_CONTRACT && verifiedContracts.get(contractAddress)) return true;
   if (env.NFT_EXCLUDE_SPAM && nft.spamInfo?.isSpam) return false;
 
   const floorPrice = nft.contract?.openSeaMetadata?.floorPrice;
