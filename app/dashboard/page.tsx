@@ -81,7 +81,7 @@ export default async function DashboardPage() {
 
         <div className="mt-5 grid gap-3">
           {(holdings || []).map((holding, index) => {
-            const metadata = holding.metadata_json as { name?: string; attributes?: unknown[] } | null;
+            const metadata = holding.metadata_json as { creator?: unknown; attributes?: unknown[] } | null;
             const scoreBreakdown = getHoldingScoreBreakdown(
               {
                 contractAddress: holding.contract_address,
@@ -91,6 +91,7 @@ export default async function DashboardPage() {
               index
             );
             const traits = getTraitSummary(metadata?.attributes);
+            const creator = getCreatorSummary(metadata?.creator);
             const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
 
             return (
@@ -100,7 +101,7 @@ export default async function DashboardPage() {
                     <span className="rounded bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
                       Item {index + 1}
                     </span>
-                    <h3 className="font-semibold text-ink">{metadata?.name || "OG-Block NFT"}</h3>
+                    <h3 className="font-semibold text-ink">{creator || "Unknown creator"}</h3>
                   </div>
                   <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
                     <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />
@@ -180,6 +181,32 @@ function getTraitSummary(attributes: unknown) {
     .filter(Boolean)
     .slice(0, 3)
     .join(" / ");
+}
+
+function getCreatorSummary(creator: unknown) {
+  if (typeof creator === "string") return creator;
+  if (Array.isArray(creator)) {
+    return creator
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (!item || typeof item !== "object") return "";
+        const creatorItem = item as { name?: unknown; address?: unknown; username?: unknown };
+        if (typeof creatorItem.name === "string") return creatorItem.name;
+        if (typeof creatorItem.username === "string") return creatorItem.username;
+        if (typeof creatorItem.address === "string") return shortAddress(creatorItem.address);
+        return "";
+      })
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(" / ");
+  }
+  if (creator && typeof creator === "object") {
+    const creatorObject = creator as { name?: unknown; address?: unknown; username?: unknown };
+    if (typeof creatorObject.name === "string") return creatorObject.name;
+    if (typeof creatorObject.username === "string") return creatorObject.username;
+    if (typeof creatorObject.address === "string") return shortAddress(creatorObject.address);
+  }
+  return "";
 }
 
 function Stat({ label, value }: { label: string; value: string | number }) {
