@@ -26,11 +26,11 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
   const [busy, setBusy] = useState(false);
 
   async function refreshScoreAfterVerification() {
-    setStatus("Wallet verified. Calculating score...");
+    setStatus("Wallet verified. Generating score and receipt...");
     const response = await fetch("/api/score/refresh", { method: "POST" });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || "Score refresh failed");
-    setStatus(`Score refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
+    setStatus(`Score and receipt refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
     window.location.reload();
   }
 
@@ -69,12 +69,12 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
 
   async function refreshScore() {
     setBusy(true);
-    setStatus("Refreshing score...");
+    setStatus("Refreshing score and receipt creator...");
     try {
       const response = await fetch("/api/score/refresh", { method: "POST" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Score refresh failed");
-      setStatus(`Score refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
+      setStatus(`Score and receipt refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
       window.location.reload();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Score refresh failed");
@@ -130,7 +130,7 @@ export function WalletScorePanel({ xUserId, xHandle, verifiedWallet }: WalletSco
           onClick={refreshScore}
           type="button"
         >
-          Refresh score
+          Refresh score & receipt
         </button>
       </div>
       {status ? <p className="mt-3 text-sm text-black/65">{status}</p> : null}
