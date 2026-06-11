@@ -84,6 +84,10 @@ type AlchemyOwnedNft = {
       safelistRequestStatus?: string | null;
     };
   };
+  spamInfo?: {
+    isSpam?: boolean;
+    classifications?: string[];
+  };
   tokenId?: string;
   raw?: { metadata?: Record<string, unknown> };
   name?: string;
@@ -264,6 +268,7 @@ function isGenuineAlchemyNft(nft: AlchemyOwnedNft, verifiedContracts: Map<string
   if (!contractAddress) return false;
 
   if (env.NFT_REQUIRE_VERIFIED_CONTRACT && !verifiedContracts.get(contractAddress)) return false;
+  if (env.NFT_EXCLUDE_SPAM && nft.spamInfo?.isSpam) return false;
 
   const floorPrice = nft.contract?.openSeaMetadata?.floorPrice;
   if (env.NFT_MIN_FLOOR_PRICE_ETH > 0) {
