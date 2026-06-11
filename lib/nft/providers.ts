@@ -103,6 +103,11 @@ type BasescanSourceCodeResponse = {
   }>;
 };
 
+type ContractCreator = {
+  name: string;
+  address: string;
+};
+
 export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
@@ -155,17 +160,25 @@ class AlchemyNftProvider implements NftProvider {
       return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
     }
     const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[] };
-    const verifiedContracts = await getVerifiedContractMap((payload.ownedNfts || []).map((nft) => nft.contract?.address));
+    const contractAddresses = (payload.ownedNfts || []).map((nft) => nft.contract?.address);
+    const [verifiedContracts, contractCreators] = await Promise.all([
+      getVerifiedContractMap(contractAddresses),
+      getContractCreatorMap(contractAddresses)
+    ]);
 
     return (payload.ownedNfts || [])
       .filter((nft) => isGenuineAlchemyNft(nft, verifiedContracts))
       .map((nft) => ({
         contractAddress: nft.contract?.address || contractAddress,
         tokenId: nft.tokenId || "0",
-        metadata: {
-          ...(nft.raw?.metadata || {}),
-          name: nft.raw?.metadata?.name || nft.name
-        }
+        metadata: withContractCreatorMetadata(
+          {
+            ...(nft.raw?.metadata || {}),
+            name: nft.raw?.metadata?.name || nft.name
+          },
+          nft.contract?.address || contractAddress,
+          contractCreators
+        )
       }));
   }
 }
@@ -230,7 +243,11 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
 
   const client = createPublicClient({ chain: baseChain, transport: http(rpcUrl) });
   const holdings: NftHolding[] = [];
-  const verifiedContracts = await getVerifiedContractMap([...candidateMap.values()].map((candidate) => candidate.contractAddress));
+  const candidateContracts = [...candidateMap.values()].map((candidate) => candidate.contractAddress);
+  const [verifiedContracts, contractCreators] = await Promise.all([
+    getVerifiedContractMap(candidateContracts),
+    getContractCreatorMap(candidateContracts)
+  ]);
 
   for (const candidate of candidateMap.values()) {
     if (holdings.length >= 100) break;
@@ -263,7 +280,7 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
       holdings.push({
         contractAddress: candidate.contractAddress,
         tokenId: candidate.tokenId,
-        metadata
+        metadata: withContractCreatorMetadata(metadata, candidate.contractAddress, contractCreators)
       });
     } catch {
       continue;
@@ -303,6 +320,20 @@ async function getVerifiedContractMap(contractAddresses: Array<string | undefine
   return verifiedMap;
 }
 
+async function getContractCreatorMap(contractAddresses: Array<string | undefined>) {
+  const uniqueContracts = [...new Set(contractAddresses.filter(Boolean).map((address) => address!.toLowerCase()))];
+  const creatorMap = new Map<string, ContractCreator>();
+
+  await Promise.all(
+    uniqueContracts.map(async (contractAddress) => {
+      const creator = await getContractCreatorFromBasescan(contractAddress);
+      if (creator) creatorMap.set(contractAddress, creator);
+    })
+  );
+
+  return creatorMap;
+}
+
 async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
   if (!env.BASESCAN_API_KEY) return false;
 
@@ -329,6 +360,50 @@ async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
   } catch {
     return false;
   }
+}
+
+async function getContractCreatorFromBasescan(contractAddress: string): Promise<ContractCreator | null> {
+  try {
+    const response = await fetch(`https://basescan.org/address/${contractAddress}`, {
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!response.ok) return null;
+
+    const html = await response.text();
+    const creatorSection = html.match(/Contract Creator[\s\S]{0,3000}/i)?.[0] || "";
+    const creatorMatch = creatorSection.match(/href=['"]\/address\/(0x[a-fA-F0-9]{40})['"][\s\S]{0,500}?>([^<]+)<\/a>/i);
+    if (!creatorMatch) return null;
+
+    return {
+      address: creatorMatch[1],
+      name: decodeHtmlEntities(creatorMatch[2].trim())
+    };
+  } catch {
+    return null;
+  }
+}
+
+function withContractCreatorMetadata(
+  metadata: Record<string, unknown>,
+  contractAddress: string,
+  contractCreators: Map<string, ContractCreator>
+) {
+  const creator = contractCreators.get(contractAddress.toLowerCase());
+  if (!creator) return metadata;
+
+  return {
+    ...metadata,
+    creator
+  };
+}
+
+function decodeHtmlEntities(value: string) {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&quot;", "\"")
+    .replaceAll("&#39;", "'")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
 }
 
 function tokenIdFromHex(tokenId: string) {

@@ -91,7 +91,7 @@ export default async function DashboardPage() {
               index
             );
             const traits = getTraitSummary(metadata?.attributes);
-            const creator = getCreatorSummary(metadata?.creator);
+            const creator = getCreatorDisplay(metadata?.creator);
             const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
 
             return (
@@ -101,7 +101,18 @@ export default async function DashboardPage() {
                     <span className="rounded bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
                       Item {index + 1}
                     </span>
-                    <h3 className="font-semibold text-ink">{creator || "Unknown creator"}</h3>
+                    {creator.address ? (
+                      <Link
+                        className="font-semibold text-ink hover:text-baseblue"
+                        href={`https://basescan.org/address/${creator.address}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Creator: {creator.label}
+                      </Link>
+                    ) : (
+                      <h3 className="font-semibold text-ink">Creator: {creator.label}</h3>
+                    )}
                   </div>
                   <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
                     <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />
@@ -183,30 +194,31 @@ function getTraitSummary(attributes: unknown) {
     .join(" / ");
 }
 
-function getCreatorSummary(creator: unknown) {
-  if (typeof creator === "string") return creator;
+function getCreatorDisplay(creator: unknown): { label: string; address?: string } {
+  if (typeof creator === "string") return { label: creator };
   if (Array.isArray(creator)) {
-    return creator
+    const creators = creator
       .map((item) => {
-        if (typeof item === "string") return item;
-        if (!item || typeof item !== "object") return "";
+        if (typeof item === "string") return { label: item };
+        if (!item || typeof item !== "object") return null;
         const creatorItem = item as { name?: unknown; address?: unknown; username?: unknown };
-        if (typeof creatorItem.name === "string") return creatorItem.name;
-        if (typeof creatorItem.username === "string") return creatorItem.username;
-        if (typeof creatorItem.address === "string") return shortAddress(creatorItem.address);
-        return "";
+        const address = typeof creatorItem.address === "string" ? creatorItem.address : undefined;
+        if (typeof creatorItem.name === "string") return { label: creatorItem.name, address };
+        if (typeof creatorItem.username === "string") return { label: creatorItem.username, address };
+        if (address) return { label: shortAddress(address) || address, address };
+        return null;
       })
-      .filter(Boolean)
-      .slice(0, 2)
-      .join(" / ");
+      .filter((item): item is { label: string; address?: string } => Boolean(item));
+    if (creators.length > 0) return creators[0];
   }
   if (creator && typeof creator === "object") {
     const creatorObject = creator as { name?: unknown; address?: unknown; username?: unknown };
-    if (typeof creatorObject.name === "string") return creatorObject.name;
-    if (typeof creatorObject.username === "string") return creatorObject.username;
-    if (typeof creatorObject.address === "string") return shortAddress(creatorObject.address);
+    const address = typeof creatorObject.address === "string" ? creatorObject.address : undefined;
+    if (typeof creatorObject.name === "string") return { label: creatorObject.name, address };
+    if (typeof creatorObject.username === "string") return { label: creatorObject.username, address };
+    if (address) return { label: shortAddress(address) || address, address };
   }
-  return "";
+  return { label: "Unknown creator" };
 }
 
 function Stat({ label, value }: { label: string; value: string | number }) {
