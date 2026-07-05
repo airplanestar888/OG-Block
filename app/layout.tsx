@@ -6,6 +6,11 @@ import { SiteNav } from "@/components/site-nav";
 export const metadata: Metadata = {
   title: "OG-Block",
   description: "X identity, verified Base NFT ownership, and public social rank.",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png"
+  },
   other: {
     "base:app_id": "6a2a7c700cfd412b2ab2b7d8",
     "talentapp:project_verification":
