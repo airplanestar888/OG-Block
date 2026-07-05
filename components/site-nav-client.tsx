@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 const NAV_LINKS = [
   { href: "/how-it-works", label: "How it works" },
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/dashboard", label: "Dashboard" }
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/privacy", label: "Privacy" }
 ];
 
 export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean }) {
