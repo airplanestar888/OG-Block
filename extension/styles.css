@@ -1,31 +1,45 @@
 .base-culture-score-badge {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(0, 82, 255, 0.18);
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  color: rgb(15, 20, 25);
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 5px;
   font-family:
     TwitterChirp,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-}
-
-.base-culture-score-pill {
-  align-items: center;
-  background: rgba(0, 82, 255, 0.12);
-  border: 1px solid rgba(0, 82, 255, 0.28);
-  border-radius: 999px;
-  color: rgb(0, 54, 168);
-  display: inline-flex;
   font-size: 12px;
   font-weight: 700;
   line-height: 16px;
-  padding: 4px 8px;
+  margin-top: 6px;
+  padding: 4px 9px;
+  width: fit-content;
+}
+
+.base-culture-score-label {
+  color: rgb(0, 82, 255);
+  white-space: nowrap;
+}
+
+.base-culture-score-value {
+  color: rgb(15, 20, 25);
+  white-space: nowrap;
+}
+
+.base-culture-score-meta {
+  border-left: 1px solid rgba(0, 82, 255, 0.18);
+  color: rgba(15, 20, 25, 0.66);
+  margin-left: 2px;
+  padding-left: 7px;
+  white-space: nowrap;
 }
 
 .base-culture-score-og {
-  background: rgba(0, 196, 140, 0.14);
-  border-color: rgba(0, 196, 140, 0.34);
   color: rgb(0, 112, 80);
 }

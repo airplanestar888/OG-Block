@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "description": "Display verified Base NFT score and OG rank on x.com profiles.",
   "permissions": ["storage"],
-  "host_permissions": ["https://x.com/*", "http://localhost:3000/*", "https://*.vercel.app/*"],
+  "host_permissions": ["https://x.com/*", "http://localhost:3000/*", "https://og-block.vercel.app/*", "https://*.vercel.app/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://x.com/*"],

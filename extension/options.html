@@ -46,13 +46,33 @@
         font-size: 13px;
         line-height: 1.5;
       }
+
+      .checkbox-row {
+        align-items: center;
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .checkbox-row input {
+        width: auto;
+      }
+
+      .checkbox-row label {
+        font-weight: 600;
+        margin: 0;
+      }
     </style>
   </head>
   <body>
     <h1>Base Culture Score</h1>
-    <p>Set the deployed website URL. Local development defaults to http://localhost:3000.</p>
+    <p>Set the deployed website URL. Local development can use http://localhost:3000.</p>
     <label for="apiBaseUrl">Backend URL</label>
-    <input id="apiBaseUrl" placeholder="https://your-app.vercel.app" />
+    <input id="apiBaseUrl" placeholder="https://og-block.vercel.app" />
+    <div class="checkbox-row">
+      <input id="debugEnabled" type="checkbox" />
+      <label for="debugEnabled">Show debug overlay</label>
+    </div>
     <button id="save" type="button">Save</button>
     <p id="status" role="status"></p>
     <script src="options.js"></script>
