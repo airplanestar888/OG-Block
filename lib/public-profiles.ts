@@ -1,11 +1,11 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import type { PublicScoreProfile } from "@/lib/types";
+import { getNftProvider } from "@/lib/nft/providers";
+import type { PublicLeaderboardProfile, PublicScoreProfile } from "@/lib/types";
 import { shortAddress } from "@/lib/address";
 
 type LeaderboardRow = {
   rank: number | null;
   score: number;
-  is_og: boolean;
   nft_count: number;
   last_calculated_at: string | null;
   users: {
@@ -15,6 +15,23 @@ type LeaderboardRow = {
     profile_role: "human" | "agent";
   } | null;
 };
+
+const AGENT_IDENTITY_CONTRACT = "0x8004a169fb4a3325136eb29fa0ceb6d2e539a432";
+
+async function getAgentIdentity(agentWalletAddress?: string | null) {
+  if (!agentWalletAddress) return { hasAgentIdentity: false, agentIdentityTokenId: null };
+
+  try {
+    const holdings = await getNftProvider().getHoldings(agentWalletAddress, AGENT_IDENTITY_CONTRACT);
+    const identity = holdings[0];
+    return {
+      hasAgentIdentity: Boolean(identity),
+      agentIdentityTokenId: identity?.tokenId || null
+    };
+  } catch {
+    return { hasAgentIdentity: false, agentIdentityTokenId: null };
+  }
+}
 
 export async function getPublicProfileByHandle(handle: string): Promise<PublicScoreProfile | null> {
   const supabase = getSupabaseAdmin();
@@ -47,6 +64,7 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
 
   const humanWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "human");
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
+  const agentIdentity = await getAgentIdentity(agentWallet?.address);
 
   return {
     xHandle: user.x_handle,
@@ -60,15 +78,17 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
     rank: score?.rank || null,
     isOg: Boolean(score?.is_og),
     nftCount: score?.nft_count || 0,
+    hasAgentIdentity: agentIdentity.hasAgentIdentity,
+    agentIdentityTokenId: agentIdentity.agentIdentityTokenId,
     lastCalculatedAt: score?.last_calculated_at || null
   };
 }
 
-export async function getLeaderboard(limit = 100): Promise<PublicScoreProfile[]> {
+export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProfile[]> {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("scores")
-    .select("rank,score,is_og,nft_count,last_calculated_at,users(x_handle,x_name,x_avatar,profile_role)")
+    .select("rank,score,nft_count,last_calculated_at,users(x_handle,x_name,x_avatar,profile_role)")
     .order("score", { ascending: false })
     .order("rank", { ascending: true })
     .limit(limit);
@@ -76,29 +96,15 @@ export async function getLeaderboard(limit = 100): Promise<PublicScoreProfile[]>
   if (error) throw error;
 
   const rows = (data || []) as unknown as LeaderboardRow[];
-  const userIds = rows.map((row) => row.users?.x_handle).filter(Boolean) as string[];
-
-  const profiles = await Promise.all(
-    rows.map(async (row) => {
-      const handle = row.users?.x_handle || "";
-      const profile = handle ? await getPublicProfileByHandle(handle) : null;
-      return profile || {
-        xHandle: handle,
-        xName: row.users?.x_name || null,
-        xAvatar: row.users?.x_avatar || null,
-        profileRole: row.users?.profile_role || "human",
-        walletAddress: null,
-        humanWalletAddress: null,
-        agentWalletAddress: null,
-        score: row.score,
-        rank: row.rank,
-        isOg: row.is_og,
-        nftCount: row.nft_count,
-        lastCalculatedAt: row.last_calculated_at
-      };
-    })
-  );
-
-  void userIds;
-  return profiles;
+  return rows.map((row) => ({
+    xHandle: row.users?.x_handle || "",
+    xName: row.users?.x_name || null,
+    xAvatar: row.users?.x_avatar || null,
+    profileRole: row.users?.profile_role || "human",
+    score: row.score,
+    rank: row.rank,
+    nftCount: row.nft_count,
+    badgeCount: 0,
+    lastCalculatedAt: row.last_calculated_at
+  }));
 }

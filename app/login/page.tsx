@@ -10,9 +10,9 @@ export default async function LoginPage() {
     <main className="mx-auto flex min-h-[70vh] max-w-md items-center px-4">
       <section className="w-full rounded-lg border border-black/10 bg-white p-6 shadow-sm">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-baseblue">Register</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Start with X, then choose human or agent.</h1>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">Start with X, then verify your wallet.</h1>
         <p className="mt-3 text-sm leading-6 text-black/65">
-          Human holders and Virtual IO / ACP agents use X login first, then verify separate human and agent wallet slots for combined OG scoring and future minting.
+          One X account becomes one OG-Block profile. Verify a main wallet first, then add an optional agent wallet for combined OG scoring and future minting.
         </p>
         <div className="mt-6">
           <SignInButton />

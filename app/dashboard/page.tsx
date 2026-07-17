@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { ProfileRolePanel } from "@/components/profile-role-panel";
 import { WalletScorePanel } from "@/components/wallet-score-panel";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
@@ -58,20 +57,19 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-4">
-        <Stat label="Profile" value={user.profile_role === "agent" ? "Agent" : "Human"} />
         <Stat label="Score" value={score?.score ?? 0} />
         <Stat label="Rank" value={score?.rank ? `#${score.rank}` : "Unranked"} />
         <Stat label="NFTs" value={score?.nft_count ?? 0} />
+        <Stat label="Badges" value={0} />
       </section>
 
-      <ProfileRolePanel initialRole={user.profile_role} />
       <div className="grid gap-4 lg:grid-cols-2">
         <WalletScorePanel
           xUserId={user.x_user_id}
           xHandle={user.x_handle}
           walletSlot="human"
-          title="Human Wallet"
-          description="Holder wallet for regular NFT ownership. Its NFTs accumulate into the OG score."
+          title="Wallet"
+          description="Your main holder wallet. Its NFTs accumulate into the OG score."
           verifiedWallet={humanWallet?.address}
         />
         <WalletScorePanel
@@ -81,15 +79,32 @@ export default async function DashboardPage() {
           title="Agent Wallet"
           description="Virtual IO / ACP agent wallet. Its NFTs also accumulate into the same OG score."
           verifiedWallet={agentWallet?.address}
+          allowBrowserConnect={false}
         />
       </div>
+
+      <section className="rounded-lg border border-baseblue/15 bg-baseblue/[0.04] p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">Badges & Perks</p>
+            <h2 className="mt-2 font-semibold text-ink">OG-Block badge field is ready.</h2>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-black/60">
+              Badges will be OG-Block NFT or perk proofs from our own campaigns. Collection NFTs stay in Blockchain Legacy below.
+            </p>
+          </div>
+          <div className="rounded-xl border border-baseblue/15 bg-white px-5 py-4 text-center">
+            <p className="text-3xl font-semibold text-ink">0</p>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-semibold text-ink">Blockchain Legacy</h2>
             <p className="mt-1 text-sm text-black/60">
-              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify a human or agent wallet to generate your combined receipt."}
+              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify your wallet or agent wallet to generate your combined receipt."}
             </p>
           </div>
           <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-black/10 text-center text-xs">
@@ -121,18 +136,20 @@ export default async function DashboardPage() {
                     <span className="rounded bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
                       Item {index + 1}
                     </span>
-                    {creator.address ? (
-                      <Link
-                        className="font-semibold text-ink hover:text-baseblue"
-                        href={`https://basescan.org/address/${creator.address}`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Creator: {creator.label}
-                      </Link>
-                    ) : (
-                      <h3 className="font-semibold text-ink">Creator: {creator.label}</h3>
-                    )}
+                    {creator.label !== "Unknown creator" ? (
+                      creator.address ? (
+                        <Link
+                          className="font-semibold text-ink hover:text-baseblue"
+                          href={`https://basescan.org/address/${creator.address}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Creator: {creator.label}
+                        </Link>
+                      ) : (
+                        <h3 className="font-semibold text-ink">Creator: {creator.label}</h3>
+                      )
+                    ) : null}
                   </div>
                   <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
                     <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />

@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
   }
 
   const { address, chainId, walletSlot, message, signature } = payload.data;
+  if (walletSlot !== "human") {
+    return NextResponse.json({ error: "Agent wallet must be verified by the agent flow" }, { status: 400 });
+  }
+
   if (chainId !== 8453) {
     return NextResponse.json({ error: "Only Base mainnet is supported" }, { status: 400 });
   }

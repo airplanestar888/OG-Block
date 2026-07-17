@@ -108,6 +108,29 @@ export async function persistScore(
   }
 }
 
+export async function resetScore(userId: string, options: { recalculateRank?: boolean } = {}) {
+  const supabase = getSupabaseAdmin();
+  const shouldRecalculateRank = options.recalculateRank ?? true;
+
+  await supabase.from("nft_holdings").delete().eq("user_id", userId);
+
+  const { error: scoreError } = await supabase.from("scores").upsert(
+    {
+      user_id: userId,
+      score: 0,
+      is_og: false,
+      nft_count: 0,
+      last_calculated_at: new Date().toISOString()
+    },
+    { onConflict: "user_id" }
+  );
+  if (scoreError) throw scoreError;
+
+  if (shouldRecalculateRank) {
+    await recalculateRanks();
+  }
+}
+
 export async function recalculateRanks() {
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase

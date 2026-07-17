@@ -116,11 +116,11 @@ function createScoreBadge(profile, id) {
     badge.appendChild(og);
   }
 
-  if (profile.profileRole === "agent") {
-    const agent = document.createElement("span");
-    agent.className = "base-culture-score-meta base-culture-score-agent";
-    agent.textContent = "Agent";
-    badge.appendChild(agent);
+  if (profile.hasAgentIdentity) {
+    const virtual = document.createElement("span");
+    virtual.className = "base-culture-score-meta base-culture-score-virtual";
+    virtual.textContent = profile.agentIdentityTokenId ? `Virtual IO #${profile.agentIdentityTokenId}` : "Virtual IO";
+    badge.appendChild(virtual);
   }
 
   return badge;

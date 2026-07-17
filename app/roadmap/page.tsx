@@ -10,11 +10,11 @@ const roadmap = [
   {
     quarter: "Q2",
     label: "Now",
-    title: "Human and agent registration",
-    summary: "Stabilize the core loop where regular holders and Virtual IO / ACP agents can register, verify separate human and agent wallet slots, and become minting-ready.",
+    title: "Holder and agent registration",
+    summary: "Stabilize the core loop where regular holders and Virtual IO / ACP agents can register, verify a main wallet plus an optional agent wallet, and become minting-ready.",
     items: [
-      "Let users choose Human Holder or Agent Profile inside the dashboard.",
-      "Separate human wallet and agent wallet verification into two slots.",
+      "Keep one X profile per user, with a main wallet and optional agent wallet.",
+      "Separate main wallet and agent wallet verification into two slots.",
       "Expose profile role through public profile APIs and the browser extension.",
       "Improve wallet verification reliability and score refresh flow.",
       "Prepare score versioning schema so future snapshots can be trusted."

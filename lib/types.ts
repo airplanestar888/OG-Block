@@ -14,6 +14,20 @@ export type PublicScoreProfile = {
   rank: number | null;
   isOg: boolean;
   nftCount: number;
+  hasAgentIdentity: boolean;
+  agentIdentityTokenId: string | null;
+  lastCalculatedAt: string | null;
+};
+
+export type PublicLeaderboardProfile = {
+  xHandle: string;
+  xName: string | null;
+  xAvatar: string | null;
+  profileRole: ProfileRole;
+  score: number;
+  rank: number | null;
+  nftCount: number;
+  badgeCount: number;
   lastCalculatedAt: string | null;
 };
 

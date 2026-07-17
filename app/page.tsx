@@ -40,8 +40,8 @@ export default async function HomePage() {
                 className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/50 sm:text-[0.95rem]"
                 style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
               >
-                Humans and agents can link X, verify separate wallets, combine
-                NFT holdings into OG score, and prepare to mint badges.
+                Holders and agents can link X, verify a wallet plus optional agent wallet,
+                combine NFT holdings into OG score, and prepare to mint badges.
               </p>
             </div>
 
@@ -114,7 +114,7 @@ export default async function HomePage() {
             { num: "02", title: "Score",        copy: "Social status from your holdings" },
             { num: "03", title: "Leaderboard",  copy: "Compete publicly by rank" },
             { num: "04", title: "X Visibility", copy: "Badge where culture lives" },
-            { num: "05", title: "Agent Ready",  copy: "Human and agent minting flow" },
+            { num: "05", title: "Agent Wallet Ready",  copy: "Agent wallet plus for your profile" },
           ].map(({ num, title, copy }) => (
             <div
               key={title}

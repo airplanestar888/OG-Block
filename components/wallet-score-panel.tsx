@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
 import { base } from "wagmi/chains";
 import { shortAddress } from "@/lib/address";
@@ -13,14 +14,19 @@ type WalletScorePanelProps = {
   title: string;
   description: string;
   verifiedWallet?: string | null;
+  allowBrowserConnect?: boolean;
 };
 
-export function WalletScorePanel({ xUserId, xHandle, walletSlot, title, description, verifiedWallet }: WalletScorePanelProps) {
+export function WalletScorePanel({
+  xUserId,
+  xHandle,
+  walletSlot,
+  title,
+  description,
+  verifiedWallet,
+  allowBrowserConnect = true
+}: WalletScorePanelProps) {
   const { address, isConnected } = useAccount();
-  const connectedAddress = address?.toLowerCase();
-  const verifiedAddress = verifiedWallet?.toLowerCase();
-  const isDifferentWallet = Boolean(connectedAddress && verifiedAddress && connectedAddress !== verifiedAddress);
-  const canVerifyWallet = isConnected && (!verifiedWallet || isDifferentWallet);
   const chainId = useChainId();
   const { connect, connectors, isPending: connectPending } = useConnect();
   const { disconnect } = useDisconnect();
@@ -28,6 +34,14 @@ export function WalletScorePanel({ xUserId, xHandle, walletSlot, title, descript
   const { signMessageAsync } = useSignMessage();
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const browserWalletReady = mounted && isConnected;
+  const browserWalletAddress = mounted ? address : undefined;
 
   async function refreshScoreAfterVerification() {
     setStatus(`${title} verified. Recalculating combined OG score...`);
@@ -39,7 +53,7 @@ export function WalletScorePanel({ xUserId, xHandle, walletSlot, title, descript
   }
 
   async function verifyWallet() {
-    if (!address) return;
+    if (!allowBrowserConnect || !address) return;
     setBusy(true);
     setStatus("Waiting for wallet signature...");
 
@@ -72,6 +86,28 @@ export function WalletScorePanel({ xUserId, xHandle, walletSlot, title, descript
     }
   }
 
+  async function disconnectVerifiedWallet() {
+    setBusy(true);
+    setStatus(`Disconnecting ${walletSlot} wallet...`);
+
+    try {
+      const response = await fetch("/api/wallet/disconnect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ walletSlot })
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Wallet disconnect failed");
+      if (allowBrowserConnect && isConnected) disconnect();
+      setStatus(`${title} disconnected. Combined OG score updated to ${payload.score}.`);
+      window.location.reload();
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Wallet disconnect failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function refreshScore() {
     setBusy(true);
     setStatus("Refreshing combined OG score...");
@@ -89,56 +125,99 @@ export function WalletScorePanel({ xUserId, xHandle, walletSlot, title, descript
   }
 
   return (
-    <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h2 className="font-semibold text-ink">{title}</h2>
-          <p className="mt-1 text-sm text-black/60">{description}</p>
-          <p className="mt-1 text-sm text-black/60">
-            {verifiedWallet
-              ? `Verified: ${shortAddress(verifiedWallet)}${isDifferentWallet ? ` / Connected: ${shortAddress(address)}` : ""}`
-              : address
-                ? `Connected: ${shortAddress(address)}`
-                : `Connect Base and sign to register your ${walletSlot} wallet.`}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-semibold text-ink">{title}</h2>
+            {verifiedWallet ? (
+              <span className="rounded-full bg-baseblue/10 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-baseblue">
+                Verified
+              </span>
+            ) : (
+              <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-black/45">
+                Not connected
+              </span>
+            )}
+          </div>
+          <p className="mt-2 max-w-xl text-sm leading-6 text-black/60">{description}</p>
         </div>
-        {isConnected ? (
-          <button
-            className="focus-ring rounded-md border border-black/15 px-4 py-2 text-sm font-semibold hover:bg-black/5"
-            onClick={() => disconnect()}
-            type="button"
-          >
-            Disconnect
-          </button>
+      </div>
+
+      <div className="mt-5 rounded-xl border border-black/10 bg-[#fbfcff] p-4">
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/40">
+          {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent setup"}
+        </p>
+        {verifiedWallet ? (
+          <p className="mt-2 font-mono text-sm font-semibold text-ink">{shortAddress(verifiedWallet)}</p>
+        ) : allowBrowserConnect ? (
+          <p className="mt-2 text-sm leading-6 text-black/65">
+            {browserWalletAddress ? `Connected browser wallet: ${shortAddress(browserWalletAddress)}. Sign once to verify it as your wallet.` : "Connect a Base wallet, then sign once to verify your wallet."}
+          </p>
         ) : (
+          <p className="mt-2 text-sm leading-6 text-black/65">
+            Agent wallet must be registered from the agent flow or console. Browser wallet connect is disabled for this slot.
+            <Link className="ml-1 font-semibold text-baseblue hover:underline" href="/agent-guide">
+              View agent guide
+            </Link>
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
           <button
-            className="focus-ring rounded-md bg-baseblue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={connectPending || connectors.length === 0}
+            className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={!mounted || connectPending || connectors.length === 0 || busy}
             onClick={() => connect({ connector: connectors[0] })}
             type="button"
           >
             Connect wallet
           </button>
-        )}
+        ) : null}
+
+        {allowBrowserConnect && !verifiedWallet && browserWalletReady ? (
+          <>
+            <button
+              className="focus-ring rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={busy}
+              onClick={verifyWallet}
+              type="button"
+            >
+              Verify wallet
+            </button>
+            <button
+              className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 hover:bg-black/5"
+              onClick={() => disconnect()}
+              type="button"
+            >
+              Disconnect browser
+            </button>
+          </>
+        ) : null}
+
+        {verifiedWallet ? (
+          <>
+            <button
+              className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/70 hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={busy}
+              onClick={refreshScore}
+              type="button"
+            >
+              Refresh score
+            </button>
+            <button
+              className="focus-ring rounded-full border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={busy}
+              onClick={disconnectVerifiedWallet}
+              type="button"
+            >
+              Disconnect wallet
+            </button>
+          </>
+        ) : null}
       </div>
-      <div className="mt-4 flex flex-wrap gap-3">
-        <button
-          className={`focus-ring rounded-md px-4 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${verifiedWallet ? "bg-baseblue text-white" : "bg-ink text-white"}`}
-          disabled={!canVerifyWallet || busy}
-          onClick={verifyWallet}
-          type="button"
-        >
-          {isDifferentWallet ? `Change ${walletSlot} wallet` : verifiedWallet ? `${title} verified` : `Verify ${walletSlot} wallet`}
-        </button>
-        <button
-          className="focus-ring rounded-md border border-black/15 px-4 py-2 text-sm font-semibold hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={!verifiedWallet || busy}
-          onClick={refreshScore}
-          type="button"
-        >
-          Refresh score & minting readiness
-        </button>
-      </div>
+
       {status ? <p className="mt-3 text-sm text-black/65">{status}</p> : null}
     </div>
   );

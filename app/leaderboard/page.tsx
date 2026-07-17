@@ -8,7 +8,7 @@ export default async function LeaderboardPage() {
     <main className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-6">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-baseblue">Leaderboard</p>
-        <h1 className="mt-2 text-4xl font-semibold tracking-tight text-ink">OG rank by verified Base NFT score</h1>
+        <h1 className="mt-2 text-4xl font-semibold tracking-tight text-ink">Verified culture profiles ranked by score</h1>
       </div>
 
       <section className="rounded-lg border border-black/10 bg-white shadow-sm">
@@ -17,15 +17,14 @@ export default async function LeaderboardPage() {
           <span className="text-sm text-baseblue" aria-hidden="true">-&gt;</span>
         </div>
         <div className="overflow-x-auto overscroll-x-contain">
-          <table className="min-w-[720px] w-full text-left text-sm">
+          <table className="min-w-[620px] w-full text-left text-sm">
             <thead className="bg-black/[0.03] text-black/60">
               <tr>
                 <th className="px-4 py-3 font-medium">Rank</th>
                 <th className="px-4 py-3 font-medium">X</th>
-                <th className="px-4 py-3 font-medium">Wallets</th>
+                <th className="px-4 py-3 font-medium">NFT</th>
+                <th className="px-4 py-3 font-medium">Badge</th>
                 <th className="px-4 py-3 font-medium">Score</th>
-                <th className="px-4 py-3 font-medium">OG</th>
-                <th className="px-4 py-3 font-medium">NFTs</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/10">
@@ -44,20 +43,14 @@ export default async function LeaderboardPage() {
                       <span>@{profile.xHandle}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs">
-                    <div className="space-y-1">
-                      <p>H: {profile.humanWalletAddress || "-"}</p>
-                      <p>A: {profile.agentWalletAddress || "-"}</p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">{profile.score}</td>
-                  <td className="px-4 py-3">{profile.isOg ? <span className="rounded bg-mint/15 px-2 py-1 font-medium text-emerald-700">OG</span> : "-"}</td>
                   <td className="px-4 py-3">{profile.nftCount}</td>
+                  <td className="px-4 py-3">{profile.badgeCount}</td>
+                  <td className="px-4 py-3">{profile.score}</td>
                 </tr>
               ))}
               {leaderboard.length === 0 ? (
                 <tr>
-                  <td className="px-4 py-8 text-center text-black/55" colSpan={6}>
+                  <td className="px-4 py-8 text-center text-black/55" colSpan={5}>
                     No scored holders yet.
                   </td>
                 </tr>

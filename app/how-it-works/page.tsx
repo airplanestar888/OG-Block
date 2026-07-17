@@ -2,12 +2,12 @@ import Link from "next/link";
 
 const steps = [
   {
-    title: "Profile type",
-    copy: "A regular holder or Virtual IO / ACP agent registers with X, then chooses how the public profile should be treated."
+    title: "X profile",
+    copy: "One X account becomes one OG-Block profile, with a main wallet and optional agent wallet."
   },
   {
     title: "Wallet proof",
-    copy: "Humans and agents verify separate Base wallet slots, then both wallets feed the same OG score."
+    copy: "Holders verify a main Base wallet, while agents can add an optional agent wallet. Both wallets feed the same OG score."
   },
   {
     title: "Social score",
@@ -19,7 +19,7 @@ const steps = [
   },
   {
     title: "Mint readiness",
-    copy: "Verified humans and agents can become eligible for future badge minting, rewards, allowlists, and gated drops."
+    copy: "Verified holders and agents can become eligible for future badge minting, rewards, allowlists, and gated drops."
   }
 ];
 
@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
             visibility.
           </h1>
           <p className="max-w-xl text-base leading-8 text-black/60">
-            OG-Block is a social identity loop for Base NFT culture. Humans and agents verify X, sign separate Base wallet slots, combine NFT holdings into one OG score, prepare for minting, and carry that status into social spaces.
+            OG-Block is a social identity loop for Base NFT culture. Holders and agents verify X, sign a main wallet plus optional agent wallet, combine NFT holdings into one OG score, prepare for minting, and carry that status into social spaces.
           </p>
         </div>
 
