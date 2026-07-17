@@ -104,7 +104,7 @@ export default async function DashboardPage() {
           <div>
             <h2 className="font-semibold text-ink">Blockchain Legacy</h2>
             <p className="mt-1 text-sm text-black/60">
-              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify your wallet or agent wallet to generate your combined receipt."}
+              {score?.last_calculated_at ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}` : "Verify your wallet or agent wallet to generate your combined receipt."}
             </p>
           </div>
           <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-black/10 text-center text-xs">
@@ -196,6 +196,14 @@ export default async function DashboardPage() {
 
 function getBaseExplorerNftUrl(contractAddress: string, tokenId: string) {
   return `https://basescan.org/nft/${contractAddress}/${tokenId}`;
+}
+
+function formatUtcDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC"
+  }).format(new Date(value));
 }
 
 function ReceiptStat({ label, value }: { label: string; value: string | number }) {

@@ -7,10 +7,10 @@ import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
-  { href: "/roadmap", label: "Roadmap" },
-  { href: "/agent-guide", label: "Agents" },
-  { href: "/how-it-works", label: "How it works" },
   { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/how-it-works", label: "How it works" },
+  { href: "/agent-guide", label: "Agents" },
+  { href: "/roadmap", label: "Roadmap" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/privacy", label: "Privacy" }
 ];
@@ -36,19 +36,17 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         className="page-container flex items-center justify-between"
         style={{ paddingTop: "0.875rem", paddingBottom: "0.875rem" }}
       >
-        <Link href="/" className="focus-ring flex items-center gap-2.5">
+        <Link href="/" className="focus-ring flex items-center gap-2.5 rounded-xl px-1 py-1">
           <Image
-            src="/og-block-logo.png"
-            alt="OG Block"
-            width={38}
-            height={38}
-            className="rounded-[9px]"
+            src="/og-block-logo.svg"
+            alt="OG-Block"
+            width={34}
+            height={32}
+            className="h-8 w-[34px] rounded-[9px] object-cover shadow-[0_6px_16px_rgba(0,82,255,0.18)]"
+            priority
           />
-          <span
-            className="text-[0.85rem] font-bold uppercase text-[#0A0B0D]"
-            style={{ letterSpacing: "0.18em" }}
-          >
-            OG Block
+          <span className="text-[0.95rem] font-black tracking-[-0.03em] text-[#0A0B0D]">
+            OG-Block
           </span>
         </Link>
 
@@ -134,7 +132,7 @@ function NavAuthAction({ isLoggedIn, compact = false }: { isLoggedIn: boolean; c
       href="/login"
       className={`focus-ring inline-flex items-center rounded-[10px] bg-[#0000FF] font-semibold text-white transition hover:bg-[#141CB5] ${sizeClass}`}
     >
-      Register
+      Sign in
     </Link>
   );
 }

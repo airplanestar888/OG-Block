@@ -156,7 +156,7 @@ export function WalletScorePanel({
           </p>
         ) : (
           <p className="mt-2 text-sm leading-6 text-black/65">
-            Agent wallet must be registered from the agent flow or console. Browser wallet connect is disabled for this slot.
+            Agent wallet must be verified from the agent flow or console. Browser wallet connect is disabled for this slot.
             <Link className="ml-1 font-semibold text-baseblue hover:underline" href="/agent-guide">
               View agent guide
             </Link>

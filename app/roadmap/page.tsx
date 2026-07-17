@@ -10,13 +10,13 @@ const roadmap = [
   {
     quarter: "Q2",
     label: "Now",
-    title: "Holder and agent registration",
-    summary: "Stabilize the core loop where regular holders and Virtual IO / ACP agents can register, verify a main wallet plus an optional agent wallet, and become minting-ready.",
+    title: "Sign in and wallet proof",
+    summary: "Stabilize the core loop where one X account becomes one OG-Block profile with a verified wallet and an optional agent wallet plus slot.",
     items: [
+      "Use Sign in with X as the only entry point.",
       "Keep one X profile per user, with a main wallet and optional agent wallet.",
-      "Separate main wallet and agent wallet verification into two slots.",
-      "Expose profile role through public profile APIs and the browser extension.",
-      "Improve wallet verification reliability and score refresh flow.",
+      "Let agent wallets verify through agent or console flow, not browser wallet connect.",
+      "Improve wallet disconnect, replacement, and score refresh reliability.",
       "Prepare score versioning schema so future snapshots can be trusted."
     ]
   },
@@ -26,10 +26,10 @@ const roadmap = [
     title: "Genesis snapshot and proof history",
     summary: "Move from live score only into historical score moments that can be referenced, compared, and rewarded.",
     items: [
-      "Create the first Genesis score snapshot for verified humans and agents.",
-      "Store score inputs, rank, NFT count, OG status, profile role, and timestamp per snapshot.",
+      "Create the first Genesis score snapshot for verified wallets and agent wallet plus slots.",
+      "Store score inputs, rank, NFT count, badge count, AgentIdentity status, and timestamp per snapshot.",
       "Add snapshot history to dashboard and profile views.",
-      "Introduce snapshot eligibility rules for badges and allowlists.",
+      "Introduce snapshot eligibility rules for OG-Block badges and allowlists.",
       "Publish transparent scoring notes so holders understand why ranks move."
     ]
   },
@@ -39,23 +39,23 @@ const roadmap = [
     title: "Mintable NFT badges and community utility",
     summary: "Turn important score moments into collectible proof badges that can unlock roles, perks, and future drops.",
     items: [
-      "Launch Genesis Badge mint for eligible human and agent profiles.",
-      "Add badge claim status, mint windows, and profile eligibility checks.",
+      "Launch Genesis Badge mint for eligible verified profiles.",
+      "Add Badge field, claim status, mint windows, and profile eligibility checks.",
       "Connect badges to community roles, gated channels, or partner allowlists.",
       "Support seasonal badge designs for future score snapshots.",
-      "Improve anti-spam and duplicate-wallet handling around badge claims."
+      "Keep collection NFTs separate from OG-Block badge and perk proofs."
     ]
   },
   {
     quarter: "Q1",
     label: "Agent layer",
-    title: "Agent wallet slots and delegated culture actions",
-    summary: "Separate identity wallets from action wallets so holders can safely assign bots, agents, or operators without losing identity ownership.",
+    title: "Agent Wallet Ready",
+    summary: "Make agent wallets a clean plus feature for any AI agent while keeping special identity badges, like AgentIdentity, as extension-only proofs.",
     items: [
-      "Design wallet slots for identity wallet, vault wallet, and agent wallet.",
-      "Add signed delegation rules for what an agent wallet can do.",
-      "Expose agent wallet status on dashboard without changing public identity.",
-      "Create safety controls for revoking or rotating agent slots.",
+      "Publish a public agent guide that any AI agent can scan and follow.",
+      "Show AgentIdentity-powered Virtual IO only in the X extension when the NFT is actually held.",
+      "Expose agent wallet status on dashboard without turning the whole profile into an agent type.",
+      "Create safety controls for revoking or rotating agent wallets.",
       "Test agent use cases for campaign participation, claims, and automation."
     ]
   },
@@ -66,7 +66,7 @@ const roadmap = [
     summary: "Use snapshots, badges, and delegated wallets as a base for a broader reputation layer across Base culture.",
     items: [
       "Release Season Two scoring with snapshot-to-snapshot comparison.",
-      "Add richer public holder pages with badges, rank history, and wallet slots.",
+      "Add richer public profile pages with badges, rank history, and wallet proof.",
       "Open partner collection modules for more Base NFT communities.",
       "Build admin tools for snapshot creation, eligibility review, and badge campaigns.",
       "Prepare APIs for apps, bots, and extensions to read reputation safely."
@@ -74,11 +74,31 @@ const roadmap = [
   }
 ];
 
-const principles = [
-  "Score must be explainable, not magic.",
-  "Snapshots should preserve history, not rewrite it.",
-  "Badges should prove moments, not just decorate profiles.",
-  "Agent wallets should add utility without exposing the main identity wallet."
+const coreModules = [
+  {
+    title: "Wallet Proof",
+    copy: "One X profile with a verified wallet and optional agent wallet."
+  },
+  {
+    title: "Culture Score",
+    copy: "NFT holdings, rank, and score calculated across connected wallets."
+  },
+  {
+    title: "Badges & Perks",
+    copy: "OG-Block NFT or perk proofs from campaigns and snapshots."
+  },
+  {
+    title: "X Extension",
+    copy: "Display OG-Block score, rank, and AgentIdentity status on X."
+  },
+  {
+    title: "Snapshots",
+    copy: "Versioned score moments for eligibility and badge minting."
+  },
+  {
+    title: "Agent Wallet",
+    copy: "A plus slot for AI agents to verify, act, and mint when eligible."
+  }
 ];
 
 export default function RoadmapPage() {
@@ -100,7 +120,7 @@ export default function RoadmapPage() {
           </div>
           <div className="max-w-2xl lg:pb-2">
             <p className="text-base leading-8 text-black/60">
-              OG-Block starts as a visible Base culture score for humans and agents, then grows into a versioned reputation system. Because the current build is already inside the Q2 cycle, this roadmap runs from this Q2 through the next Q2: registration, Genesis snapshot, mintable badges, agent wallet slots, and the next reputation network release.
+              OG-Block starts as a visible culture score for verified X profiles, then grows into a versioned reputation system. Because the current build is already inside the Q2 cycle, this roadmap runs from this Q2 through the next Q2: sign in, wallet proof, Genesis snapshot, mintable badges, Agent Wallet Ready, and the next reputation network release.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">
@@ -141,17 +161,20 @@ export default function RoadmapPage() {
 
         <section className="mt-12 grid gap-6 border-t border-black/10 pt-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Product direction</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Core modules</p>
             <h2 className="mt-3 max-w-sm text-3xl font-semibold leading-tight text-black/88 sm:text-4xl">
-              Reputation should become portable culture proof.
+              The product blocks behind OG-Block.
             </h2>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {principles.map((principle) => (
-              <div key={principle} className="flex min-h-20 items-center gap-3 border border-black/10 bg-white/74 px-4 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
-                <span className="h-2 w-2 shrink-0 rounded-full bg-baseblue" />
-                <span className="text-sm font-semibold leading-6 text-black/72">{principle}</span>
+            {coreModules.map((module) => (
+              <div key={module.title} className="min-h-28 border border-black/10 bg-white/74 p-4 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
+                <div className="flex items-center gap-3">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-baseblue" />
+                  <h3 className="font-semibold text-black/84">{module.title}</h3>
+                </div>
+                <p className="mt-3 text-sm leading-6 text-black/58">{module.copy}</p>
               </div>
             ))}
           </div>

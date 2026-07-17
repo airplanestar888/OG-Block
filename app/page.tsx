@@ -51,7 +51,7 @@ export default async function HomePage() {
                 href={session ? "/dashboard" : "/login"}
                 className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
               >
-                {session ? "Open dashboard" : "Register profile"}
+                {session ? "Open dashboard" : "Sign in"}
               </Link>
               <Link
                 href="/leaderboard"
