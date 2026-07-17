@@ -7,6 +7,7 @@ import { getOrCreateCurrentUser } from "@/lib/users";
 const walletConnectSchema = z.object({
   address: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
   chainId: z.number().int(),
+  walletSlot: z.enum(["human", "agent"]),
   message: z.string().min(12),
   signature: z.string().regex(/^0x[a-fA-F0-9]+$/)
 });
@@ -20,13 +21,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid wallet payload" }, { status: 400 });
   }
 
-  const { address, chainId, message, signature } = payload.data;
+  const { address, chainId, walletSlot, message, signature } = payload.data;
   if (chainId !== 8453) {
     return NextResponse.json({ error: "Only Base mainnet is supported" }, { status: 400 });
   }
 
-  if (!message.includes(user.x_user_id) || !message.toLowerCase().includes(address.toLowerCase())) {
-    return NextResponse.json({ error: "Signed message does not match this X account and wallet" }, { status: 400 });
+  if (
+    !message.includes(user.x_user_id) ||
+    !message.toLowerCase().includes(address.toLowerCase()) ||
+    !message.includes(`Wallet slot: ${walletSlot}`)
+  ) {
+    return NextResponse.json({ error: "Signed message does not match this X account, wallet, and slot" }, { status: 400 });
   }
 
   const verified = await verifyMessage({ address: address as `0x${string}`, message, signature: signature as `0x${string}` });
@@ -42,11 +47,12 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         address: address.toLowerCase(),
         chain_id: chainId,
+        wallet_slot: walletSlot,
         verified_at: new Date().toISOString()
       },
-      { onConflict: "user_id,address" }
+      { onConflict: "user_id,wallet_slot" }
     )
-    .select("address,chain_id,verified_at")
+    .select("address,chain_id,wallet_slot,verified_at")
     .single();
 
   if (error) throw error;

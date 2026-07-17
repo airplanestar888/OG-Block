@@ -40,8 +40,8 @@ export default async function HomePage() {
                 className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/50 sm:text-[0.95rem]"
                 style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
               >
-                Link your X identity, Base wallet, and NFT holdings into a
-                public social score on Base.
+                Humans and agents can link X, verify separate wallets, combine
+                NFT holdings into OG score, and prepare to mint badges.
               </p>
             </div>
 
@@ -51,7 +51,7 @@ export default async function HomePage() {
                 href={session ? "/dashboard" : "/login"}
                 className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
               >
-                {session ? "Open dashboard" : "Start with X"}
+                {session ? "Open dashboard" : "Register profile"}
               </Link>
               <Link
                 href="/leaderboard"
@@ -114,7 +114,7 @@ export default async function HomePage() {
             { num: "02", title: "Score",        copy: "Social status from your holdings" },
             { num: "03", title: "Leaderboard",  copy: "Compete publicly by rank" },
             { num: "04", title: "X Visibility", copy: "Badge where culture lives" },
-            { num: "05", title: "Rewards",      copy: "Roles and allowlists for OGs" },
+            { num: "05", title: "Agent Ready",  copy: "Human and agent minting flow" },
           ].map(({ num, title, copy }) => (
             <div
               key={title}

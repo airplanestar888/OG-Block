@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
-import { calculateScore, persistScore, recalculateRanks } from "@/lib/scoring";
+import { calculateScoreForWallets, persistScore, recalculateRanks } from "@/lib/scoring";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
-type WalletRow = {
+ type WalletRow = {
   user_id: string;
   address: string;
+  wallet_slot: "human" | "agent";
   verified_at: string | null;
 };
 
@@ -17,27 +18,28 @@ export async function GET(request: NextRequest) {
   const supabase = getSupabaseAdmin();
   const { data: wallets, error } = await supabase
     .from("wallets")
-    .select("user_id,address,verified_at")
+    .select("user_id,address,wallet_slot,verified_at")
+    .in("wallet_slot", ["human", "agent"])
     .order("verified_at", { ascending: false });
 
   if (error) throw error;
 
-  const latestWallets = getLatestWalletsByUser((wallets || []) as WalletRow[]).slice(0, env.CRON_REFRESH_LIMIT);
+  const walletGroups = getWalletGroupsByUser((wallets || []) as WalletRow[]).slice(0, env.CRON_REFRESH_LIMIT);
   const refreshed: Array<{ userId: string; score: number; nftCount: number }> = [];
   const failed: Array<{ userId: string; error: string }> = [];
 
-  for (const wallet of latestWallets) {
+  for (const group of walletGroups) {
     try {
-      const result = await calculateScore(wallet.user_id, wallet.address);
-      await persistScore(wallet.user_id, wallet.address, result, { recalculateRank: false });
+      const result = await calculateScoreForWallets(group.userId, group.wallets.map((wallet) => wallet.address));
+      await persistScore(group.userId, result, { recalculateRank: false });
       refreshed.push({
-        userId: wallet.user_id,
+        userId: group.userId,
         score: result.score,
         nftCount: result.nftCount
       });
     } catch (error) {
       failed.push({
-        userId: wallet.user_id,
+        userId: group.userId,
         error: error instanceof Error ? error.message : "Unknown refresh error"
       });
     }
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
 
   return NextResponse.json({
     ok: true,
-    checked: latestWallets.length,
+    checked: walletGroups.length,
     refreshed: refreshed.length,
     failed: failed.length,
     failures: failed.slice(0, 10)
@@ -66,14 +68,19 @@ function isAuthorizedCronRequest(request: NextRequest) {
   return false;
 }
 
-function getLatestWalletsByUser(wallets: WalletRow[]) {
-  const latestWallets = new Map<string, WalletRow>();
+function getWalletGroupsByUser(wallets: WalletRow[]) {
+  const groups = new Map<string, Map<WalletRow["wallet_slot"], WalletRow>>();
 
   for (const wallet of wallets) {
-    if (!latestWallets.has(wallet.user_id)) {
-      latestWallets.set(wallet.user_id, wallet);
+    const existing = groups.get(wallet.user_id) || new Map<WalletRow["wallet_slot"], WalletRow>();
+    if (!existing.has(wallet.wallet_slot)) {
+      existing.set(wallet.wallet_slot, wallet);
     }
+    groups.set(wallet.user_id, existing);
   }
 
-  return [...latestWallets.values()];
+  return [...groups.entries()].map(([userId, slots]) => ({
+    userId,
+    wallets: [...slots.values()]
+  }));
 }

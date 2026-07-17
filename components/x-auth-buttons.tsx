@@ -9,7 +9,7 @@ export function SignInButton() {
       onClick={() => signIn("twitter", { callbackUrl: "/dashboard" })}
       type="button"
     >
-      Log in with X
+      Register with X
     </button>
   );
 }

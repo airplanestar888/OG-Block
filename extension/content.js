@@ -116,6 +116,13 @@ function createScoreBadge(profile, id) {
     badge.appendChild(og);
   }
 
+  if (profile.profileRole === "agent") {
+    const agent = document.createElement("span");
+    agent.className = "base-culture-score-meta base-culture-score-agent";
+    agent.textContent = "Agent";
+    badge.appendChild(agent);
+  }
+
   return badge;
 }
 

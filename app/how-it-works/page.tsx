@@ -2,24 +2,24 @@ import Link from "next/link";
 
 const steps = [
   {
-    title: "NFT membership",
-    copy: "OG-Block NFT acts as the identity layer. A holder proves they own the wallet, not just the username."
+    title: "Profile type",
+    copy: "A regular holder or Virtual IO / ACP agent registers with X, then chooses how the public profile should be treated."
+  },
+  {
+    title: "Wallet proof",
+    copy: "Humans and agents verify separate Base wallet slots, then both wallets feed the same OG score."
   },
   {
     title: "Social score",
     copy: "NFT count, rare traits, early token IDs, and OG allowlist status become a transparent reputation score."
   },
   {
-    title: "Leaderboard",
-    copy: "Ranks turn culture into a visible competition, giving holders a reason to collect, verify, and return."
-  },
-  {
     title: "X visibility",
-    copy: "The extension brings score, rank, and OG status directly onto X profiles where community attention already lives."
+    copy: "The extension brings score, rank, OG status, and agent identity directly onto X profiles."
   },
   {
-    title: "Rewards",
-    copy: "Roles, allowlists, gated drops, and future perks make the score useful beyond the dashboard."
+    title: "Mint readiness",
+    copy: "Verified humans and agents can become eligible for future badge minting, rewards, allowlists, and gated drops."
   }
 ];
 
@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
             visibility.
           </h1>
           <p className="max-w-xl text-base leading-8 text-black/60">
-            OG-Block is a social identity loop for Base NFT culture. Users verify X, sign with a wallet, prove NFT ownership, earn a score, compete on rank, and carry that status into social spaces.
+            OG-Block is a social identity loop for Base NFT culture. Humans and agents verify X, sign separate Base wallet slots, combine NFT holdings into one OG score, prepare for minting, and carry that status into social spaces.
           </p>
         </div>
 

@@ -7,14 +7,12 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const supabase = getSupabaseAdmin();
-  const [{ data: wallet }, { data: score }, { data: holdings }] = await Promise.all([
+  const [{ data: wallets }, { data: score }, { data: holdings }] = await Promise.all([
     supabase
       .from("wallets")
-      .select("address,chain_id,verified_at")
+      .select("address,chain_id,wallet_slot,verified_at")
       .eq("user_id", user.id)
-      .order("verified_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .in("wallet_slot", ["human", "agent"]),
     supabase
       .from("scores")
       .select("score,rank,is_og,nft_count,last_calculated_at")
@@ -29,7 +27,8 @@ export async function GET() {
 
   return NextResponse.json({
     user,
-    wallet,
+    wallets: wallets || [],
+    wallet: (wallets || []).find((wallet) => wallet.wallet_slot === "human") || (wallets || []).find((wallet) => wallet.wallet_slot === "agent") || null,
     score,
     holdings: holdings || []
   });

@@ -22,7 +22,7 @@ export default async function LeaderboardPage() {
               <tr>
                 <th className="px-4 py-3 font-medium">Rank</th>
                 <th className="px-4 py-3 font-medium">X</th>
-                <th className="px-4 py-3 font-medium">Wallet</th>
+                <th className="px-4 py-3 font-medium">Wallets</th>
                 <th className="px-4 py-3 font-medium">Score</th>
                 <th className="px-4 py-3 font-medium">OG</th>
                 <th className="px-4 py-3 font-medium">NFTs</th>
@@ -44,7 +44,12 @@ export default async function LeaderboardPage() {
                       <span>@{profile.xHandle}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs">{profile.walletAddress || "-"}</td>
+                  <td className="px-4 py-3 font-mono text-xs">
+                    <div className="space-y-1">
+                      <p>H: {profile.humanWalletAddress || "-"}</p>
+                      <p>A: {profile.agentWalletAddress || "-"}</p>
+                    </div>
+                  </td>
                   <td className="px-4 py-3">{profile.score}</td>
                   <td className="px-4 py-3">{profile.isOg ? <span className="rounded bg-mint/15 px-2 py-1 font-medium text-emerald-700">OG</span> : "-"}</td>
                   <td className="px-4 py-3">{profile.nftCount}</td>

@@ -12,6 +12,7 @@ type LeaderboardRow = {
     x_handle: string;
     x_name: string | null;
     x_avatar: string | null;
+    profile_role: "human" | "agent";
   } | null;
 };
 
@@ -21,21 +22,19 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
 
   const { data: user, error: userError } = await supabase
     .from("users")
-    .select("id,x_handle,x_name,x_avatar")
+    .select("id,x_handle,x_name,x_avatar,profile_role")
     .eq("x_handle", normalizedHandle)
     .maybeSingle();
 
   if (userError) throw userError;
   if (!user) return null;
 
-  const [{ data: wallet, error: walletError }, { data: score, error: scoreError }] = await Promise.all([
+  const [{ data: wallets, error: walletError }, { data: score, error: scoreError }] = await Promise.all([
     supabase
       .from("wallets")
-      .select("address")
+      .select("address,wallet_slot")
       .eq("user_id", user.id)
-      .order("verified_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .in("wallet_slot", ["human", "agent"]),
     supabase
       .from("scores")
       .select("score,rank,is_og,nft_count,last_calculated_at")
@@ -46,11 +45,17 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   if (walletError) throw walletError;
   if (scoreError) throw scoreError;
 
+  const humanWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "human");
+  const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
+
   return {
     xHandle: user.x_handle,
     xName: user.x_name,
     xAvatar: user.x_avatar,
-    walletAddress: shortAddress(wallet?.address || null),
+    profileRole: user.profile_role || "human",
+    walletAddress: shortAddress(humanWallet?.address || agentWallet?.address || null),
+    humanWalletAddress: shortAddress(humanWallet?.address || null),
+    agentWalletAddress: shortAddress(agentWallet?.address || null),
     score: score?.score || 0,
     rank: score?.rank || null,
     isOg: Boolean(score?.is_og),
@@ -63,7 +68,7 @@ export async function getLeaderboard(limit = 100): Promise<PublicScoreProfile[]>
   const supabase = getSupabaseAdmin();
   const { data, error } = await supabase
     .from("scores")
-    .select("rank,score,is_og,nft_count,last_calculated_at,users(x_handle,x_name,x_avatar)")
+    .select("rank,score,is_og,nft_count,last_calculated_at,users(x_handle,x_name,x_avatar,profile_role)")
     .order("score", { ascending: false })
     .order("rank", { ascending: true })
     .limit(limit);
@@ -81,7 +86,10 @@ export async function getLeaderboard(limit = 100): Promise<PublicScoreProfile[]>
         xHandle: handle,
         xName: row.users?.x_name || null,
         xAvatar: row.users?.x_avatar || null,
+        profileRole: row.users?.profile_role || "human",
         walletAddress: null,
+        humanWalletAddress: null,
+        agentWalletAddress: null,
         score: row.score,
         rank: row.rank,
         isOg: row.is_og,

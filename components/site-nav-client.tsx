@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
+  { href: "/roadmap", label: "Roadmap" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/dashboard", label: "Dashboard" },
@@ -132,7 +133,7 @@ function NavAuthAction({ isLoggedIn, compact = false }: { isLoggedIn: boolean; c
       href="/login"
       className={`focus-ring inline-flex items-center rounded-[10px] bg-[#0000FF] font-semibold text-white transition hover:bg-[#141CB5] ${sizeClass}`}
     >
-      Log in with X
+      Register
     </Link>
   );
 }

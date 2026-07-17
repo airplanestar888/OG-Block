@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { calculateScore, persistScore } from "@/lib/scoring";
+import { calculateScoreForWallets, persistScore } from "@/lib/scoring";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { rateLimit } from "@/lib/rate-limit";
@@ -14,19 +14,21 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = getSupabaseAdmin();
-  const { data: wallet, error } = await supabase
+  const { data: wallets, error } = await supabase
     .from("wallets")
-    .select("address")
+    .select("address,wallet_slot")
     .eq("user_id", user.id)
-    .order("verified_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .in("wallet_slot", ["human", "agent"]);
 
   if (error) throw error;
-  if (!wallet?.address) return NextResponse.json({ error: "Connect a verified wallet first" }, { status: 400 });
 
-  const result = await calculateScore(user.id, wallet.address);
-  await persistScore(user.id, wallet.address, result);
+  const walletAddresses = (wallets || []).map((wallet) => wallet.address).filter(Boolean);
+  if (walletAddresses.length === 0) {
+    return NextResponse.json({ error: "Connect a human or agent wallet first" }, { status: 400 });
+  }
+
+  const result = await calculateScoreForWallets(user.id, walletAddresses);
+  await persistScore(user.id, result);
 
   return NextResponse.json({
     score: result.score,

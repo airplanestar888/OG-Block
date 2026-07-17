@@ -5,7 +5,7 @@ import { SiteNav } from "@/components/site-nav";
 
 export const metadata: Metadata = {
   title: "OG-Block",
-  description: "X identity, verified Base NFT ownership, and public social rank.",
+  description: "Human and agent profiles with verified Base wallets, NFT ownership, and public social rank.",
   icons: {
     icon: "/icon.png",
     shortcut: "/favicon.ico",

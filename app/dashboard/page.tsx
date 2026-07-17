@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { ProfileRolePanel } from "@/components/profile-role-panel";
 import { WalletScorePanel } from "@/components/wallet-score-panel";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
@@ -17,14 +18,12 @@ export default async function DashboardPage() {
   if (!user) redirect("/login");
 
   const supabase = getSupabaseAdmin();
-  const [{ data: wallet }, { data: score }, { data: holdings }] = await Promise.all([
+  const [{ data: wallets }, { data: score }, { data: holdings }] = await Promise.all([
     supabase
       .from("wallets")
-      .select("address,verified_at")
+      .select("address,verified_at,wallet_slot")
       .eq("user_id", user.id)
-      .order("verified_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+      .in("wallet_slot", ["human", "agent"]),
     supabase
       .from("scores")
       .select("score,rank,is_og,nft_count,last_calculated_at")
@@ -36,6 +35,9 @@ export default async function DashboardPage() {
       .eq("user_id", user.id)
       .order("updated_at", { ascending: false })
   ]);
+
+  const humanWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "human");
+  const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
 
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
@@ -56,20 +58,38 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-4">
+        <Stat label="Profile" value={user.profile_role === "agent" ? "Agent" : "Human"} />
         <Stat label="Score" value={score?.score ?? 0} />
         <Stat label="Rank" value={score?.rank ? `#${score.rank}` : "Unranked"} />
-        <Stat label="OG" value={score?.is_og ? "Yes" : "No"} />
         <Stat label="NFTs" value={score?.nft_count ?? 0} />
       </section>
 
-      <WalletScorePanel xUserId={user.x_user_id} xHandle={user.x_handle} verifiedWallet={wallet?.address} />
+      <ProfileRolePanel initialRole={user.profile_role} />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <WalletScorePanel
+          xUserId={user.x_user_id}
+          xHandle={user.x_handle}
+          walletSlot="human"
+          title="Human Wallet"
+          description="Holder wallet for regular NFT ownership. Its NFTs accumulate into the OG score."
+          verifiedWallet={humanWallet?.address}
+        />
+        <WalletScorePanel
+          xUserId={user.x_user_id}
+          xHandle={user.x_handle}
+          walletSlot="agent"
+          title="Agent Wallet"
+          description="Virtual IO / ACP agent wallet. Its NFTs also accumulate into the same OG score."
+          verifiedWallet={agentWallet?.address}
+        />
+      </div>
 
       <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-semibold text-ink">Blockchain Legacy</h2>
             <p className="mt-1 text-sm text-black/60">
-              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify wallet to generate your receipt."}
+              {score?.last_calculated_at ? `Last refreshed ${new Date(score.last_calculated_at).toLocaleString()}` : "Verify a human or agent wallet to generate your combined receipt."}
             </p>
           </div>
           <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-black/10 text-center text-xs">

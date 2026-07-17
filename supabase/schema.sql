@@ -6,19 +6,32 @@ create table if not exists users (
   x_handle text not null unique,
   x_name text,
   x_avatar text,
+  profile_role text not null default 'human' check (profile_role in ('human', 'agent')),
   created_at timestamptz not null default now()
 );
+
+alter table users add column if not exists profile_role text not null default 'human';
+alter table users drop constraint if exists users_profile_role_check;
+alter table users add constraint users_profile_role_check check (profile_role in ('human', 'agent'));
 
 create table if not exists wallets (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id) on delete cascade,
   address text not null,
   chain_id integer not null,
+  wallet_slot text not null default 'human' check (wallet_slot in ('human', 'agent')),
   verified_at timestamptz not null default now(),
-  unique (user_id, address)
+  unique (user_id, wallet_slot)
 );
 
+alter table wallets add column if not exists wallet_slot text not null default 'human';
+alter table wallets drop constraint if exists wallets_wallet_slot_check;
+alter table wallets add constraint wallets_wallet_slot_check check (wallet_slot in ('human', 'agent'));
+alter table wallets drop constraint if exists wallets_user_id_address_key;
+create unique index if not exists wallets_user_id_wallet_slot_key on wallets(user_id, wallet_slot);
+
 create index if not exists wallets_user_id_verified_at_idx on wallets(user_id, verified_at desc);
+create index if not exists wallets_user_id_slot_verified_at_idx on wallets(user_id, wallet_slot, verified_at desc);
 create index if not exists wallets_address_idx on wallets(lower(address));
 
 create table if not exists scores (

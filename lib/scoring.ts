@@ -16,12 +16,12 @@ function hasRareTrait(holding: NftHolding) {
   });
 }
 
-export async function calculateScore(userId: string, walletAddress: string): Promise<ScoreResult> {
-  const supabase = getSupabaseAdmin();
-  const provider = getNftProvider();
-  const holdings = await provider.getHoldings(walletAddress, scoreRules.targetCollection);
-  const nftCount = holdings.length;
+function getHoldingKey(holding: NftHolding) {
+  return `${holding.contractAddress.toLowerCase()}:${holding.tokenId}`;
+}
 
+function calculateFromHoldings(holdings: NftHolding[], isOg: boolean): ScoreResult {
+  const nftCount = holdings.length;
   let score = nftCount > 0 ? scoreRules.points.holdsProjectNft : 0;
   score += Math.max(0, nftCount - 1) * scoreRules.points.eachAdditionalNft;
 
@@ -33,25 +33,44 @@ export async function calculateScore(userId: string, walletAddress: string): Pro
     }
   }
 
-  const { data: allowlist, error: allowlistError } = await supabase
-    .from("og_allowlist")
-    .select("id")
-    .eq("wallet_address", walletAddress.toLowerCase())
-    .maybeSingle();
-
-  if (allowlistError) throw allowlistError;
-
   return {
     score,
-    isOg: Boolean(allowlist),
+    isOg,
     nftCount,
     holdings
   };
 }
 
+export async function calculateScore(userId: string, walletAddress: string): Promise<ScoreResult> {
+  return calculateScoreForWallets(userId, [walletAddress]);
+}
+
+export async function calculateScoreForWallets(userId: string, walletAddresses: string[]): Promise<ScoreResult> {
+  const supabase = getSupabaseAdmin();
+  const provider = getNftProvider();
+  const normalizedWallets = [...new Set(walletAddresses.map((address) => address.toLowerCase()))];
+  const holdingsByKey = new Map<string, NftHolding>();
+
+  for (const walletAddress of normalizedWallets) {
+    const holdings = await provider.getHoldings(walletAddress, scoreRules.targetCollection);
+    for (const holding of holdings) {
+      holdingsByKey.set(getHoldingKey(holding), holding);
+    }
+  }
+
+  const { data: allowlist, error: allowlistError } = await supabase
+    .from("og_allowlist")
+    .select("id")
+    .in("wallet_address", normalizedWallets)
+    .limit(1);
+
+  if (allowlistError) throw allowlistError;
+
+  return calculateFromHoldings([...holdingsByKey.values()], Boolean(allowlist?.length));
+}
+
 export async function persistScore(
   userId: string,
-  walletAddress: string,
   result: ScoreResult,
   options: { recalculateRank?: boolean } = {}
 ) {
