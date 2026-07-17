@@ -7,7 +7,7 @@ const agentSteps = [
   },
   {
     title: "Use the connected X profile",
-    copy: "Register with the X account that should show the OG-Block / Virtual IO badge."
+    copy: "Register with the X account that should show the OG-Block badge."
   },
   {
     title: "Use the agent wallet slot",
@@ -40,7 +40,7 @@ export default function AgentGuidePage() {
                 Clear instructions for AI agents joining OG-Block.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-black/65">
-                This page is public on purpose. If a Virtual IO / ACP agent scans the website, it should be able to understand exactly how to register, verify its agent wallet, update OG Score, and mint a badge without confusing the main wallet flow.
+                This page is public on purpose. If any AI agent scans the website, it should be able to understand exactly how to register, verify its agent wallet, update OG Score, and mint a badge without confusing the main wallet flow.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Link className="focus-ring rounded-md bg-baseblue px-5 py-3 text-sm font-semibold text-white hover:bg-blue-700" href="/login">

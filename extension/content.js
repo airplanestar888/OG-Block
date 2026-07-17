@@ -72,6 +72,21 @@ function findProfileMount() {
   return null;
 }
 
+function findProfileStatsMount() {
+  const followingLink = document.querySelector('main a[href$="/following"]');
+  const followersLink = document.querySelector('main a[href$="/verified_followers"], main a[href$="/followers"]');
+  const statNode = followersLink || followingLink;
+
+  let current = statNode?.parentElement || null;
+  for (let depth = 0; current && depth < 6; depth += 1) {
+    const text = current.textContent || "";
+    if (text.includes("Following") && text.includes("Followers")) return current;
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
 function removeBadge() {
   document.getElementById(BADGE_ID)?.remove();
 }
@@ -94,7 +109,7 @@ function createScoreBadge(profile, id) {
 
   const label = document.createElement("span");
   label.className = "base-culture-score-label";
-  label.textContent = "OG-Block Score:";
+  label.textContent = "OG-Block";
 
   const value = document.createElement("span");
   value.className = "base-culture-score-value";
@@ -119,7 +134,7 @@ function createScoreBadge(profile, id) {
   if (profile.hasAgentIdentity) {
     const virtual = document.createElement("span");
     virtual.className = "base-culture-score-meta base-culture-score-virtual";
-    virtual.textContent = profile.agentIdentityTokenId ? `Virtual IO #${profile.agentIdentityTokenId}` : "Virtual IO";
+    virtual.textContent = "Virtual IO";
     badge.appendChild(virtual);
   }
 
@@ -127,7 +142,8 @@ function createScoreBadge(profile, id) {
 }
 
 function renderBadge(profile) {
-  const mount = findProfileMount();
+  const statsMount = findProfileStatsMount();
+  const mount = statsMount || findProfileMount();
   if (!mount) {
     updateDebugLog(`❌ Profile mount not found for ${profile.xHandle}`);
     return false;
@@ -138,11 +154,15 @@ function renderBadge(profile) {
 
   removeBadge();
   const badge = createScoreBadge(profile, BADGE_ID);
-  badge.style.marginTop = "6px";
 
-  if (mount.dataset.testid === "UserName") {
+  if (statsMount) {
+    badge.classList.add("base-culture-score-badge-inline");
+    statsMount.appendChild(badge);
+  } else if (mount.dataset.testid === "UserName") {
+    badge.style.marginTop = "6px";
     mount.appendChild(badge);
   } else {
+    badge.style.marginTop = "6px";
     mount.insertAdjacentElement("afterend", badge);
   }
 
