@@ -107,7 +107,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── FEATURES ─────────────────────────────────── */}
-      <section className="page-container relative pb-10 pt-2 sm:pb-14 sm:pt-4">
+      <section className="page-container relative pb-16 pt-2 sm:pb-20 sm:pt-4">
         <div className="reveal reveal-d3 border-t border-[rgba(10,11,13,0.08)]">
           {[
             { num: "01", title: "Membership",  copy: "NFT as identity access" },
@@ -149,59 +149,6 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
-      {/* ── ROADMAP ───────────────────────────────────── */}
-      <section className="page-container relative pb-16 sm:pb-20">
-        <div className="reveal reveal-d4 overflow-hidden rounded-[22px] border border-[rgba(10,11,13,0.08)] bg-[#F7F8FB]">
-          <div className="grid gap-px bg-[rgba(10,11,13,0.08)] lg:grid-cols-[0.95fr_1.05fr]">
-            <div className="bg-white p-5 sm:p-7 lg:p-8">
-              <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.18em] text-[#0000FF]/70">
-                Roadmap
-              </p>
-              <h2
-                className="mt-3 max-w-md text-[clamp(2.25rem,5vw,4.1rem)] font-semibold leading-[0.95] text-[#0A0B0D]"
-                style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "0.01em" }}
-              >
-                Live score changes. Snapshots preserve status.
-              </h2>
-              <p className="mt-4 max-w-[36rem] text-[0.88rem] leading-6 text-[#0A0B0D]/52 sm:text-[0.95rem]">
-                OG-Block will turn score history into versioned proofs. Genesis captures the earliest verified culture proof, then each season can become a mintable badge.
-              </p>
-              <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#0000FF]/16 bg-[#0000FF]/5 px-3 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.13em] text-[#0000FF]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#0000FF]" />
-                Snapshot first, mint later
-              </div>
-            </div>
-
-            <div className="grid gap-px bg-[rgba(10,11,13,0.08)] sm:grid-cols-2">
-              <RoadmapCard
-                num="01"
-                title="Genesis Snapshot"
-                status="First proof"
-                copy="Lock the first recorded score, rank, wallet proof, and culture state before the leaderboard evolves."
-              />
-              <RoadmapCard
-                num="02"
-                title="Versioned Receipts"
-                status="v1 / Season 01"
-                copy="Every major refresh can produce a named score version, so holders can compare status across seasons."
-              />
-              <RoadmapCard
-                num="03"
-                title="Mintable NFT Badges"
-                status="Onchain badge"
-                copy="Mint selected snapshots as NFT badges like Genesis Holder, OG Score v1, or Season Rank."
-              />
-              <RoadmapCard
-                num="04"
-                title="Agent Wallet Slots"
-                status="Delegated future"
-                copy="Add identity, vault, and agent wallet slots so delegated wallets can act without replacing the identity wallet."
-              />
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   );
 }
@@ -217,34 +164,5 @@ function ScoreMetric({ label, value }: { label: string; value: string }) {
         {value}
       </p>
     </div>
-  );
-}
-
-function RoadmapCard({
-  num,
-  title,
-  status,
-  copy
-}: {
-  num: string;
-  title: string;
-  status: string;
-  copy: string;
-}) {
-  return (
-    <article className="bg-white p-5 sm:p-6">
-      <div className="flex items-center justify-between gap-4">
-        <span className="text-[0.62rem] font-bold tabular-nums text-[#0000FF]/62">{num}</span>
-        <span className="rounded-full border border-[rgba(10,11,13,0.08)] px-2.5 py-1 text-[0.58rem] font-bold uppercase tracking-[0.12em] text-[#0A0B0D]/38">
-          {status}
-        </span>
-      </div>
-      <h3 className="mt-6 text-[1rem] font-semibold tracking-[-0.02em] text-[#0A0B0D]">
-        {title}
-      </h3>
-      <p className="mt-2 text-[0.78rem] leading-6 text-[#0A0B0D]/50">
-        {copy}
-      </p>
-    </article>
   );
 }
