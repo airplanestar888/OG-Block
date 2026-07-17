@@ -1,10 +1,10 @@
 .base-culture-score-badge {
   align-items: center;
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(0, 82, 255, 0.18);
+  background: rgb(0, 82, 255);
+  border: 0;
   border-radius: 999px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-  color: rgb(15, 20, 25);
+  box-shadow: 0 1px 4px rgba(0, 82, 255, 0.2);
+  color: white;
   display: inline-flex;
   flex-wrap: nowrap;
   gap: 5px;
@@ -15,36 +15,37 @@
     "Segoe UI",
     sans-serif;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 16px;
   margin-top: 6px;
-  padding: 4px 9px;
+  padding: 4px 7px 4px 9px;
   width: fit-content;
 }
 
 .base-culture-score-badge-inline {
-  background: rgba(255, 255, 255, 0.96);
-  border: 1px solid rgba(0, 82, 255, 0.28);
-  box-shadow: 0 1px 3px rgba(0, 82, 255, 0.08);
-  margin-left: 12px;
+  align-self: center;
+  line-height: 14px;
+  margin-left: 10px;
   margin-top: 0;
-  padding: 3px 8px;
+  padding: 2px 6px 2px 8px;
+  transform: translateY(-1px);
+  vertical-align: middle;
 }
 
 .base-culture-score-label {
-  color: rgb(0, 82, 255);
+  color: white;
   white-space: nowrap;
 }
 
 .base-culture-score-value {
-  color: rgb(15, 20, 25);
+  color: white;
   white-space: nowrap;
 }
 
 .base-culture-score-meta {
-  border-left: 1px solid rgba(0, 82, 255, 0.18);
-  color: rgba(15, 20, 25, 0.66);
-  margin-left: 2px;
+  border-left: 1px solid rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.9);
+  margin-left: 1px;
   padding-left: 7px;
   white-space: nowrap;
 }
@@ -58,5 +59,11 @@
 }
 
 .base-culture-score-virtual {
-  color: rgb(0, 178, 169);
+  background: rgb(0, 178, 169);
+  border-left: 0;
+  border-radius: 999px;
+  color: white;
+  line-height: 14px;
+  margin-left: 3px;
+  padding: 1px 7px;
 }

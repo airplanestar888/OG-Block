@@ -109,7 +109,7 @@ function createScoreBadge(profile, id) {
 
   const label = document.createElement("span");
   label.className = "base-culture-score-label";
-  label.textContent = "OG-Block";
+  label.textContent = "OG";
 
   const value = document.createElement("span");
   value.className = "base-culture-score-value";
@@ -122,13 +122,6 @@ function createScoreBadge(profile, id) {
     rank.className = "base-culture-score-meta";
     rank.textContent = `#${profile.rank}`;
     badge.appendChild(rank);
-  }
-
-  if (profile.isOg) {
-    const og = document.createElement("span");
-    og.className = "base-culture-score-meta base-culture-score-og";
-    og.textContent = "OG";
-    badge.appendChild(og);
   }
 
   if (profile.hasAgentIdentity) {

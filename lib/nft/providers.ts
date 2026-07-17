@@ -108,6 +108,8 @@ type ContractCreator = {
   address: string;
 };
 
+const verifiedContractCache = new Map<string, boolean>();
+
 export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
@@ -144,29 +146,40 @@ class MockNftProvider implements NftProvider {
 class AlchemyNftProvider implements NftProvider {
   async getHoldings(address: string, contractAddress: string): Promise<NftHolding[]> {
     if (!env.NFT_PROVIDER_API_KEY) throw new Error("NFT_PROVIDER_API_KEY is required for Alchemy");
-    const url = new URL(`https://base-mainnet.g.alchemy.com/nft/v3/${env.NFT_PROVIDER_API_KEY}/getNFTsForOwner`);
-    url.searchParams.set("owner", address);
-    if (shouldFilterContract(contractAddress)) {
-      url.searchParams.set("contractAddresses[]", contractAddress);
-    }
-    url.searchParams.set("withMetadata", "true");
-    url.searchParams.set("pageSize", "100");
-    if (env.NFT_EXCLUDE_SPAM && !env.NFT_REQUIRE_VERIFIED_CONTRACT) {
-      url.searchParams.append("excludeFilters[]", "SPAM");
+    const ownedNfts: AlchemyOwnedNft[] = [];
+    let pageKey: string | undefined;
+
+    for (let page = 0; page < 10; page += 1) {
+      const url = new URL(`https://base-mainnet.g.alchemy.com/nft/v3/${env.NFT_PROVIDER_API_KEY}/getNFTsForOwner`);
+      url.searchParams.set("owner", address);
+      if (shouldFilterContract(contractAddress)) {
+        url.searchParams.set("contractAddresses[]", contractAddress);
+      }
+      url.searchParams.set("withMetadata", "true");
+      url.searchParams.set("pageSize", "100");
+      if (pageKey) url.searchParams.set("pageKey", pageKey);
+      if (env.NFT_EXCLUDE_SPAM && !env.NFT_REQUIRE_VERIFIED_CONTRACT) {
+        url.searchParams.append("excludeFilters[]", "SPAM");
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
+      }
+
+      const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[]; pageKey?: string };
+      ownedNfts.push(...(payload.ownedNfts || []));
+      pageKey = payload.pageKey;
+      if (!pageKey) break;
     }
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
-    }
-    const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[] };
-    const contractAddresses = (payload.ownedNfts || []).map((nft) => nft.contract?.address);
+    const contractAddresses = ownedNfts.map((nft) => nft.contract?.address);
     const [verifiedContracts, contractCreators] = await Promise.all([
       getVerifiedContractMap(contractAddresses),
       getContractCreatorMap(contractAddresses)
     ]);
 
-    return (payload.ownedNfts || [])
+    return ownedNfts
       .filter((nft) => isGenuineAlchemyNft(nft, verifiedContracts))
       .map((nft) => ({
         contractAddress: nft.contract?.address || contractAddress,
@@ -312,11 +325,17 @@ async function getVerifiedContractMap(contractAddresses: Array<string | undefine
 
   if (!env.NFT_REQUIRE_VERIFIED_CONTRACT) return verifiedMap;
 
-  await Promise.all(
-    uniqueContracts.map(async (contractAddress) => {
-      verifiedMap.set(contractAddress, await isContractSourceVerifiedOnBasescan(contractAddress));
-    })
-  );
+  for (const contractAddress of uniqueContracts) {
+    const cached = verifiedContractCache.get(contractAddress);
+    if (cached !== undefined) {
+      verifiedMap.set(contractAddress, cached);
+      continue;
+    }
+
+    const verified = await isContractSourceVerifiedOnBasescan(contractAddress);
+    verifiedContractCache.set(contractAddress, verified);
+    verifiedMap.set(contractAddress, verified);
+  }
 
   return verifiedMap;
 }
@@ -345,22 +364,26 @@ async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
   url.searchParams.set("address", contractAddress);
   url.searchParams.set("apikey", env.BASESCAN_API_KEY);
 
-  try {
-    const response = await fetch(url, { signal: AbortSignal.timeout(6000) });
-    if (!response.ok) return false;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (!response.ok) continue;
 
-    const payload = (await response.json()) as BasescanSourceCodeResponse;
-    const source = Array.isArray(payload.result) ? payload.result[0] : null;
-    if (!source) return false;
+      const payload = (await response.json()) as BasescanSourceCodeResponse;
+      const source = Array.isArray(payload.result) ? payload.result[0] : null;
+      if (!source) continue;
 
-    const sourceCode = source.SourceCode?.trim();
-    const abi = source.ABI?.trim();
-    const contractName = source.ContractName?.trim();
+      const sourceCode = source.SourceCode?.trim();
+      const abi = source.ABI?.trim();
+      const contractName = source.ContractName?.trim();
 
-    return Boolean(sourceCode && contractName && abi && abi !== "Contract source code not verified");
-  } catch {
-    return false;
+      return Boolean(sourceCode && contractName && abi && abi !== "Contract source code not verified");
+    } catch {
+      if (attempt === 2) return false;
+    }
   }
+
+  return false;
 }
 
 async function getContractCreatorFromBasescan(contractAddress: string): Promise<ContractCreator | null> {
