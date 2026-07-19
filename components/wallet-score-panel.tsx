@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
+import type { Connector } from "wagmi";
 import { base } from "wagmi/chains";
 import { shortAddress } from "@/lib/address";
 import type { WalletSlot } from "@/lib/types";
@@ -16,6 +17,11 @@ type WalletScorePanelProps = {
   verifiedWallet?: string | null;
   allowBrowserConnect?: boolean;
 };
+
+function getWalletButtonLabel(connector: Connector) {
+  const name = connector.name || "Browser wallet";
+  return `Connect ${name}`;
+}
 
 export function WalletScorePanel({
   xUserId,
@@ -34,6 +40,7 @@ export function WalletScorePanel({
   const { signMessageAsync } = useSignMessage();
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [selectedConnector, setSelectedConnector] = useState<Connector | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -152,7 +159,7 @@ export function WalletScorePanel({
           <p className="mt-2 font-mono text-sm font-semibold text-ink">{shortAddress(verifiedWallet)}</p>
         ) : allowBrowserConnect ? (
           <p className="mt-2 text-sm leading-6 text-black/65">
-            {browserWalletAddress ? `Connected browser wallet: ${shortAddress(browserWalletAddress)}. Sign once to verify it as your wallet.` : "Connect a Base wallet, then sign once to verify your wallet."}
+            {browserWalletAddress ? `Connected browser wallet: ${shortAddress(browserWalletAddress)}. Sign once to verify it as your wallet.` : "Choose an EVM wallet, switch to Base, then sign once to verify it."}
           </p>
         ) : (
           <p className="mt-2 text-sm leading-6 text-black/65">
@@ -166,14 +173,44 @@ export function WalletScorePanel({
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
-          <button
-            className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!mounted || connectPending || connectors.length === 0 || busy}
-            onClick={() => connect({ connector: connectors[0] })}
-            type="button"
-          >
-            Connect wallet
-          </button>
+          connectors.length > 1 ? (
+            <div className="flex flex-wrap gap-2">
+              {connectors.map((connector) => (
+                <button
+                  className={`focus-ring rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                    selectedConnector?.uid === connector.uid ? "bg-baseblue text-white shadow-sm" : "border border-black/10 bg-white text-ink hover:bg-black/[0.03]"
+                  }`}
+                  disabled={!mounted || connectPending || busy}
+                  onClick={() => setSelectedConnector(connector)}
+                  type="button"
+                  key={connector.uid}
+                >
+                  {getWalletButtonLabel(connector)}
+                </button>
+              ))}
+              <button
+                className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={!mounted || connectPending || !selectedConnector || busy}
+                onClick={() => {
+                  if (selectedConnector) connect({ connector: selectedConnector });
+                }}
+                type="button"
+              >
+                Continue
+              </button>
+            </div>
+          ) : (
+            <button
+              className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!mounted || connectPending || connectors.length === 0 || busy}
+              onClick={() => {
+                if (connectors[0]) connect({ connector: connectors[0] });
+              }}
+              type="button"
+            >
+              Connect wallet
+            </button>
+          )
         ) : null}
 
         {allowBrowserConnect && !verifiedWallet && browserWalletReady ? (

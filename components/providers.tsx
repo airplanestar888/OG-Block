@@ -10,7 +10,13 @@ import { useState } from "react";
 
 const wagmiConfig = createConfig({
   chains: [base],
-  connectors: [injected()],
+  connectors: [
+    injected({ target: "metaMask", shimDisconnect: true }),
+    injected({ target: "okxWallet", shimDisconnect: true }),
+    injected({ target: "bitKeep", shimDisconnect: true }),
+    injected({ target: "trust", shimDisconnect: true }),
+    injected({ shimDisconnect: true })
+  ],
   ssr: true,
   transports: {
     [base.id]: http()
