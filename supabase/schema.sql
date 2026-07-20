@@ -66,11 +66,23 @@ create table if not exists og_allowlist (
 
 create index if not exists og_allowlist_wallet_address_idx on og_allowlist(lower(wallet_address));
 
+create table if not exists nft_blocklist (
+  id uuid primary key default gen_random_uuid(),
+  kind text not null check (kind in ('contract', 'creator')),
+  value text not null,
+  note text,
+  created_at timestamptz not null default now(),
+  unique (kind, value)
+);
+
+create index if not exists nft_blocklist_kind_value_idx on nft_blocklist(kind, lower(value));
+
 alter table users enable row level security;
 alter table wallets enable row level security;
 alter table scores enable row level security;
 alter table nft_holdings enable row level security;
 alter table og_allowlist enable row level security;
+alter table nft_blocklist enable row level security;
 
 -- The app uses SUPABASE_SERVICE_ROLE_KEY on trusted Next.js API routes.
 -- Keep public anon access locked down unless you later add explicit client-side policies.

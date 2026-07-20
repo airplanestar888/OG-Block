@@ -145,6 +145,12 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(JSON.stringify({ ok: false, error: error instanceof Error ? error.message : String(error) }, null, 2));
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "object" && error !== null
+        ? JSON.stringify(error)
+        : String(error);
+  console.error(JSON.stringify({ ok: false, error: message }, null, 2));
   process.exit(1);
 });

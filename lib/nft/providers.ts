@@ -1,5 +1,6 @@
 import { createPublicClient, getContract, http, type Address } from "viem";
 import { env } from "@/lib/env";
+import { getNftBlocklist, type NftBlocklist } from "@/lib/nft/blocklist";
 import type { NftHolding } from "@/lib/types";
 
 const baseChain = {
@@ -110,31 +111,13 @@ type ContractCreator = {
 
 const verifiedContractCache = new Map<string, boolean>();
 
-const DEFAULT_BLOCKED_CONTRACTS = [
-  "0x27b43b897ff89a1c9999e317304e756133beb105"
-];
-
-const DEFAULT_BLOCKED_CREATORS = [
-  "0x43831ccd4d1ade29e185b249c356cf5367350ce2"
-];
-
-function getBlockedContracts(): Set<string> {
-  return new Set([...DEFAULT_BLOCKED_CONTRACTS, ...env.NFT_BLOCKLIST_CONTRACTS].map((value) => value.toLowerCase()));
-}
-
-function getBlockedCreators(): Set<string> {
-  return new Set([...DEFAULT_BLOCKED_CREATORS, ...env.NFT_BLOCKLIST_CREATORS].map((value) => value.toLowerCase()));
-}
-
-function isBlockedNft(contractAddress: string | undefined, creator?: ContractCreator): boolean {
+function isBlockedNft(contractAddress: string | undefined, creator: ContractCreator | undefined, blocklist: NftBlocklist): boolean {
   if (!contractAddress) return false;
 
-  const blockedContracts = getBlockedContracts();
-  if (blockedContracts.has(contractAddress.toLowerCase())) return true;
+  if (blocklist.contracts.has(contractAddress.toLowerCase())) return true;
 
   if (creator) {
-    const blockedCreators = getBlockedCreators();
-    if (creator.address && blockedCreators.has(creator.address.toLowerCase())) return true;
+    if (creator.address && blocklist.creators.has(creator.address.toLowerCase())) return true;
     if (creator.name && /phishing/i.test(creator.name)) return true;
   }
 
@@ -205,9 +188,10 @@ class AlchemyNftProvider implements NftProvider {
     }
 
     const contractAddresses = ownedNfts.map((nft) => nft.contract?.address);
-    const [verifiedContracts, contractCreators] = await Promise.all([
+    const [verifiedContracts, contractCreators, blocklist] = await Promise.all([
       getVerifiedContractMap(contractAddresses),
-      getContractCreatorMap(contractAddresses)
+      getContractCreatorMap(contractAddresses),
+      getNftBlocklist()
     ]);
 
     return ownedNfts
@@ -215,7 +199,7 @@ class AlchemyNftProvider implements NftProvider {
         const creator = nft.contract?.address
           ? contractCreators.get(nft.contract.address.toLowerCase())
           : undefined;
-        return !isBlockedNft(nft.contract?.address, creator) && isGenuineAlchemyNft(nft, verifiedContracts);
+        return !isBlockedNft(nft.contract?.address, creator, blocklist) && isGenuineAlchemyNft(nft, verifiedContracts);
       })
       .map((nft) => ({
         contractAddress: nft.contract?.address || contractAddress,
@@ -293,14 +277,15 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
   const client = createPublicClient({ chain: baseChain, transport: http(rpcUrl) });
   const holdings: NftHolding[] = [];
   const candidateContracts = [...candidateMap.values()].map((candidate) => candidate.contractAddress);
-  const [verifiedContracts, contractCreators] = await Promise.all([
+  const [verifiedContracts, contractCreators, blocklist] = await Promise.all([
     getVerifiedContractMap(candidateContracts),
-    getContractCreatorMap(candidateContracts)
+    getContractCreatorMap(candidateContracts),
+    getNftBlocklist()
   ]);
 
   for (const candidate of candidateMap.values()) {
     if (holdings.length >= 100) break;
-    if (isBlockedNft(candidate.contractAddress)) continue;
+    if (isBlockedNft(candidate.contractAddress, undefined, blocklist)) continue;
     if (env.NFT_REQUIRE_VERIFIED_CONTRACT && !verifiedContracts.get(candidate.contractAddress.toLowerCase())) continue;
     try {
       const tokenId = BigInt(candidate.tokenId);
@@ -328,7 +313,7 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
 
       const metadata = await fetchNftMetadata(metadataUri, candidate.tokenId);
       const creator = contractCreators.get(candidate.contractAddress.toLowerCase());
-      if (isBlockedNft(candidate.contractAddress, creator)) continue;
+      if (isBlockedNft(candidate.contractAddress, creator, blocklist)) continue;
       holdings.push({
         contractAddress: candidate.contractAddress,
         tokenId: candidate.tokenId,
