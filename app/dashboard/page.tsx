@@ -86,7 +86,7 @@ export default async function DashboardPage() {
       <section className="rounded-lg border border-baseblue/15 bg-baseblue/[0.04] p-5 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">Badges & Perks</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges & Perks</p>
             <h2 className="mt-2 font-semibold text-ink">OG-Block badge field is ready.</h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-black/60">
               Badges will be OG-Block NFT or perk proofs from our own campaigns. Collection NFTs stay in Blockchain Legacy below.

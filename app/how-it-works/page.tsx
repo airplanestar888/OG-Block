@@ -47,7 +47,7 @@ export default function HowItWorksPage() {
             <article key={step.title} className="bg-white/74 p-5 backdrop-blur">
               <p className="text-xs font-bold text-baseblue">0{index + 1}</p>
               <h2 className="mt-5 text-lg font-semibold text-black">{step.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-black/58">{step.copy}</p>
+              <p className="mt-3 text-sm leading-6 text-black/60">{step.copy}</p>
             </article>
           ))}
         </div>
@@ -56,7 +56,7 @@ export default function HowItWorksPage() {
           <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">
             Open dashboard
           </Link>
-          <Link className="border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/78" href="/leaderboard">
+          <Link className="border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
             View leaderboard
           </Link>
         </div>

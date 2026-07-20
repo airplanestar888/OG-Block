@@ -15,14 +15,14 @@ export default async function LeaderboardPage() {
       <section className="relative mx-auto max-w-6xl">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.85fr] lg:items-end">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.24em] text-baseblue">Leaderboard</p>
-            <h1 className="mt-4 max-w-3xl text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[0.95] tracking-tight text-black/90">
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Leaderboard</p>
+            <h1 className="mt-4 max-w-3xl text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[0.95] tracking-tight text-black/88">
               Who holds the most. Who ranks the highest.
             </h1>
           </div>
 
           <div className="rounded-[1.5rem] border border-black/10 bg-white/78 p-5 shadow-sm backdrop-blur">
-            <p className="text-sm leading-6 text-black/60">
+            <p className="text-sm leading-7 text-black/60">
               Every verified profile, ranked live. This is where OG status is earned, not claimed.
             </p>
             <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-black/10 text-center">

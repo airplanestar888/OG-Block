@@ -110,7 +110,7 @@ export default function RoadmapPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Roadmap</p>
         <div className="mt-5 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-end">
           <div>
-            <h1 className="text-[clamp(2rem,4.2vw,4.2rem)] font-semibold leading-[1.08] text-black/88">
+            <h1 className="text-[clamp(3rem,6vw,6rem)] font-semibold leading-[0.95] text-black/88">
               Score your culture.
               <br />
               Lock your rank.
@@ -126,7 +126,7 @@ export default function RoadmapPage() {
               <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">
                 Open dashboard
               </Link>
-              <Link className="border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/78" href="/leaderboard">
+              <Link className="border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
                 View leaderboard
               </Link>
             </div>
@@ -144,12 +144,12 @@ export default function RoadmapPage() {
                   </span>
                 </div>
                 <h2 className="mt-6 text-xl font-semibold leading-tight text-black/88">{phase.title}</h2>
-                <p className="mt-3 text-sm leading-6 text-black/58">{phase.summary}</p>
+                <p className="mt-3 text-sm leading-6 text-black/60">{phase.summary}</p>
               </div>
 
               <ul className="mt-6 space-y-3 border-t border-black/10 pt-5">
                 {phase.items.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-black/68">
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-black/60">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-baseblue" />
                     <span>{item}</span>
                   </li>
@@ -174,7 +174,7 @@ export default function RoadmapPage() {
                   <span className="h-2 w-2 shrink-0 rounded-full bg-baseblue" />
                   <h3 className="font-semibold text-black/84">{module.title}</h3>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-black/58">{module.copy}</p>
+                <p className="mt-3 text-sm leading-6 text-black/60">{module.copy}</p>
               </div>
             ))}
           </div>
