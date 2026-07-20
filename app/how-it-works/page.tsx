@@ -2,24 +2,24 @@ import Link from "next/link";
 
 const steps = [
   {
-    title: "X profile",
-    copy: "One X account becomes one OG-Block profile, with a main wallet and optional agent wallet."
+    title: "One profile",
+    copy: "Sign in with X. One account, one identity. No separate agent or holder types — just your profile."
   },
   {
-    title: "Wallet proof",
-    copy: "Holders verify a main Base wallet, while agents can add an optional agent wallet. Both wallets feed the same OG score."
+    title: "Verify your wallet",
+    copy: "Sign once with your Base wallet to prove ownership. Add an agent wallet as a plus slot anytime."
   },
   {
-    title: "Social score",
-    copy: "NFT count, rare traits, early token IDs, and OG allowlist status become a transparent reputation score."
+    title: "Your score, ranked",
+    copy: "Holdings, rare traits, early IDs — all counted and ranked publicly against every verified profile."
   },
   {
-    title: "X visibility",
-    copy: "The extension brings score, rank, OG status, and agent identity directly onto X profiles."
+    title: "Live on X",
+    copy: "Your score and rank appear directly on X profiles. Culture status, visible where it matters."
   },
   {
-    title: "Mint readiness",
-    copy: "Verified holders and agents can become eligible for future badge minting, rewards, allowlists, and gated drops."
+    title: "Earn the badge",
+    copy: "Hit the threshold. Lock the snapshot. Mint the badge that proves you were here early."
   }
 ];
 
@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
             visibility.
           </h1>
           <p className="max-w-xl text-base leading-8 text-black/60">
-            OG-Block is a social identity loop for Base NFT culture. Holders and agents verify X, sign a main wallet plus optional agent wallet, combine NFT holdings into one OG score, prepare for minting, and carry that status into social spaces.
+            OG-Block turns your Base NFT holdings into a public rank. Verify once, score everything, and carry that status onto X — where the culture actually is.
           </p>
         </div>
 

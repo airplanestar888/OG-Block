@@ -40,8 +40,8 @@ export default async function HomePage() {
                 className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/50 sm:text-[0.95rem]"
                 style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
               >
-                Holders and agents can link X, verify a wallet plus optional agent wallet,
-                combine NFT holdings into OG score, and prepare to mint badges.
+                Your NFT holdings have a rank. OG-Block makes that rank visible,
+                verifiable, and ready to carry anywhere culture lives.
               </p>
             </div>
 
@@ -110,11 +110,11 @@ export default async function HomePage() {
       <section className="page-container relative pb-16 pt-2 sm:pb-20 sm:pt-4">
         <div className="reveal reveal-d3 border-t border-[rgba(10,11,13,0.08)]">
           {[
-            { num: "01", title: "Membership",  copy: "NFT as identity access" },
-            { num: "02", title: "Score",        copy: "Social status from your holdings" },
-            { num: "03", title: "Leaderboard",  copy: "Compete publicly by rank" },
-            { num: "04", title: "X Visibility", copy: "Badge where culture lives" },
-            { num: "05", title: "Agent Wallet Ready",  copy: "Agent wallet plus for your profile" },
+            { num: "01", title: "Membership",         copy: "Your NFTs become your identity" },
+            { num: "02", title: "Culture Score",      copy: "Rank built from what you actually hold" },
+            { num: "03", title: "Leaderboard",        copy: "Public proof of where you stand" },
+            { num: "04", title: "X Visibility",       copy: "Your rank, live on every X profile" },
+            { num: "05", title: "Agent Wallet Ready", copy: "Let your agent hold, score, and mint" },
           ].map(({ num, title, copy }) => (
             <div
               key={title}

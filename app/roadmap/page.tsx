@@ -77,27 +77,27 @@ const roadmap = [
 const coreModules = [
   {
     title: "Wallet Proof",
-    copy: "One X profile with a verified wallet and optional agent wallet."
+    copy: "Sign once. Your wallet ownership is verified on-chain, permanently attached to your profile."
   },
   {
     title: "Culture Score",
-    copy: "NFT holdings, rank, and score calculated across connected wallets."
+    copy: "Every NFT you hold becomes points. Rare traits, early IDs, and OG status all count."
   },
   {
     title: "Badges & Perks",
-    copy: "OG-Block NFT or perk proofs from campaigns and snapshots."
+    copy: "Score a moment, mint the proof. OG-Block badges are collectible records of where you ranked."
   },
   {
     title: "X Extension",
-    copy: "Display OG-Block score, rank, and AgentIdentity status on X."
+    copy: "Your rank shows up on X automatically. No screenshots, no claims — just live proof."
   },
   {
     title: "Snapshots",
-    copy: "Versioned score moments for eligibility and badge minting."
+    copy: "Score frozen at a moment in time. Snapshots are the source of truth for badges and allowlists."
   },
   {
     title: "Agent Wallet",
-    copy: "A plus slot for AI agents to verify, act, and mint when eligible."
+    copy: "Any AI agent can hold, score, and mint through its own verified wallet slot."
   }
 ];
 
@@ -120,7 +120,7 @@ export default function RoadmapPage() {
           </div>
           <div className="max-w-2xl lg:pb-2">
             <p className="text-base leading-8 text-black/60">
-              OG-Block starts as a visible culture score for verified X profiles, then grows into a versioned reputation system. Because the current build is already inside the Q2 cycle, this roadmap runs from this Q2 through the next Q2: sign in, wallet proof, Genesis snapshot, mintable badges, Agent Wallet Ready, and the next reputation network release.
+              OG-Block is building the reputation layer that Base culture deserves — starting with a live score, locking it into snapshots, minting it as proof, and opening it up to agents and partners across the ecosystem.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">
@@ -163,7 +163,7 @@ export default function RoadmapPage() {
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Core modules</p>
             <h2 className="mt-3 max-w-sm text-3xl font-semibold leading-tight text-black/88 sm:text-4xl">
-              The product blocks behind OG-Block.
+              Everything that makes the score real.
             </h2>
           </div>
 

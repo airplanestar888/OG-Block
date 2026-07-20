@@ -17,13 +17,13 @@ export default async function LeaderboardPage() {
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.24em] text-baseblue">Leaderboard</p>
             <h1 className="mt-4 max-w-3xl text-[clamp(3rem,6vw,5.8rem)] font-semibold leading-[0.95] tracking-tight text-black/90">
-              Verified culture profiles ranked by score.
+              Who holds the most. Who ranks the highest.
             </h1>
           </div>
 
           <div className="rounded-[1.5rem] border border-black/10 bg-white/78 p-5 shadow-sm backdrop-blur">
             <p className="text-sm leading-6 text-black/60">
-              The main playground for OG-Block status: verified X profiles, NFT count, OG-Block badges, and culture score in one public board.
+              Every verified profile, ranked live. This is where OG status is earned, not claimed.
             </p>
             <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-black/10 text-center">
               <HeroStat label="Profiles" value={leaderboard.length} />
@@ -68,7 +68,7 @@ export default async function LeaderboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
             <div>
               <h2 className="font-semibold text-black/88">Culture board</h2>
-              <p className="mt-1 text-sm text-black/50">Rank, X profile, NFT count, badge count, and score.</p>
+              <p className="mt-1 text-sm text-black/50">Live rankings across all verified OG-Block profiles.</p>
             </div>
             <div className="rounded-full border border-baseblue/15 bg-baseblue/[0.04] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-baseblue">
               Badges {totalBadges}
@@ -104,7 +104,7 @@ export default async function LeaderboardPage() {
                         <Avatar src={profile.xAvatar} handle={profile.xHandle} size={34} />
                         <div>
                           <p className="font-semibold text-black/85">@{profile.xHandle}</p>
-                          <p className="text-xs text-black/40">Verified profile</p>
+                          <p className="text-xs text-black/40">OG-Block verified</p>
                         </div>
                       </div>
                     </td>
