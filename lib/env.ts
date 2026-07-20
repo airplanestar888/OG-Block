@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+function parseList(value: unknown): string[] {
+  if (typeof value !== "string" || value.trim() === "") return [];
+  return value
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 const serverEnvSchema = z.object({
   NEXTAUTH_SECRET: z.string().optional(),
   X_CLIENT_ID: z.string().optional(),
@@ -11,6 +19,8 @@ const serverEnvSchema = z.object({
   NFT_EXCLUDE_SPAM: z.enum(["true", "false"]).default("true").transform((value) => value === "true"),
   NFT_REQUIRE_VERIFIED_CONTRACT: z.enum(["true", "false"]).default("true").transform((value) => value === "true"),
   NFT_MIN_FLOOR_PRICE_ETH: z.coerce.number().min(0).default(0),
+  NFT_BLOCKLIST_CONTRACTS: z.preprocess(parseList, z.array(z.string()).default([])),
+  NFT_BLOCKLIST_CREATORS: z.preprocess(parseList, z.array(z.string()).default([])),
   BASESCAN_API_KEY: z.string().optional(),
   CRON_SECRET: z.string().optional(),
   CRON_REFRESH_LIMIT: z.coerce.number().int().positive().default(50),

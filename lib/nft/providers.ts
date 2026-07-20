@@ -110,6 +110,37 @@ type ContractCreator = {
 
 const verifiedContractCache = new Map<string, boolean>();
 
+const DEFAULT_BLOCKED_CONTRACTS = [
+  "0x27b43b897ff89a1c9999e317304e756133beb105"
+];
+
+const DEFAULT_BLOCKED_CREATORS = [
+  "0x43831ccd4d1ade29e185b249c356cf5367350ce2"
+];
+
+function getBlockedContracts(): Set<string> {
+  return new Set([...DEFAULT_BLOCKED_CONTRACTS, ...env.NFT_BLOCKLIST_CONTRACTS].map((value) => value.toLowerCase()));
+}
+
+function getBlockedCreators(): Set<string> {
+  return new Set([...DEFAULT_BLOCKED_CREATORS, ...env.NFT_BLOCKLIST_CREATORS].map((value) => value.toLowerCase()));
+}
+
+function isBlockedNft(contractAddress: string | undefined, creator?: ContractCreator): boolean {
+  if (!contractAddress) return false;
+
+  const blockedContracts = getBlockedContracts();
+  if (blockedContracts.has(contractAddress.toLowerCase())) return true;
+
+  if (creator) {
+    const blockedCreators = getBlockedCreators();
+    if (creator.address && blockedCreators.has(creator.address.toLowerCase())) return true;
+    if (creator.name && /phishing/i.test(creator.name)) return true;
+  }
+
+  return false;
+}
+
 export interface NftProvider {
   getHoldings(address: string, contractAddress: string): Promise<NftHolding[]>;
 }
@@ -180,7 +211,12 @@ class AlchemyNftProvider implements NftProvider {
     ]);
 
     return ownedNfts
-      .filter((nft) => isGenuineAlchemyNft(nft, verifiedContracts))
+      .filter((nft) => {
+        const creator = nft.contract?.address
+          ? contractCreators.get(nft.contract.address.toLowerCase())
+          : undefined;
+        return !isBlockedNft(nft.contract?.address, creator) && isGenuineAlchemyNft(nft, verifiedContracts);
+      })
       .map((nft) => ({
         contractAddress: nft.contract?.address || contractAddress,
         tokenId: nft.tokenId || "0",
@@ -264,6 +300,7 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
 
   for (const candidate of candidateMap.values()) {
     if (holdings.length >= 100) break;
+    if (isBlockedNft(candidate.contractAddress)) continue;
     if (env.NFT_REQUIRE_VERIFIED_CONTRACT && !verifiedContracts.get(candidate.contractAddress.toLowerCase())) continue;
     try {
       const tokenId = BigInt(candidate.tokenId);
@@ -290,6 +327,8 @@ async function getHoldingsFromAlchemyTransfers(address: string, contractAddress:
       }
 
       const metadata = await fetchNftMetadata(metadataUri, candidate.tokenId);
+      const creator = contractCreators.get(candidate.contractAddress.toLowerCase());
+      if (isBlockedNft(candidate.contractAddress, creator)) continue;
       holdings.push({
         contractAddress: candidate.contractAddress,
         tokenId: candidate.tokenId,
