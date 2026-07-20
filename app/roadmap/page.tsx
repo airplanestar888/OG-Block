@@ -110,10 +110,10 @@ export default function RoadmapPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Roadmap</p>
         <div className="mt-5 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-end">
           <div>
-            <h1 className="text-[clamp(3rem,6vw,6rem)] font-semibold leading-[0.95] text-black/88">
-              Score culture.
+            <h1 className="text-[clamp(2rem,4.2vw,4.2rem)] font-semibold leading-[1.08] text-black/88">
+              Score your culture.
               <br />
-              Lock the rank.
+              Lock your rank.
               <br />
               Own the badge.
             </h1>
