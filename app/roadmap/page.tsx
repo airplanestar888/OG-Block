@@ -111,11 +111,11 @@ export default function RoadmapPage() {
         <div className="mt-5 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-end">
           <div>
             <h1 className="text-[clamp(3rem,6vw,6rem)] font-semibold leading-[0.95] text-black/88">
-              From score,
+              Score culture.
               <br />
-              to snapshot,
+              Lock the rank.
               <br />
-              to badge.
+              Own the badge.
             </h1>
           </div>
           <div className="max-w-2xl lg:pb-2">
