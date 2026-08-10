@@ -302,7 +302,7 @@ export default function OgCardPage() {
           <p className="text-center text-sm font-semibold text-black/70">Sold out — all {MAX_SUPPLY} OG Cards claimed.</p>
         ) : !isConnected ? (
           <div className="space-y-3 text-center">
-            <p className="text-sm text-black/55">Connect your wallet to mint.</p>
+            <p className="text-sm text-black/55">Connect your wallet to claim your Official OG Badge NFT</p>
             <button
               className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
               onClick={() => {
