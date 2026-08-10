@@ -212,7 +212,7 @@ export default function OgCardPage() {
       {/* card visual */}
       <div className="relative overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8">
         {/* card artwork */}
-        <div className="relative mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-white">
+        <div className="relative mx-auto mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={CARD_IMAGE}
@@ -248,7 +248,7 @@ export default function OgCardPage() {
             <p className="font-bold text-ink">
               {alreadyClaimed ? "OG" : nextNumber !== undefined ? `#${nextNumber}` : "OG"}
             </p>
-            <p className="mt-0.5 text-black/45">{alreadyClaimed ? "Card Type" : "Your Number"}</p>
+            <p className="mt-0.5 text-black/45">{alreadyClaimed ? "Card Type" : "Token ID"}</p>
           </div>
           <div className="rounded-lg border border-black/10 bg-[#f7f8fb] px-3 py-2.5">
             <p className="font-bold text-ink">{previewTier ?? "—"}</p>
@@ -302,7 +302,7 @@ export default function OgCardPage() {
           <p className="text-center text-sm font-semibold text-black/70">Sold out — all {MAX_SUPPLY} OG Cards claimed.</p>
         ) : !isConnected ? (
           <div className="space-y-3 text-center">
-            <p className="text-sm text-black/55">Connect your wallet to claim your Official OG Badge NFT</p>
+            <p className="text-sm text-black/55">Connect your wallet to claim your OG Badge</p>
             <button
               className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
               onClick={() => {
