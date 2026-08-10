@@ -104,7 +104,7 @@ export default async function LeaderboardPage() {
                         <Avatar src={profile.xAvatar} handle={profile.xHandle} size={34} />
                         <div>
                           <p className="font-semibold text-black/85">@{profile.xHandle}</p>
-                          <p className="text-xs text-black/40">OG-Block verified</p>
+                          <p className="text-xs text-black/40">Wallet verified</p>
                         </div>
                       </div>
                     </td>
