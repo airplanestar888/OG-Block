@@ -8,12 +8,14 @@ import { useRouter } from "next/navigation";
 import { shortAddress } from "@/lib/address";
 import { OgCardAbi } from "@/lib/og-card-abi";
 
-const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_OG_CARD_CONTRACT as `0x${string}` | undefined;
-// which chain the contract lives on — set to 84532 (Base Sepolia) for testnet, 8453 for mainnet
-const TARGET_CHAIN_ID = Number(process.env.NEXT_PUBLIC_OG_CARD_CHAIN_ID ?? "8453");
-const TARGET_CHAIN = TARGET_CHAIN_ID === baseSepolia.id ? baseSepolia : base;
-const EXPLORER = TARGET_CHAIN_ID === baseSepolia.id ? "https://sepolia.basescan.org" : "https://basescan.org";
 const CARD_IMAGE = "/og-card.png";
+
+function chainForId(id: number) {
+  return id === baseSepolia.id ? baseSepolia : base;
+}
+function explorerForId(id: number) {
+  return id === baseSepolia.id ? "https://sepolia.basescan.org" : "https://basescan.org";
+}
 
 function tierForNumber(n: number): string {
   if (n < 100) return "Genesis";
@@ -42,35 +44,53 @@ export default function OgCardPage() {
   const [mounted, setMounted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
-  const wrongChain = isConnected && chainId !== TARGET_CHAIN_ID;
+  // runtime config (DB-backed, editable in admin portal → no redeploy)
+  const [contractAddress, setContractAddress] = useState<`0x${string}` | undefined>(undefined);
+  const [targetChainId, setTargetChainId] = useState<number | undefined>(undefined);
+  const [configLoaded, setConfigLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/og-card/config")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.contractAddress) setContractAddress(data.contractAddress as `0x${string}`);
+        if (data.chainId) setTargetChainId(Number(data.chainId));
+      })
+      .catch(() => {})
+      .finally(() => setConfigLoaded(true));
+  }, []);
+
+  const targetChain = targetChainId ? chainForId(targetChainId) : base;
+  const explorer = explorerForId(targetChainId ?? base.id);
+  const wrongChain = isConnected && targetChainId !== undefined && chainId !== targetChainId;
 
   // check on-chain claim
   const { data: hasClaimedOnChain, refetch: refetchOnChain } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: contractAddress,
     abi: OgCardAbi,
     functionName: "hasClaimed",
     args: address ? [address] : undefined,
-    chainId: TARGET_CHAIN_ID,
-    query: { enabled: !!address && !!CONTRACT_ADDRESS }
+    chainId: targetChainId,
+    query: { enabled: !!address && !!contractAddress && !!targetChainId }
   });
 
   // current supply → next token number + tier preview
   const { data: totalSupply } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: contractAddress,
     abi: OgCardAbi,
     functionName: "totalSupply",
-    chainId: TARGET_CHAIN_ID,
-    query: { enabled: !!CONTRACT_ADDRESS }
+    chainId: targetChainId,
+    query: { enabled: !!contractAddress && !!targetChainId }
   });
 
   // holder's token balance (to confirm ownership)
   const { data: ownedBalance } = useReadContract({
-    address: CONTRACT_ADDRESS,
+    address: contractAddress,
     abi: OgCardAbi,
     functionName: "balanceOf",
     args: address ? [address] : undefined,
-    chainId: TARGET_CHAIN_ID,
-    query: { enabled: !!address && !!CONTRACT_ADDRESS }
+    chainId: targetChainId,
+    query: { enabled: !!address && !!contractAddress && !!targetChainId }
   });
 
   // mint tx
@@ -120,17 +140,17 @@ export default function OgCardPage() {
   }, [modalOpen]);
 
   async function handleMint() {
-    if (!CONTRACT_ADDRESS || !address) return;
+    if (!contractAddress || !address || !targetChainId) return;
     setError("");
     try {
-      if (chainId !== TARGET_CHAIN_ID) {
-        await switchChainAsync({ chainId: TARGET_CHAIN_ID });
+      if (chainId !== targetChainId) {
+        await switchChainAsync({ chainId: targetChainId });
       }
       writeContract({
-        address: CONTRACT_ADDRESS,
+        address: contractAddress,
         abi: OgCardAbi,
         functionName: "mint",
-        chainId: TARGET_CHAIN_ID
+        chainId: targetChainId
       }, {
         onError: (err) => setError(err.message || "Mint failed")
       });
@@ -139,7 +159,7 @@ export default function OgCardPage() {
     }
   }
 
-  if (status === "loading" || !mounted) {
+  if (status === "loading" || !mounted || !configLoaded) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="text-sm text-black/50">Loading…</p>
@@ -149,7 +169,7 @@ export default function OgCardPage() {
 
   if (!session) return null;
 
-  if (!CONTRACT_ADDRESS) {
+  if (!contractAddress) {
     return (
       <main className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="text-sm text-red-600">OG Card contract not configured.</p>
@@ -258,7 +278,7 @@ export default function OgCardPage() {
 
         <div className="relative mt-4 text-center">
           <a
-            href={`${EXPLORER}/address/${CONTRACT_ADDRESS}`}
+            href={`${explorer}/address/${contractAddress}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-[0.65rem] text-[#0000FF]/60 underline decoration-dotted underline-offset-2 hover:text-[#0000FF]"
@@ -293,7 +313,7 @@ export default function OgCardPage() {
             <p className="font-mono text-xs text-black/45">{shortAddress(address) ?? address}</p>
             {wrongChain ? (
               <p className="text-xs text-ember">
-                Wrong network. Minting will switch you to {TARGET_CHAIN.name}.
+                Wrong network. Minting will switch you to {targetChain.name}.
               </p>
             ) : null}
             <div className="flex items-center justify-center gap-3">
@@ -319,7 +339,7 @@ export default function OgCardPage() {
         {txHash ? (
           <p className="text-center">
             <a
-              href={`${EXPLORER}/tx/${txHash}`}
+              href={`${explorer}/tx/${txHash}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-[#0000FF] underline decoration-dotted underline-offset-2 hover:text-[#141CB5]"
@@ -384,7 +404,7 @@ export default function OgCardPage() {
               <div className="flex flex-col gap-2 pt-2">
                 {txHash ? (
                   <a
-                    href={`${EXPLORER}/tx/${txHash}`}
+                    href={`${explorer}/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"

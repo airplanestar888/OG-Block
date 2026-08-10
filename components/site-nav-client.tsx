@@ -16,9 +16,11 @@ const NAV_LINKS = [
   { href: "/privacy", label: "Privacy" }
 ];
 
-export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function SiteNavClient({ isLoggedIn, isAdmin = false }: { isLoggedIn: boolean; isAdmin?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const navLinks = isAdmin ? [...NAV_LINKS, { href: "/admin", label: "Admin" }] : NAV_LINKS;
 
   useEffect(() => {
     setOpen(false);
@@ -52,7 +54,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean }) {
         </Link>
 
         <nav className="nav-links hidden items-center gap-1 sm:flex">
-          {NAV_LINKS.map(({ href, label }) => (
+          {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
@@ -90,7 +92,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean }) {
       {open ? (
         <div className="border-t border-[rgba(10,11,13,0.07)] bg-white sm:hidden">
           <nav className="page-container flex flex-col py-3">
-            {NAV_LINKS.map(({ href, label }) => (
+            {navLinks.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
