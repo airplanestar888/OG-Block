@@ -210,7 +210,7 @@ export default function OgCardPage() {
         <div className="absolute -bottom-8 -left-8 size-32 rounded-full bg-[#0000FF]/[0.04]" />
 
         {/* card artwork */}
-        <div className="relative mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden rounded-xl border border-black/10 bg-[#050914]">
+        <div className="relative mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={CARD_IMAGE}
@@ -380,7 +380,7 @@ export default function OgCardPage() {
             </button>
 
             {/* NFT art — same resource used for the on-chain image */}
-            <div className="aspect-square w-full overflow-hidden bg-[#050914]">
+            <div className="aspect-square w-full overflow-hidden bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={CARD_IMAGE} alt="OG Card" className="h-full w-full object-cover" />
             </div>
