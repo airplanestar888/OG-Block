@@ -40,6 +40,7 @@ export default function OgCardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const wrongChain = isConnected && chainId !== TARGET_CHAIN_ID;
 
@@ -95,9 +96,10 @@ export default function OgCardPage() {
       .finally(() => setLoading(false));
   }, [status]);
 
-  // after tx confirmed → record in Supabase
+  // after tx confirmed → record in Supabase + pop the success modal
   useEffect(() => {
     if (!txConfirmed || !address) return;
+    setModalOpen(true);
     fetch("/api/og-card/claim", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -108,6 +110,14 @@ export default function OgCardPage() {
       .catch(() => {})
       .finally(() => refetchOnChain());
   }, [txConfirmed, address, refetchOnChain]);
+
+  // lock body scroll while the modal is open
+  useEffect(() => {
+    document.body.style.overflow = modalOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [modalOpen]);
 
   async function handleMint() {
     if (!CONTRACT_ADDRESS || !address) return;
@@ -327,6 +337,73 @@ export default function OgCardPage() {
           <p className="text-center text-sm text-red-600">{error}</p>
         ) : null}
       </div>
+
+      {/* success modal — pops the NFT art when the mint confirms */}
+      {modalOpen ? (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm"
+          onClick={() => setModalOpen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-[#0000FF]/20 bg-white shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="focus-ring absolute right-3 top-3 z-10 grid size-8 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/60"
+              onClick={() => setModalOpen(false)}
+              aria-label="Close"
+              type="button"
+            >
+              ✕
+            </button>
+
+            {/* NFT art — same resource used for the on-chain image */}
+            <div className="aspect-square w-full overflow-hidden bg-[#050914]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={CARD_IMAGE} alt="OG Card" className="h-full w-full object-cover" />
+            </div>
+
+            <div className="space-y-3 p-6 text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0000FF]">
+                {txConfirmed ? "Minted" : "Minting"}
+              </p>
+              <h2
+                className="text-ink"
+                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", letterSpacing: "0.01em" }}
+              >
+                OG Card{nextNumber !== undefined ? ` #${nextNumber}` : ""}
+              </h2>
+              <p className="text-sm leading-6 text-black/55">
+                {txConfirmed
+                  ? "Your OG Card is now on-chain. Welcome to the OG-Block network."
+                  : "Confirming your mint on-chain…"}
+              </p>
+
+              <div className="flex flex-col gap-2 pt-2">
+                {txHash ? (
+                  <a
+                    href={`${EXPLORER}/tx/${txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
+                  >
+                    View transaction
+                  </a>
+                ) : null}
+                <button
+                  className="focus-ring rounded-full border border-black/15 px-6 py-3 text-sm font-semibold text-black/65 transition hover:bg-black/5"
+                  onClick={() => setModalOpen(false)}
+                  type="button"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
