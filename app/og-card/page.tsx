@@ -10,6 +10,10 @@ import { OgCardAbi } from "@/lib/og-card-abi";
 
 const CARD_IMAGE = "/og-card.png";
 
+// Base Builder attribution — appended to mint calldata so onchain activity
+// is credited to our builder account (builder code bc_4va9iidy).
+const BUILDER_DATA_SUFFIX = "0x62635f34766139696964790b0080218021802180218021802180218021" as `0x${string}`;
+
 function chainForId(id: number) {
   return id === baseSepolia.id ? baseSepolia : base;
 }
@@ -150,7 +154,8 @@ export default function OgCardPage() {
         address: contractAddress,
         abi: OgCardAbi,
         functionName: "mint",
-        chainId: targetChainId
+        chainId: targetChainId,
+        dataSuffix: BUILDER_DATA_SUFFIX
       }, {
         onError: (err) => setError(err.message || "Mint failed")
       });
