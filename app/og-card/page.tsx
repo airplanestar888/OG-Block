@@ -189,14 +189,7 @@ export default function OgCardPage() {
       {/* header */}
       <div className="text-center">
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0000FF]">Exclusive</p>
-        <h1
-          className="mt-3 font-extrabold tracking-tight text-ink"
-          style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
-            letterSpacing: "0.01em"
-          }}
-        >
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">
           Claim Your OG Card
         </h1>
         <p className="mt-2 text-sm leading-6 text-black/55">
@@ -389,10 +382,7 @@ export default function OgCardPage() {
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0000FF]">
                 {txConfirmed ? "Minted" : "Minting"}
               </p>
-              <h2
-                className="text-ink"
-                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "2rem", letterSpacing: "0.01em" }}
-              >
+              <h2 className="text-2xl font-semibold tracking-tight text-ink">
                 OG Card{nextNumber !== undefined ? ` #${nextNumber}` : ""}
               </h2>
               <p className="text-sm leading-6 text-black/55">
