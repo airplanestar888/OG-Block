@@ -14,6 +14,9 @@ import { Base64 } from "@openzeppelin/contracts/utils/Base64.sol";
 contract OgCard is ERC721, Ownable {
     using Strings for uint256;
 
+    /// Hard cap on total cards. Mint reverts once this many are minted.
+    uint256 public constant MAX_SUPPLY = 1000;
+
     uint256 private _nextTokenId;
 
     // per-token provenance
@@ -35,6 +38,7 @@ contract OgCard is ERC721, Ownable {
 
     error AlreadyClaimed();
     error NonexistentToken();
+    error SoldOut();
 
     constructor(string memory initialImageURI)
         ERC721("OG-Block OG Card", "OGCARD")
@@ -45,9 +49,10 @@ contract OgCard is ERC721, Ownable {
 
     // ─── Mint ───────────────────────────────────────────
 
-    /// @notice Mint exactly one OG Card to the caller. Reverts if already claimed.
+    /// @notice Mint exactly one OG Card to the caller. Reverts if already claimed or sold out.
     function mint() external {
         if (hasClaimed[msg.sender]) revert AlreadyClaimed();
+        if (_nextTokenId >= MAX_SUPPLY) revert SoldOut();
 
         uint256 tokenId = _nextTokenId++;
         hasClaimed[msg.sender] = true;
@@ -68,7 +73,7 @@ contract OgCard is ERC721, Ownable {
     function tierOf(uint256 tokenId) public view returns (string memory) {
         _requireOwned(tokenId);
         if (tokenId < 100) return "Genesis";
-        if (tokenId < 1000) return "Early";
+        if (tokenId < 500) return "Early";
         return "Member";
     }
 
@@ -77,7 +82,7 @@ contract OgCard is ERC721, Ownable {
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         _requireOwned(tokenId);
 
-        string memory tier = tokenId < 100 ? "Genesis" : (tokenId < 1000 ? "Early" : "Member");
+        string memory tier = tokenId < 100 ? "Genesis" : (tokenId < 500 ? "Early" : "Member");
         address minter = minterOf[tokenId];
         uint256 timestamp = uint256(mintedAt[tokenId]);
 

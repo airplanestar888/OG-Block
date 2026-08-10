@@ -116,9 +116,9 @@ Set these env vars in Vercel:
 
 Contract: [`contracts/OgCard.sol`](contracts/OgCard.sol) (OpenZeppelin ERC-721 + Ownable).
 
-- `mint()` — one per wallet (`hasClaimed` guard), records `minterOf` + `mintedAt`.
+- `mint()` — one per wallet (`hasClaimed` guard), records `minterOf` + `mintedAt`. Reverts `SoldOut` once `MAX_SUPPLY` (1000) is reached.
 - `tokenURI(id)` — on-chain JSON: name `OG Card #id`, description, image, attributes (**OG Number, Tier, Minted, Minter**).
-- Tier by mint order: `#0–99` Genesis, `#100–999` Early, `#1000+` Member.
+- Tier by mint order: `#0–99` Genesis, `#100–499` Early, `#500–999` Member. Total supply capped at 1000.
 - `contractURI()` — OpenSea collection metadata.
 - `setImageURI(uri)` — owner-only; change the card image anytime, no redeploy.
 

@@ -50,6 +50,13 @@ export const OgCardAbi = [
   },
   {
     type: "function",
+    name: "MAX_SUPPLY",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
     name: "tierOf",
     inputs: [{ name: "tokenId", type: "uint256" }],
     outputs: [{ name: "", type: "string" }],

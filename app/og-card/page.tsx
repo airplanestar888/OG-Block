@@ -21,9 +21,11 @@ function explorerForId(id: number) {
   return id === baseSepolia.id ? "https://sepolia.basescan.org" : "https://basescan.org";
 }
 
+const MAX_SUPPLY = 1000;
+
 function tierForNumber(n: number): string {
   if (n < 100) return "Genesis";
-  if (n < 1000) return "Early";
+  if (n < 500) return "Early";
   return "Member";
 }
 
@@ -188,6 +190,8 @@ export default function OgCardPage() {
   const alreadyClaimed = !!claim || !!hasClaimedOnChain;
   const nextNumber = totalSupply !== undefined ? Number(totalSupply) : undefined;
   const previewTier = nextNumber !== undefined ? tierForNumber(nextNumber) : undefined;
+  const soldOut = nextNumber !== undefined && nextNumber >= MAX_SUPPLY;
+  const remaining = nextNumber !== undefined ? Math.max(MAX_SUPPLY - nextNumber, 0) : undefined;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
@@ -251,8 +255,10 @@ export default function OgCardPage() {
             <p className="mt-0.5 text-black/45">Tier</p>
           </div>
           <div className="rounded-lg border border-black/10 bg-[#f7f8fb] px-3 py-2.5">
-            <p className="font-bold text-ink">1 / 1</p>
-            <p className="mt-0.5 text-black/45">Per Wallet</p>
+            <p className="font-bold text-ink">
+              {remaining !== undefined ? `${remaining}/${MAX_SUPPLY}` : `1 / ${MAX_SUPPLY}`}
+            </p>
+            <p className="mt-0.5 text-black/45">{remaining !== undefined ? "Remaining" : "Supply"}</p>
           </div>
         </div>
 
@@ -292,6 +298,8 @@ export default function OgCardPage() {
           <p className="text-center text-sm text-black/50">Checking claim status…</p>
         ) : alreadyClaimed ? (
           <p className="text-center text-sm text-black/55">You already claimed your OG Card.</p>
+        ) : soldOut ? (
+          <p className="text-center text-sm font-semibold text-black/70">Sold out — all {MAX_SUPPLY} OG Cards claimed.</p>
         ) : !isConnected ? (
           <div className="space-y-3 text-center">
             <p className="text-sm text-black/55">Connect your wallet to mint.</p>
