@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
-import type { Connector } from "wagmi";
 import { base } from "wagmi/chains";
 import { shortAddress } from "@/lib/address";
+import { pickAvailableConnector } from "@/lib/wallet";
 import type { WalletSlot } from "@/lib/types";
-
-const PRIORITY_CONNECTOR_IDS = ["metaMask", "okxWallet", "bitKeep", "trust"] as const;
 
 type WalletScorePanelProps = {
   xUserId: string;
@@ -19,40 +17,6 @@ type WalletScorePanelProps = {
   verifiedWallet?: string | null;
   allowBrowserConnect?: boolean;
 };
-
-async function pickAvailableConnector(connectors: readonly Connector[]) {
-  for (const id of PRIORITY_CONNECTOR_IDS) {
-    const connector = connectors.find((item) => item.id === id);
-    if (!connector) continue;
-    try {
-      const provider = await connector.getProvider();
-      if (provider) return connector;
-    } catch {
-      continue;
-    }
-  }
-
-  for (const connector of connectors) {
-    if (connector.id === "injected") continue;
-    if ((PRIORITY_CONNECTOR_IDS as readonly string[]).includes(connector.id)) continue;
-    try {
-      const provider = await connector.getProvider();
-      if (provider) return connector;
-    } catch {
-      continue;
-    }
-  }
-
-  const fallbackConnector = connectors.find((item) => item.id === "injected");
-  if (!fallbackConnector) return null;
-
-  try {
-    const provider = await fallbackConnector.getProvider();
-    return provider ? fallbackConnector : null;
-  } catch {
-    return fallbackConnector;
-  }
-}
 
 export function WalletScorePanel({
   xUserId,

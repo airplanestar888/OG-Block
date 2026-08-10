@@ -6,6 +6,7 @@ import { base, baseSepolia } from "wagmi/chains";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { shortAddress } from "@/lib/address";
+import { pickAvailableConnector } from "@/lib/wallet";
 import { OgCardAbi } from "@/lib/og-card-abi";
 
 const CARD_IMAGE = "/og-card.png";
@@ -305,9 +306,13 @@ export default function OgCardPage() {
             <p className="text-sm text-black/55">Connect your wallet to claim your OG Badge</p>
             <button
               className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
-              onClick={() => {
-                const connector = connectors[0];
-                if (connector) connect({ connector });
+              onClick={async () => {
+                const connector = await pickAvailableConnector(connectors);
+                if (connector) {
+                  connect({ connector });
+                } else {
+                  setError("No EVM wallet detected. Please install MetaMask, OKX, Bitget, or Trust Wallet.");
+                }
               }}
               type="button"
             >
