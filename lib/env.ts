@@ -26,7 +26,9 @@ const serverEnvSchema = z.object({
   CRON_REFRESH_LIMIT: z.coerce.number().int().positive().default(50),
   BASE_RPC_URL: z.string().url().default("https://mainnet.base.org"),
   TARGET_NFT_CONTRACT_ADDRESS: z.string().default("0x0000000000000000000000000000000000000000"),
-  PUBLIC_APP_URL: z.string().url().default("http://localhost:3000")
+  PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+  NEXT_PUBLIC_OG_CARD_CONTRACT: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  NEXT_PUBLIC_OG_CARD_CHAIN_ID: z.coerce.number().int().default(8453)
 });
 
 export const env = serverEnvSchema.parse(process.env);

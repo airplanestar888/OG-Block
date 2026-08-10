@@ -109,3 +109,46 @@ Set these env vars in Vercel:
 
 - `CRON_SECRET`: long random secret used to authorize the cron endpoint.
 - `CRON_REFRESH_LIMIT=50`: maximum latest verified wallets refreshed per cron run.
+
+## OG Card (NFT)
+
+`/og-card` lets a logged-in user mint one **OG Card** ERC-721 per wallet on Base. The user pays gas. Metadata is generated fully on-chain (`tokenURI` returns base64 JSON); only the base image is hosted off-chain and can be swapped by the owner without redeploying.
+
+Contract: [`contracts/OgCard.sol`](contracts/OgCard.sol) (OpenZeppelin ERC-721 + Ownable).
+
+- `mint()` — one per wallet (`hasClaimed` guard), records `minterOf` + `mintedAt`.
+- `tokenURI(id)` — on-chain JSON: name `OG Card #id`, description, image, attributes (**OG Number, Tier, Minted, Minter**).
+- Tier by mint order: `#0–99` Genesis, `#100–999` Early, `#1000+` Member.
+- `contractURI()` — OpenSea collection metadata.
+- `setImageURI(uri)` — owner-only; change the card image anytime, no redeploy.
+
+Env vars:
+
+- `NEXT_PUBLIC_OG_CARD_CONTRACT`: deployed contract address.
+- `NEXT_PUBLIC_OG_CARD_CHAIN_ID`: `8453` (Base mainnet) or `84532` (Base Sepolia).
+- `OG_CARD_IMAGE_URI` (optional, deploy/verify only): defaults to `${PUBLIC_APP_URL}/og-card.png`.
+- `DEPLOYER_PRIVATE_KEY` (deploy only): funded wallet, never commit.
+
+Card artwork lives at [`public/og-card.png`](public/og-card.png). Replace the file to change the image; if the contract is already live, also call `setImageURI` with the new URL.
+
+The claim is also recorded in Supabase (`og_card_claims`, unique per `wallet_address`) via `POST /api/og-card/claim` for fast off-chain lookups. Apply the migration [`supabase/migrations/20260810000100_add_og_card_claims.sql`](supabase/migrations/20260810000100_add_og_card_claims.sql).
+
+### Scripts
+
+```bash
+npm run og-card:compile                              # compile Solidity → contracts/OgCard.json
+NETWORK=testnet DEPLOYER_PRIVATE_KEY=0x... \
+  npm run og-card:deploy                             # deploy (omit NETWORK for mainnet)
+DEPLOYER_PRIVATE_KEY=0x... OG_CARD_CONTRACT=0x... \
+  npm run og-card:smoke                              # mint + assert on-chain metadata (Base Sepolia)
+NETWORK=testnet OG_CARD_CONTRACT=0x... BASESCAN_API_KEY=... \
+  npm run og-card:verify                             # submit source verification to Basescan
+```
+
+Deploy flow:
+
+1. `npm run og-card:compile`
+2. Fund the deployer wallet with ETH (Sepolia faucet for testnet; real ETH for mainnet).
+3. `npm run og-card:deploy` (set `NETWORK=testnet` for Base Sepolia).
+4. Put the printed address in `NEXT_PUBLIC_OG_CARD_CONTRACT` and set `NEXT_PUBLIC_OG_CARD_CHAIN_ID`.
+5. `npm run og-card:verify` to publish the source on Basescan.

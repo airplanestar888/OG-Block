@@ -4,12 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { injected } from "@wagmi/core";
 import { http, createConfig } from "wagmi";
-import { base } from "wagmi/chains";
+import { base, baseSepolia } from "wagmi/chains";
 import { WagmiProvider } from "wagmi";
 import { useState } from "react";
 
 const wagmiConfig = createConfig({
-  chains: [base],
+  chains: [base, baseSepolia],
   connectors: [
     injected({ target: "metaMask", shimDisconnect: true }),
     injected({ target: "okxWallet", shimDisconnect: true }),
@@ -19,7 +19,8 @@ const wagmiConfig = createConfig({
   ],
   ssr: true,
   transports: {
-    [base.id]: http()
+    [base.id]: http(),
+    [baseSepolia.id]: http()
   }
 });
 
