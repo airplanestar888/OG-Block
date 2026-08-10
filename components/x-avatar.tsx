@@ -33,7 +33,7 @@ export function XAvatar({
 
   return (
     <div
-      className="grid rounded-full bg-baseblue font-semibold text-white"
+      className="grid rounded-full bg-black/10 font-semibold text-black/50"
       style={{ width: size, height: size, placeItems: "center" }}
     >
       {handle.slice(0, 1).toUpperCase() || "?"}

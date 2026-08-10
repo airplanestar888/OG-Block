@@ -190,10 +190,13 @@ export default function OgCardPage() {
   const previewTier = nextNumber !== undefined ? tierForNumber(nextNumber) : undefined;
 
   return (
-    <main className="mx-auto max-w-2xl space-y-8 px-4 py-12">
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(0,82,255,0.14),transparent_30%),linear-gradient(90deg,rgba(0,82,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,82,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
+
+      <div className="relative mx-auto max-w-2xl space-y-8">
       {/* header */}
       <div className="text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0000FF]">Exclusive</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-baseblue">Exclusive</p>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">
           Claim Your OG Card
         </h1>
@@ -203,10 +206,7 @@ export default function OgCardPage() {
       </div>
 
       {/* card visual */}
-      <div className="relative overflow-hidden rounded-2xl border border-[#0000FF]/15 bg-gradient-to-br from-[#0000FF]/[0.04] to-white p-6 shadow-sm sm:p-8">
-        <div className="absolute -right-10 -top-10 size-40 rounded-full bg-[#0000FF]/[0.06]" />
-        <div className="absolute -bottom-8 -left-8 size-32 rounded-full bg-[#0000FF]/[0.04]" />
-
+      <div className="relative overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8">
         {/* card artwork */}
         <div className="relative mx-auto mb-6 aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -226,10 +226,10 @@ export default function OgCardPage() {
             <img
               src={userAvatar}
               alt=""
-              className="size-14 rounded-full border-2 border-[#0000FF]/20 object-cover"
+              className="size-14 rounded-full border border-black/10 object-cover"
             />
           ) : (
-            <div className="grid size-14 place-items-center rounded-full bg-[#0000FF] text-lg font-bold text-white">
+            <div className="grid size-14 place-items-center rounded-full bg-black/10 text-lg font-bold text-black/50">
               {userHandle.slice(0, 1).toUpperCase()}
             </div>
           )}
@@ -240,17 +240,17 @@ export default function OgCardPage() {
         </div>
 
         <div className="relative mt-5 grid grid-cols-3 gap-3 text-center text-xs">
-          <div className="rounded-lg border border-black/8 bg-white/60 px-3 py-2.5">
+          <div className="rounded-lg border border-black/10 bg-[#f7f8fb] px-3 py-2.5">
             <p className="font-bold text-ink">
               {alreadyClaimed ? "OG" : nextNumber !== undefined ? `#${nextNumber}` : "OG"}
             </p>
             <p className="mt-0.5 text-black/45">{alreadyClaimed ? "Card Type" : "Your Number"}</p>
           </div>
-          <div className="rounded-lg border border-black/8 bg-white/60 px-3 py-2.5">
+          <div className="rounded-lg border border-black/10 bg-[#f7f8fb] px-3 py-2.5">
             <p className="font-bold text-ink">{previewTier ?? "—"}</p>
             <p className="mt-0.5 text-black/45">Tier</p>
           </div>
-          <div className="rounded-lg border border-black/8 bg-white/60 px-3 py-2.5">
+          <div className="rounded-lg border border-black/10 bg-[#f7f8fb] px-3 py-2.5">
             <p className="font-bold text-ink">1 / 1</p>
             <p className="mt-0.5 text-black/45">Per Wallet</p>
           </div>
@@ -355,6 +355,7 @@ export default function OgCardPage() {
           <p className="text-center text-sm text-red-600">{error}</p>
         ) : null}
       </div>
+      </div>
 
       {/* success modal — pops the NFT art when the mint confirms */}
       {modalOpen ? (
@@ -365,7 +366,7 @@ export default function OgCardPage() {
           aria-modal="true"
         >
           <div
-            className="relative w-full max-w-sm overflow-hidden rounded-2xl border border-[#0000FF]/20 bg-white shadow-2xl"
+            className="relative w-full max-w-sm overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
