@@ -1,7 +1,7 @@
 import NextAuth, { type NextAuthConfig } from "next-auth";
 import Twitter from "next-auth/providers/twitter";
 
-function normalizeXAvatarUrl(url?: string | null) {
+export function normalizeXAvatarUrl(url?: string | null) {
   if (!url) return undefined;
   return url.replace("_normal.", "_400x400.");
 }

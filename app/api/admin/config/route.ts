@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { isAdminUser } from "@/lib/admin";
+import { rateLimit } from "@/lib/rate-limit";
 import {
   getConfigValues,
   setConfigValue,
@@ -43,6 +44,11 @@ export async function POST(request: Request) {
   const user = await getOrCreateCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!isAdminUser(user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+  const key = `admin-config:${user.id}`;
+  if (!rateLimit(key, 10, 60_000)) {
+    return NextResponse.json({ error: "Too many requests. Try again shortly." }, { status: 429 });
+  }
 
   const parsed = updateSchema.safeParse(await request.json());
   if (!parsed.success) {

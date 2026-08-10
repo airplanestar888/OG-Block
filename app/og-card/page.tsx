@@ -34,6 +34,9 @@ type Claim = {
   id: string;
   wallet_address: string;
   claimed_at: string;
+  token_id?: string | null;
+  tier?: string | null;
+  chain_id?: number | null;
 };
 
 export default function OgCardPage() {
@@ -50,6 +53,7 @@ export default function OgCardPage() {
   const [error, setError] = useState("");
   const [mounted, setMounted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [mintedTokenId, setMintedTokenId] = useState<number | null>(null);
 
   // runtime config (DB-backed, editable in admin portal → no redeploy)
   const [contractAddress, setContractAddress] = useState<`0x${string}` | undefined>(undefined);
@@ -127,16 +131,22 @@ export default function OgCardPage() {
   useEffect(() => {
     if (!txConfirmed || !address) return;
     setModalOpen(true);
+    const body: Record<string, unknown> = { walletAddress: address };
+    if (mintedTokenId !== null) {
+      body.tokenId = String(mintedTokenId);
+      body.tier = tierForNumber(mintedTokenId);
+    }
+    if (targetChainId) body.chainId = targetChainId;
     fetch("/api/og-card/claim", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ walletAddress: address })
+      body: JSON.stringify(body)
     })
       .then((r) => r.json())
       .then((data) => setClaim(data.claim))
       .catch(() => {})
       .finally(() => refetchOnChain());
-  }, [txConfirmed, address, refetchOnChain]);
+  }, [txConfirmed, address, refetchOnChain, mintedTokenId, targetChainId]);
 
   // lock body scroll while the modal is open
   useEffect(() => {
@@ -149,6 +159,8 @@ export default function OgCardPage() {
   async function handleMint() {
     if (!contractAddress || !address || !targetChainId) return;
     setError("");
+    // token id is assigned sequentially = current supply at mint time
+    if (nextNumber !== undefined) setMintedTokenId(nextNumber);
     try {
       if (chainId !== targetChainId) {
         await switchChainAsync({ chainId: targetChainId });

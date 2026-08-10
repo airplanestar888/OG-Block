@@ -12,6 +12,7 @@ const serverEnvSchema = z.object({
   NEXTAUTH_SECRET: z.string().optional(),
   X_CLIENT_ID: z.string().optional(),
   X_CLIENT_SECRET: z.string().optional(),
+  X_BEARER_TOKEN: z.string().optional(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
   NFT_PROVIDER: z.enum(["alchemy", "simplehash", "reservoir", "rpc", "mock"]).default("mock"),
