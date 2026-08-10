@@ -110,6 +110,8 @@ Set these env vars in Vercel:
 - `CRON_SECRET`: long random secret used to authorize the cron endpoint.
 - `CRON_REFRESH_LIMIT=50`: maximum latest verified wallets refreshed per cron run.
 
+X profile refresh (handle/name/avatar) in the cron is **disabled** to avoid consuming X API credits. Profile data is captured on each user login via OAuth instead. The opt-in helper `lib/x-profiles.ts` remains for future use if an `X_BEARER_TOKEN` with credits is available.
+
 ## OG Card (NFT)
 
 `/og-card` lets a logged-in user mint one **OG Card** ERC-721 per wallet on Base. The user pays gas. Metadata is generated fully on-chain (`tokenURI` returns base64 JSON); only the base image is hosted off-chain and can be swapped by the owner without redeploying.
@@ -124,14 +126,30 @@ Contract: [`contracts/OgCard.sol`](contracts/OgCard.sol) (OpenZeppelin ERC-721 +
 
 Env vars:
 
-- `NEXT_PUBLIC_OG_CARD_CONTRACT`: deployed contract address.
+- `NEXT_PUBLIC_OG_CARD_CONTRACT`: deployed contract address (fallback if not set in `app_config`).
 - `NEXT_PUBLIC_OG_CARD_CHAIN_ID`: `8453` (Base mainnet) or `84532` (Base Sepolia).
 - `OG_CARD_IMAGE_URI` (optional, deploy/verify only): defaults to `${PUBLIC_APP_URL}/og-card.png`.
 - `DEPLOYER_PRIVATE_KEY` (deploy only): funded wallet, never commit.
+- `ADMIN_X_HANDLES` (optional): comma-separated X handles allowed into `/admin`.
 
 Card artwork lives at [`public/og-card.png`](public/og-card.png). Replace the file to change the image; if the contract is already live, also call `setImageURI` with the new URL.
 
-The claim is also recorded in Supabase (`og_card_claims`, unique per `wallet_address`) via `POST /api/og-card/claim` for fast off-chain lookups. Apply the migration [`supabase/migrations/20260810000100_add_og_card_claims.sql`](supabase/migrations/20260810000100_add_og_card_claims.sql).
+The claim is also recorded in Supabase (`og_card_claims`, unique per `wallet_address`) via `POST /api/og-card/claim` for fast off-chain lookups. It stores `token_id`, `tier`, and `chain_id` so the dashboard can render the badge without an on-chain call. Apply migrations [`20260810000100_add_og_card_claims.sql`](supabase/migrations/20260810000100_add_og_card_claims.sql) and [`20260810000300_add_og_card_claim_details.sql`](supabase/migrations/20260810000300_add_og_card_claim_details.sql). The claim endpoint is rate limited (5/min per user). Mint calldata carries a Base builder attribution suffix (builder code `bc_4va9iidy`) via wagmi `dataSuffix`.
+
+### Claim UX
+
+- `/og-card` is login-gated, chain-aware (auto-switches to the configured chain), and supports MetaMask / OKX / Bitget / Trust via the shared `pickAvailableConnector` helper (`lib/wallet.ts`).
+- On a confirmed mint a modal reveals the NFT art (same `/og-card.png` the on-chain `image` points to).
+- The dashboard **Badges & Perks** section shows the claimed OG Card (art, `#tokenId`, tier, BaseScan link) and the **Badges** stat reflects the claim. Unclaimed users see a "Claim OG Card" CTA.
+
+### Runtime config (no redeploy)
+
+Contract address + chain can be edited at runtime from the admin portal instead of redeploying:
+
+- `/admin` — gated to X handles listed in `ADMIN_X_HANDLES`. Admins also get an "Admin" nav link.
+- Config is stored in the Supabase `app_config` table (migration [`20260810000200_add_app_config.sql`](supabase/migrations/20260810000200_add_app_config.sql)); env values act as fallback.
+- `GET /api/og-card/config` (public) serves the effective contract/chain; the claim page reads it at runtime.
+- `GET|POST /api/admin/config` (admin-gated, rate limited 10/min) reads/updates it.
 
 ### Scripts
 
@@ -150,5 +168,22 @@ Deploy flow:
 1. `npm run og-card:compile`
 2. Fund the deployer wallet with ETH (Sepolia faucet for testnet; real ETH for mainnet).
 3. `npm run og-card:deploy` (set `NETWORK=testnet` for Base Sepolia).
-4. Put the printed address in `NEXT_PUBLIC_OG_CARD_CONTRACT` and set `NEXT_PUBLIC_OG_CARD_CHAIN_ID`.
+4. Put the printed address in `NEXT_PUBLIC_OG_CARD_CONTRACT` (or the admin portal) and set `NEXT_PUBLIC_OG_CARD_CHAIN_ID`.
 5. `npm run og-card:verify` to publish the source on Basescan.
+
+### Current deployments
+
+| Network | Chain ID | Contract | Notes |
+|---|---|---|---|
+| Base Sepolia (testnet) | 84532 | `0x6b0521252b3039f3135a229805371f68219a098f` | Live testnet build (MAX_SUPPLY 1000, imageURI → Vercel) |
+| Base Mainnet | 8453 | _not deployed yet_ | Deploy + `og-card:verify` when going live |
+
+Older testnet contracts (`0x841b…9e67`, `0xa464…f857`) are superseded and unused.
+
+### Vercel env checklist
+
+After deploying, set in Vercel → Settings → Environment Variables, then **redeploy** (`NEXT_PUBLIC_*` are baked at build time):
+
+- `NEXT_PUBLIC_OG_CARD_CONTRACT`, `NEXT_PUBLIC_OG_CARD_CHAIN_ID`
+- `ADMIN_X_HANDLES` (for `/admin` access)
+- Verify `base:app_id` meta renders on the homepage before verifying the domain with Base.
