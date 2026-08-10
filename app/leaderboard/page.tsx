@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { getLeaderboard } from "@/lib/public-profiles";
+import { XAvatar } from "@/components/x-avatar";
 
 export default async function LeaderboardPage() {
   const leaderboard = await getLeaderboard();
@@ -43,7 +43,7 @@ export default async function LeaderboardPage() {
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-baseblue" />
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <Avatar src={profile.xAvatar} handle={profile.xHandle} size={48} />
+                    <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={48} />
                     <div>
                       <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">Rank #{profile.rank || index + 1}</p>
                       <h2 className="mt-1 font-semibold text-black/88">@{profile.xHandle}</h2>
@@ -101,7 +101,7 @@ export default async function LeaderboardPage() {
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
-                        <Avatar src={profile.xAvatar} handle={profile.xHandle} size={34} />
+                        <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={34} />
                         <div>
                           <p className="font-semibold text-black/85">@{profile.xHandle}</p>
                           <p className="text-xs text-black/40">Wallet verified</p>
@@ -151,14 +151,3 @@ function MiniStat({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-function Avatar({ src, handle, size }: { src: string | null; handle: string; size: number }) {
-  if (src) {
-    return <Image className="rounded-full" src={src} alt="" width={size} height={size} />;
-  }
-
-  return (
-    <div className="grid rounded-full bg-baseblue font-semibold text-white" style={{ width: size, height: size, placeItems: "center" }}>
-      {handle.slice(0, 1).toUpperCase() || "?"}
-    </div>
-  );
-}

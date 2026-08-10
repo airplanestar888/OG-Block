@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { WalletScorePanel } from "@/components/wallet-score-panel";
+import { XAvatar } from "@/components/x-avatar";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
 import type { NftHolding } from "@/lib/types";
@@ -42,13 +42,7 @@ export default async function DashboardPage() {
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <section className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          {user.x_avatar ? (
-            <Image className="rounded-full" src={user.x_avatar} alt="" width={64} height={64} />
-          ) : (
-            <div className="grid size-16 place-items-center rounded-full bg-baseblue font-semibold text-white">
-              {user.x_handle.slice(0, 1).toUpperCase()}
-            </div>
-          )}
+          <XAvatar src={user.x_avatar} handle={user.x_handle} size={64} />
           <div>
             <p className="text-sm text-black/60">@{user.x_handle}</p>
             <h1 className="text-3xl font-semibold tracking-tight text-ink">{user.x_name || user.x_handle}</h1>
