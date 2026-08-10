@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { calculateScoreForWallets, persistScore, recalculateRanks } from "@/lib/scoring";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { refreshXProfiles } from "@/lib/x-profiles";
 
  type WalletRow = {
   user_id: string;
@@ -50,20 +49,15 @@ export async function GET(request: NextRequest) {
     await recalculateRanks();
   }
 
-  // Best-effort X profile refresh (handle/name/avatar). No-op without X_BEARER_TOKEN.
-  let profilesUpdated = 0;
-  try {
-    profilesUpdated = await refreshXProfiles(walletGroups.map((group) => group.userId));
-  } catch {
-    // ignore — profile refresh is non-critical
-  }
+  // NOTE: X profile refresh is intentionally disabled to avoid consuming X API
+  // credits. Profile data (handle/name/avatar) is captured on each user login.
+  // To re-enable, set X_PROFILE_REFRESH=true and call refreshXProfiles(...) here.
 
   return NextResponse.json({
     ok: true,
     checked: walletGroups.length,
     refreshed: refreshed.length,
     failed: failed.length,
-    profilesUpdated,
     failures: failed.slice(0, 10)
   });
 }
