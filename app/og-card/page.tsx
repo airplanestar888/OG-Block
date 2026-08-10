@@ -200,7 +200,7 @@ export default function OgCardPage() {
           Claim Your OG Card
         </h1>
         <p className="mt-2 text-sm leading-6 text-black/55">
-          One OG Card NFT per wallet. Metadata lives on-chain — this is a real ERC-721 on Base.
+          First OG Badge Genesis
         </p>
       </div>
 
