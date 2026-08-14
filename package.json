@@ -13,6 +13,7 @@
     "og-card:compile": "tsx scripts/compile-og-card.ts",
     "og-card:deploy": "tsx scripts/deploy-og-card.ts",
     "og-card:verify": "tsx scripts/verify-og-card.ts",
+    "og-card:set-image": "tsx scripts/set-contract-image-uri.ts",
     "og-card:smoke": "tsx scripts/smoke-og-card.ts"
   },
   "dependencies": {
