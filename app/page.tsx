@@ -2,10 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { PixelField } from "@/components/pixel-field";
-import { getAppImages } from "@/lib/app-config";
+
 
 export default async function HomePage() {
-  const [session, { nftImageUrl }] = await Promise.all([auth(), getAppImages()]);
+  const session = await auth();
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
@@ -70,12 +70,11 @@ export default async function HomePage() {
             <div className="nft-image-wrap">
               <Image
                 className="nft-img h-full w-full object-cover"
-                src={nftImageUrl}
+                src="/og-nft-grid.png"
                 alt="OG-Block NFT collection"
                 width={1776}
                 height={864}
                 priority
-                unoptimized={nftImageUrl.startsWith("http")}
               />
             </div>
 
