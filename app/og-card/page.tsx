@@ -404,17 +404,17 @@ export default function OgCardPage() {
       {/* success modal — pops the NFT art when the mint confirms */}
       {modalOpen ? (
         <div
-          className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3.5 sm:p-4 bg-black/65 backdrop-blur-md overflow-y-auto overscroll-contain"
           onClick={() => setModalOpen(false)}
           role="dialog"
           aria-modal="true"
         >
           <div
-            className="relative w-full max-w-sm overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-2xl"
+            className="relative w-full max-w-[340px] sm:max-w-sm max-h-[92vh] flex flex-col overflow-hidden rounded-[1.5rem] sm:rounded-[1.75rem] border border-black/10 bg-white shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="focus-ring absolute right-3 top-3 z-10 grid size-8 place-items-center rounded-full bg-black/40 text-white transition hover:bg-black/60"
+              className="focus-ring absolute right-3 top-3 z-10 grid size-8 sm:size-9 place-items-center rounded-full bg-black/45 text-white backdrop-blur transition hover:bg-black/70 active:scale-95 touch-manipulation"
               onClick={() => setModalOpen(false)}
               aria-label="Close"
               type="button"
@@ -423,37 +423,43 @@ export default function OgCardPage() {
             </button>
 
             {/* NFT art — dynamic resource from Supabase Storage / proxy */}
-            <div className="aspect-square w-full overflow-hidden bg-white">
+            <div className="relative aspect-square w-full shrink-0 overflow-hidden bg-[#fbfcff]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={cardImage} alt="OG Card" className="h-full w-full object-cover" />
             </div>
 
-            <div className="space-y-3 p-6 text-center">
+            <div className="space-y-3 p-5 sm:p-6 text-center">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#0000FF]">
                 {txConfirmed ? "Minted" : "Minting"}
               </p>
               <h2 className="text-2xl font-semibold tracking-tight text-ink">
                 OG Card{nextNumber !== undefined ? ` #${nextNumber}` : ""}
               </h2>
-              <p className="text-sm leading-6 text-black/55">
-                {txConfirmed
-                  ? "Your OG Card is now on-chain. Welcome to the OG-Block network."
-                  : "Confirming your mint on-chain…"}
+              <p className="text-sm leading-6 text-black/60">
+                {txConfirmed ? (
+                  <>
+                    Your OG Card is now on-chain.
+                    <br />
+                    Welcome to the OG-Block network.
+                  </>
+                ) : (
+                  "Confirming your mint on-chain…"
+                )}
               </p>
 
-              <div className="flex flex-col gap-2 pt-2">
+              <div className="flex flex-col gap-2 pt-1 sm:pt-2">
                 {txHash ? (
                   <a
                     href={`${explorer}/tx/${txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
+                    className="focus-ring inline-flex w-full items-center justify-center rounded-full bg-[#0000FF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5] active:scale-[0.98] touch-manipulation"
                   >
                     View transaction
                   </a>
                 ) : null}
                 <button
-                  className="focus-ring rounded-full border border-black/15 px-6 py-3 text-sm font-semibold text-black/65 transition hover:bg-black/5"
+                  className="focus-ring inline-flex w-full items-center justify-center rounded-full border border-black/15 px-5 py-2.5 sm:py-3 text-sm font-semibold text-black/65 transition hover:bg-black/5 active:scale-[0.98] touch-manipulation"
                   onClick={() => setModalOpen(false)}
                   type="button"
                 >
