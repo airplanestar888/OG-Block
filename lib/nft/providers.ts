@@ -136,7 +136,7 @@ function shouldFilterContract(contractAddress: string) {
 const SUPPORTED_CHAINS = [
   { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com" },
   { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com" },
-  { id: 42161, name: "Arbitrum", host: "arb-mainnet.g.alchemy.com" }
+  { id: 5678, name: "Robinhood", host: "base-mainnet.g.alchemy.com" }
 ] as const;
 
 class MockNftProvider implements NftProvider {
@@ -165,8 +165,8 @@ class MockNftProvider implements NftProvider {
         contractAddress: shouldFilterContract(contractAddress) ? contractAddress : "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
         tokenId: "108",
         metadata: {
-          name: "Arbitrum Pioneer #108",
-          chain: "Arbitrum",
+          name: "Robinhood Edition #108",
+          chain: "Robinhood",
           attributes: [{ trait_type: "Tier", value: "Early" }]
         }
       }
