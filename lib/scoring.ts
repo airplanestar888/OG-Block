@@ -72,10 +72,23 @@ export async function calculateScoreForWallets(userId: string, walletAddresses: 
 export async function persistScore(
   userId: string,
   result: ScoreResult,
-  options: { recalculateRank?: boolean } = {}
+  options: { recalculateRank?: boolean; forceHistory?: boolean } = {}
 ) {
   const supabase = getSupabaseAdmin();
   const shouldRecalculateRank = options.recalculateRank ?? true;
+
+  // Retrieve current score before update to calculate deltas
+  const { data: currentScore } = await supabase
+    .from("scores")
+    .select("score,nft_count,rank")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const oldScore = currentScore?.score ?? 0;
+  const oldNftCount = currentScore?.nft_count ?? 0;
+  const oldRank = currentScore?.rank ?? null;
+  const pointsDelta = result.score - oldScore;
+  const nftDelta = result.nftCount - oldNftCount;
 
   await supabase.from("nft_holdings").delete().eq("user_id", userId);
 
@@ -103,14 +116,78 @@ export async function persistScore(
   );
   if (scoreError) throw scoreError;
 
+  let newRank: number | null = null;
   if (shouldRecalculateRank) {
     await recalculateRanks();
+    const { data: updatedScore } = await supabase
+      .from("scores")
+      .select("rank")
+      .eq("user_id", userId)
+      .maybeSingle();
+    newRank = updatedScore?.rank ?? null;
+  }
+
+  // Record history entry if score or NFT count changed, or if it's the initial score
+  const isInitial = !currentScore && (result.score > 0 || result.nftCount > 0);
+  const hasChanged = pointsDelta !== 0 || nftDelta !== 0;
+
+  if (isInitial || hasChanged || options.forceHistory) {
+    let eventType: "initial_score" | "nft_added" | "nft_removed" | "score_updated" = "score_updated";
+    let reason = "Score recalculated";
+
+    if (isInitial) {
+      eventType = "initial_score";
+      reason = result.nftCount > 0
+        ? `Initial score: +${result.score} pts (${result.nftCount} NFT${result.nftCount > 1 ? "s" : ""})`
+        : `Initial profile verified (+${result.score} pts)`;
+    } else if (nftDelta > 0) {
+      eventType = "nft_added";
+      reason = `Added ${nftDelta} NFT${nftDelta > 1 ? "s" : ""} (+${pointsDelta} pts)`;
+    } else if (nftDelta < 0) {
+      eventType = "nft_removed";
+      reason = `Transferred ${Math.abs(nftDelta)} NFT${Math.abs(nftDelta) > 1 ? "s" : ""} (${pointsDelta} pts)`;
+    } else if (pointsDelta > 0) {
+      eventType = "score_updated";
+      reason = `Score boosted (+${pointsDelta} pts)`;
+    } else if (pointsDelta < 0) {
+      eventType = "score_updated";
+      reason = `Score updated (${pointsDelta} pts)`;
+    }
+
+    try {
+      await supabase.from("score_history").insert({
+        user_id: userId,
+        old_score: oldScore,
+        new_score: result.score,
+        points_delta: pointsDelta,
+        old_nft_count: oldNftCount,
+        new_nft_count: result.nftCount,
+        nft_delta: nftDelta,
+        old_rank: oldRank,
+        new_rank: newRank,
+        event_type: eventType,
+        reason,
+        metadata_json: {
+          holdingsCount: result.holdings.length,
+          isOg: result.isOg
+        },
+        created_at: new Date().toISOString()
+      });
+    } catch {
+      // Allow scoring flow to succeed even if history table is temporarily offline
+    }
   }
 }
 
 export async function resetScore(userId: string, options: { recalculateRank?: boolean } = {}) {
   const supabase = getSupabaseAdmin();
   const shouldRecalculateRank = options.recalculateRank ?? true;
+
+  const { data: currentScore } = await supabase
+    .from("scores")
+    .select("score,nft_count,rank")
+    .eq("user_id", userId)
+    .maybeSingle();
 
   await supabase.from("nft_holdings").delete().eq("user_id", userId);
 
@@ -128,6 +205,28 @@ export async function resetScore(userId: string, options: { recalculateRank?: bo
 
   if (shouldRecalculateRank) {
     await recalculateRanks();
+  }
+
+  if (currentScore && (currentScore.score > 0 || currentScore.nft_count > 0)) {
+    try {
+      await supabase.from("score_history").insert({
+        user_id: userId,
+        old_score: currentScore.score,
+        new_score: 0,
+        points_delta: -currentScore.score,
+        old_nft_count: currentScore.nft_count,
+        new_nft_count: 0,
+        nft_delta: -currentScore.nft_count,
+        old_rank: currentScore.rank,
+        new_rank: null,
+        event_type: "wallet_disconnected",
+        reason: `Wallet disconnected (-${currentScore.score} pts)`,
+        metadata_json: {},
+        created_at: new Date().toISOString()
+      });
+    } catch {
+      // Allow reset flow to succeed
+    }
   }
 }
 
@@ -150,3 +249,4 @@ export async function recalculateRanks() {
     if (updateError) throw updateError;
   }
 }
+

@@ -33,10 +33,16 @@ export default function AgentGuidePage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,82,255,0.14),transparent_30%),linear-gradient(rgba(0,0,0,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.035)_1px,transparent_1px)] bg-[size:auto,42px_42px,42px_42px]" />
       <div className="relative mx-auto max-w-5xl">
         <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm md:p-10">
-          <p className="text-sm font-bold uppercase tracking-[0.22em] text-baseblue">Agent onboarding</p>
-          <div className="mt-4 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Agent onboarding</p>
+          <div className="mt-2 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
             <div>
-              <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
+              <h1
+                className="text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  letterSpacing: "0.02em",
+                }}
+              >
                 Clear instructions for AI agents joining OG-Block.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-black/65">

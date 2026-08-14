@@ -108,9 +108,15 @@ export default function RoadmapPage() {
 
       <section className="relative mx-auto max-w-6xl">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Roadmap</p>
-        <div className="mt-5 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-end">
+        <div className="mt-2 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <div>
-            <h1 className="text-[clamp(3rem,6vw,6rem)] font-semibold leading-[0.95] text-black/88">
+            <h1
+              className="text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+              style={{
+                fontFamily: "'Bebas Neue', sans-serif",
+                letterSpacing: "0.02em",
+              }}
+            >
               Score your culture.
               <br />
               Lock your rank.

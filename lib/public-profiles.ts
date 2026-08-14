@@ -4,10 +4,34 @@ import type { PublicLeaderboardProfile, PublicScoreProfile } from "@/lib/types";
 import { shortAddress } from "@/lib/address";
 
 type LeaderboardRow = {
+  user_id?: string;
   rank: number | null;
   score: number;
   nft_count: number;
   last_calculated_at: string | null;
+  users: {
+    id?: string;
+    x_handle: string;
+    x_name: string | null;
+    x_avatar: string | null;
+    profile_role: "human" | "agent";
+  } | null;
+};
+
+type RawHistoryRow = {
+  id: string;
+  user_id: string;
+  old_score: number;
+  new_score: number;
+  points_delta: number;
+  old_nft_count: number;
+  new_nft_count: number;
+  nft_delta: number;
+  old_rank: number | null;
+  new_rank: number | null;
+  event_type: "initial_score" | "nft_added" | "nft_removed" | "score_updated" | "wallet_connected" | "wallet_disconnected";
+  reason: string | null;
+  created_at: string;
   users: {
     x_handle: string;
     x_name: string | null;
@@ -86,25 +110,176 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
 
 export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProfile[]> {
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
-    .from("scores")
-    .select("rank,score,nft_count,last_calculated_at,users(x_handle,x_name,x_avatar,profile_role)")
-    .order("score", { ascending: false })
-    .order("rank", { ascending: true })
-    .limit(limit);
+  const [{ data, error }, historyRes] = await Promise.all([
+    supabase
+      .from("scores")
+      .select("user_id,rank,score,nft_count,last_calculated_at,users(id,x_handle,x_name,x_avatar,profile_role)")
+      .order("score", { ascending: false })
+      .order("rank", { ascending: true })
+      .limit(limit),
+    supabase
+      .from("score_history")
+      .select("user_id,points_delta,nft_delta,event_type,created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit * 3)
+      .then(
+        (res) => res,
+        () => ({ data: null })
+      )
+  ]);
 
   if (error) throw error;
 
+  const latestHistoryByUser = new Map<
+    string,
+    {
+      points_delta: number;
+      nft_delta: number;
+      event_type: "initial_score" | "nft_added" | "nft_removed" | "score_updated" | "wallet_connected" | "wallet_disconnected";
+      created_at: string;
+    }
+  >();
+
+  if (historyRes?.data) {
+    for (const entry of historyRes.data) {
+      if (!latestHistoryByUser.has(entry.user_id)) {
+        latestHistoryByUser.set(entry.user_id, entry);
+      }
+    }
+  }
+
   const rows = (data || []) as unknown as LeaderboardRow[];
+  return rows.map((row) => {
+    const history = row.user_id ? latestHistoryByUser.get(row.user_id) : undefined;
+    const pointsDelta = history !== undefined ? history.points_delta : (row.score > 0 ? row.score : undefined);
+    const nftDelta = history !== undefined ? history.nft_delta : (row.nft_count > 0 ? row.nft_count : undefined);
+
+    return {
+      userId: row.user_id,
+      xHandle: row.users?.x_handle || "",
+      xName: row.users?.x_name || null,
+      xAvatar: row.users?.x_avatar || null,
+      profileRole: row.users?.profile_role || "human",
+      score: row.score,
+      rank: row.rank,
+      nftCount: row.nft_count,
+      badgeCount: 0,
+      lastCalculatedAt: row.last_calculated_at,
+      recentPointsDelta: pointsDelta,
+      recentNftDelta: nftDelta,
+      recentEventType: history?.event_type || (row.score > 0 ? "initial_score" : undefined),
+      recentActivityAt: history?.created_at || row.last_calculated_at
+    };
+  });
+}
+
+
+export async function getLeaderboardHistory(limit = 50): Promise<import("@/lib/types").ScoreHistoryEntry[]> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("score_history")
+    .select(`
+      id,
+      user_id,
+      old_score,
+      new_score,
+      points_delta,
+      old_nft_count,
+      new_nft_count,
+      nft_delta,
+      old_rank,
+      new_rank,
+      event_type,
+      reason,
+      created_at,
+      users (
+        x_handle,
+        x_name,
+        x_avatar,
+        profile_role
+      )
+    `)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    return [];
+  }
+
+  const rows = (data || []) as unknown as RawHistoryRow[];
   return rows.map((row) => ({
+    id: row.id,
+    userId: row.user_id,
     xHandle: row.users?.x_handle || "",
     xName: row.users?.x_name || null,
     xAvatar: row.users?.x_avatar || null,
     profileRole: row.users?.profile_role || "human",
-    score: row.score,
-    rank: row.rank,
-    nftCount: row.nft_count,
-    badgeCount: 0,
-    lastCalculatedAt: row.last_calculated_at
+    oldScore: row.old_score,
+    newScore: row.new_score,
+    pointsDelta: row.points_delta,
+    oldNftCount: row.old_nft_count,
+    newNftCount: row.new_nft_count,
+    nftDelta: row.nft_delta,
+    oldRank: row.old_rank,
+    newRank: row.new_rank,
+    eventType: row.event_type,
+    reason: row.reason,
+    createdAt: row.created_at
   }));
 }
+
+export async function getUserScoreHistory(userId: string, limit = 20): Promise<import("@/lib/types").ScoreHistoryEntry[]> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("score_history")
+    .select(`
+      id,
+      user_id,
+      old_score,
+      new_score,
+      points_delta,
+      old_nft_count,
+      new_nft_count,
+      nft_delta,
+      old_rank,
+      new_rank,
+      event_type,
+      reason,
+      created_at,
+      users (
+        x_handle,
+        x_name,
+        x_avatar,
+        profile_role
+      )
+    `)
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    return [];
+  }
+
+  const rows = (data || []) as unknown as RawHistoryRow[];
+  return rows.map((row) => ({
+    id: row.id,
+    userId: row.user_id,
+    xHandle: row.users?.x_handle || "",
+    xName: row.users?.x_name || null,
+    xAvatar: row.users?.x_avatar || null,
+    profileRole: row.users?.profile_role || "human",
+    oldScore: row.old_score,
+    newScore: row.new_score,
+    pointsDelta: row.points_delta,
+    oldNftCount: row.old_nft_count,
+    newNftCount: row.new_nft_count,
+    nftDelta: row.nft_delta,
+    oldRank: row.old_rank,
+    newRank: row.new_rank,
+    eventType: row.event_type,
+    reason: row.reason,
+    createdAt: row.created_at
+  }));
+}
+

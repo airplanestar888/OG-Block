@@ -29,8 +29,14 @@ export default function HowItWorksPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,82,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,82,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,82,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
       <section className="relative mx-auto max-w-6xl">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">How it works</p>
-        <div className="mt-5 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-end">
-          <h1 className="text-[clamp(3rem,6vw,6rem)] font-semibold leading-[0.95] text-black/88">
+        <div className="mt-2 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start">
+          <h1
+            className="text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+            style={{
+              fontFamily: "'Bebas Neue', sans-serif",
+              letterSpacing: "0.02em",
+            }}
+          >
             Proof,
             <br />
             status,

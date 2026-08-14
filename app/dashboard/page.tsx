@@ -9,6 +9,7 @@ import { XAvatar } from "@/components/x-avatar";
 import { getOgCardConfig } from "@/lib/app-config";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
+import { getUserScoreHistory } from "@/lib/public-profiles";
 import type { NftHolding } from "@/lib/types";
 
 export default async function DashboardPage() {
@@ -19,7 +20,7 @@ export default async function DashboardPage() {
   if (!user) redirect("/login");
 
   const supabase = getSupabaseAdmin();
-  const [{ data: wallets }, { data: score }, { data: holdings }, { data: ogClaim }] = await Promise.all([
+  const [{ data: wallets }, { data: score }, { data: holdings }, { data: ogClaim }, userHistory] = await Promise.all([
     supabase
       .from("wallets")
       .select("address,verified_at,wallet_slot")
@@ -39,8 +40,10 @@ export default async function DashboardPage() {
       .from("og_card_claims")
       .select("wallet_address,token_id,tier,chain_id,claimed_at")
       .eq("user_id", user.id)
-      .maybeSingle()
+      .maybeSingle(),
+    getUserScoreHistory(user.id, 15)
   ]);
+
 
   const humanWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "human");
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
@@ -237,6 +240,82 @@ export default async function DashboardPage() {
           {(holdings || []).length === 0 ? (
             <div className="rounded-lg border border-dashed border-black/15 bg-[#fbfcff] px-4 py-8 text-center text-sm text-black/55">
               No collection receipt yet.
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      {/* Score History & NFT Activity */}
+      <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 pb-4">
+          <div>
+            <h2 className="font-semibold text-ink">Score History & NFT Activity</h2>
+            <p className="mt-1 text-sm text-black/60">
+              Track of points earned and NFT balance changes over time.
+            </p>
+          </div>
+          <Link
+            href="/leaderboard"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-baseblue hover:underline"
+          >
+            <span>View Public Leaderboard</span>
+            <span>-&gt;</span>
+          </Link>
+        </div>
+
+        <div className="mt-4 divide-y divide-black/10">
+          {userHistory.map((item) => (
+            <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className={`rounded px-2 py-0.5 text-[0.68rem] font-bold uppercase ${
+                      item.eventType === "nft_added"
+                        ? "bg-emerald-500/10 text-emerald-700"
+                        : item.eventType === "initial_score"
+                        ? "bg-baseblue/10 text-baseblue"
+                        : item.eventType === "wallet_disconnected"
+                        ? "bg-rose-500/10 text-rose-700"
+                        : "bg-black/[0.06] text-black/70"
+                    }`}
+                  >
+                    {item.eventType.replace("_", " ")}
+                  </span>
+                  <span className="text-xs text-black/40">{formatUtcDate(item.createdAt)}</span>
+                </div>
+                <p className="mt-1 text-sm font-medium text-black/85">{item.reason}</p>
+                <p className="mt-0.5 text-xs text-black/50">
+                  Previous: {item.oldScore} pts -&gt; New: <span className="font-bold text-ink">{item.newScore} pts</span>
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {item.pointsDelta > 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700">
+                    <span>▲</span> +{item.pointsDelta} pts
+                  </span>
+                ) : item.pointsDelta < 0 ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/25 bg-rose-500/10 px-3 py-1 text-xs font-bold text-rose-700">
+                    <span>▼</span> {item.pointsDelta} pts
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs text-black/60">
+                    Score refreshed
+                  </span>
+                )}
+
+                {item.nftDelta > 0 ? (
+                  <span className="rounded-full bg-black/[0.05] px-2 py-1 text-xs font-bold text-black/70">
+                    +{item.nftDelta} NFT
+                  </span>
+                ) : null}
+              </div>
+            </div>
+          ))}
+
+          {userHistory.length === 0 ? (
+            <div className="py-6 text-center text-sm text-black/50">
+              No score history recorded yet. Connect a wallet to start tracking points and NFT additions.
             </div>
           ) : null}
         </div>

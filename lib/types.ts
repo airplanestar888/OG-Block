@@ -20,6 +20,7 @@ export type PublicScoreProfile = {
 };
 
 export type PublicLeaderboardProfile = {
+  userId?: string;
   xHandle: string;
   xName: string | null;
   xAvatar: string | null;
@@ -29,6 +30,38 @@ export type PublicLeaderboardProfile = {
   nftCount: number;
   badgeCount: number;
   lastCalculatedAt: string | null;
+  recentPointsDelta?: number;
+  recentNftDelta?: number;
+  recentEventType?: ScoreHistoryEventType;
+  recentActivityAt?: string | null;
+};
+
+export type ScoreHistoryEventType =
+  | "initial_score"
+  | "nft_added"
+  | "nft_removed"
+  | "score_updated"
+  | "wallet_connected"
+  | "wallet_disconnected";
+
+export type ScoreHistoryEntry = {
+  id: string;
+  userId: string;
+  xHandle: string;
+  xName: string | null;
+  xAvatar: string | null;
+  profileRole: ProfileRole;
+  oldScore: number;
+  newScore: number;
+  pointsDelta: number;
+  oldNftCount: number;
+  newNftCount: number;
+  nftDelta: number;
+  oldRank: number | null;
+  newRank: number | null;
+  eventType: ScoreHistoryEventType;
+  reason: string | null;
+  createdAt: string;
 };
 
 export type NftHolding = {
@@ -43,3 +76,4 @@ export type ScoreResult = {
   nftCount: number;
   holdings: NftHolding[];
 };
+

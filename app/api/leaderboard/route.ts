@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
-import { getLeaderboard } from "@/lib/public-profiles";
+import { getLeaderboard, getLeaderboardHistory } from "@/lib/public-profiles";
 
 export async function GET() {
-  return NextResponse.json({ leaderboard: await getLeaderboard() });
+  const [leaderboard, history] = await Promise.all([
+    getLeaderboard(),
+    getLeaderboardHistory(30)
+  ]);
+
+  return NextResponse.json({
+    leaderboard,
+    history
+  });
 }
+
