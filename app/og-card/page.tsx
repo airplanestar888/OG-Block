@@ -9,7 +9,7 @@ import { shortAddress } from "@/lib/address";
 import { pickAvailableConnector } from "@/lib/wallet";
 import { OgCardAbi } from "@/lib/og-card-abi";
 
-const CARD_IMAGE = "/og-card.png";
+const DEFAULT_CARD_IMAGE = "/api/og-card/image";
 
 // Base Builder attribution — appended to mint calldata so onchain activity
 // is credited to our builder account (builder code bc_4va9iidy).
@@ -422,10 +422,10 @@ export default function OgCardPage() {
               ✕
             </button>
 
-            {/* NFT art — same resource used for the on-chain image */}
+            {/* NFT art — dynamic resource from Supabase Storage / proxy */}
             <div className="aspect-square w-full overflow-hidden bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={CARD_IMAGE} alt="OG Card" className="h-full w-full object-cover" />
+              <img src={cardImage} alt="OG Card" className="h-full w-full object-cover" />
             </div>
 
             <div className="space-y-3 p-6 text-center">

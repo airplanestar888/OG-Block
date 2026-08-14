@@ -120,10 +120,11 @@ export default async function DashboardPage() {
           <div className="mt-5 flex flex-wrap items-center gap-4 rounded-xl border border-baseblue/15 bg-white p-4">
             <Image
               className="rounded-lg object-cover"
-              src="/og-card.png"
+              src="/api/og-card/image"
               alt="OG Card"
               width={72}
               height={72}
+              unoptimized
             />
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-ink">
