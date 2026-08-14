@@ -1,15 +1,31 @@
 import { NextResponse } from "next/server";
 import { getAppImages } from "@/lib/app-config";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import fs from "fs";
 import path from "path";
 
 export const dynamic = "force-dynamic";
 
+function parseSupabaseStorageUrl(url: string): { bucket: string; path: string } | null {
+  try {
+    const match = url.match(/\/storage\/v1\/object\/(?:sign|public|authenticated)\/([^/?#]+)\/([^?#]+)/i);
+    if (match && match[1] && match[2]) {
+      return {
+        bucket: decodeURIComponent(match[1]),
+        path: decodeURIComponent(match[2])
+      };
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
 /**
  * Secure Server Gateway / Image Proxy for OG Card NFT
  *
  * External users / OpenSea / Wallets request: /api/og-card/image
- * Server resolves the secret image URL from Supabase Database (or local fallback)
+ * Server resolves the secret image from Supabase Storage (via Service Role SDK or URL)
  * and streams the binary image directly.
  *
  * Secrets, Supabase storage paths, and buckets are NEVER exposed to the public client.
@@ -18,26 +34,58 @@ export async function GET() {
   try {
     const { cardImageUrl } = await getAppImages();
 
-    // If configured as a remote URL (e.g. Supabase Storage), stream from server-side
     if (cardImageUrl && cardImageUrl.startsWith("http")) {
-      const response = await fetch(cardImageUrl, {
-        headers: { "Cache-Control": "no-cache" }
-      });
+      // 1. Try direct Supabase Storage SDK download using Service Role Key (most secure & reliable)
+      const parsedStorage = parseSupabaseStorageUrl(cardImageUrl);
+      if (parsedStorage) {
+        try {
+          const supabase = getSupabaseAdmin();
+          const { data: blob, error: downloadError } = await supabase.storage
+            .from(parsedStorage.bucket)
+            .download(parsedStorage.path);
 
-      if (response.ok) {
-        const contentType = response.headers.get("content-type") || "image/png";
-        const buffer = await response.arrayBuffer();
+          if (blob && !downloadError) {
+            const buffer = await blob.arrayBuffer();
+            const contentType = blob.type || "image/png";
 
-        return new NextResponse(buffer, {
+            return new NextResponse(buffer, {
+              headers: {
+                "Content-Type": contentType,
+                "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400"
+              }
+            });
+          }
+        } catch (sdkError) {
+          console.warn("Supabase SDK storage download error, falling back to HTTP fetch:", sdkError);
+        }
+      }
+
+      // 2. Fallback: HTTP fetch with browser headers
+      try {
+        const response = await fetch(cardImageUrl, {
           headers: {
-            "Content-Type": contentType,
-            "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Cache-Control": "no-cache"
           }
         });
+
+        if (response.ok) {
+          const contentType = response.headers.get("content-type") || "image/png";
+          const buffer = await response.arrayBuffer();
+
+          return new NextResponse(buffer, {
+            headers: {
+              "Content-Type": contentType,
+              "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400"
+            }
+          });
+        }
+      } catch (fetchError) {
+        console.warn("HTTP fetch error for card image:", fetchError);
       }
     }
 
-    // Fallback: Read local static file from disk
+    // 3. Fallback: Read local static file from disk
     const localFilePath = path.join(process.cwd(), "public", "og-card.png");
     if (fs.existsSync(localFilePath)) {
       const fileBuffer = fs.readFileSync(localFilePath);
