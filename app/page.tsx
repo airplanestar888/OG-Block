@@ -69,7 +69,7 @@ export default async function HomePage() {
             {/* Image */}
             <div className="nft-image-wrap">
               <Image
-                className="nft-img h-full w-full object-cover grayscale"
+                className="nft-img h-full w-full object-cover"
                 src={nftImageUrl}
                 alt="OG-Block NFT collection"
                 width={1776}
