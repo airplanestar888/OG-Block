@@ -133,6 +133,12 @@ function shouldFilterContract(contractAddress: string) {
   return normalized !== "all" && normalized !== "0x0000000000000000000000000000000000000000";
 }
 
+const SUPPORTED_CHAINS = [
+  { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com" },
+  { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com" },
+  { id: 42161, name: "Arbitrum", host: "arb-mainnet.g.alchemy.com" }
+] as const;
+
 class MockNftProvider implements NftProvider {
   async getHoldings(address: string, contractAddress: string): Promise<NftHolding[]> {
     if (!address) return [];
@@ -142,6 +148,7 @@ class MockNftProvider implements NftProvider {
         tokenId: "42",
         metadata: {
           name: "Base Culture #42",
+          chain: "Base",
           attributes: [{ trait_type: "Edition", value: "Genesis" }]
         }
       },
@@ -150,41 +157,86 @@ class MockNftProvider implements NftProvider {
         tokenId: "711",
         metadata: {
           name: "Onchain Identity #711",
+          chain: "Ethereum",
           attributes: [{ trait_type: "Status", value: "OG" }]
+        }
+      },
+      {
+        contractAddress: shouldFilterContract(contractAddress) ? contractAddress : "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb",
+        tokenId: "108",
+        metadata: {
+          name: "Arbitrum Pioneer #108",
+          chain: "Arbitrum",
+          attributes: [{ trait_type: "Tier", value: "Early" }]
         }
       }
     ];
   }
 }
 
+async function fetchChainNftsFromAlchemy(
+  chainHost: string,
+  chainName: string,
+  address: string,
+  contractAddress: string,
+  apiKey: string
+): Promise<AlchemyOwnedNft[]> {
+  const ownedNfts: AlchemyOwnedNft[] = [];
+  let pageKey: string | undefined;
+
+  for (let page = 0; page < 5; page += 1) {
+    const url = new URL(`https://${chainHost}/nft/v3/${apiKey}/getNFTsForOwner`);
+    url.searchParams.set("owner", address);
+    if (shouldFilterContract(contractAddress)) {
+      url.searchParams.set("contractAddresses[]", contractAddress);
+    }
+    url.searchParams.set("withMetadata", "true");
+    url.searchParams.set("pageSize", "100");
+    if (pageKey) url.searchParams.set("pageKey", pageKey);
+    if (env.NFT_EXCLUDE_SPAM && !env.NFT_REQUIRE_VERIFIED_CONTRACT) {
+      url.searchParams.append("excludeFilters[]", "SPAM");
+    }
+
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+      if (!response.ok) break;
+
+      const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[]; pageKey?: string };
+      for (const nft of payload.ownedNfts || []) {
+        (nft as Record<string, unknown>)._chain = chainName;
+        ownedNfts.push(nft);
+      }
+      pageKey = payload.pageKey;
+      if (!pageKey) break;
+    } catch {
+      break;
+    }
+  }
+
+  return ownedNfts;
+}
+
 class AlchemyNftProvider implements NftProvider {
   async getHoldings(address: string, contractAddress: string): Promise<NftHolding[]> {
     if (!env.NFT_PROVIDER_API_KEY) throw new Error("NFT_PROVIDER_API_KEY is required for Alchemy");
     const ownedNfts: AlchemyOwnedNft[] = [];
-    let pageKey: string | undefined;
 
-    for (let page = 0; page < 10; page += 1) {
-      const url = new URL(`https://base-mainnet.g.alchemy.com/nft/v3/${env.NFT_PROVIDER_API_KEY}/getNFTsForOwner`);
-      url.searchParams.set("owner", address);
-      if (shouldFilterContract(contractAddress)) {
-        url.searchParams.set("contractAddresses[]", contractAddress);
-      }
-      url.searchParams.set("withMetadata", "true");
-      url.searchParams.set("pageSize", "100");
-      if (pageKey) url.searchParams.set("pageKey", pageKey);
-      if (env.NFT_EXCLUDE_SPAM && !env.NFT_REQUIRE_VERIFIED_CONTRACT) {
-        url.searchParams.append("excludeFilters[]", "SPAM");
-      }
+    // Fetch in parallel across Base, Ethereum Mainnet, and Arbitrum
+    const results = await Promise.allSettled(
+      SUPPORTED_CHAINS.map((c) =>
+        fetchChainNftsFromAlchemy(c.host, c.name, address, contractAddress, env.NFT_PROVIDER_API_KEY!)
+      )
+    );
 
-      const response = await fetch(url);
-      if (!response.ok) {
-        return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
+    for (const result of results) {
+      if (result.status === "fulfilled") {
+        ownedNfts.push(...result.value);
       }
+    }
 
-      const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[]; pageKey?: string };
-      ownedNfts.push(...(payload.ownedNfts || []));
-      pageKey = payload.pageKey;
-      if (!pageKey) break;
+    // If no NFTs returned from multi-chain getNFTsForOwner, fallback to transfer history
+    if (ownedNfts.length === 0) {
+      return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
     }
 
     const contractAddresses = ownedNfts.map((nft) => nft.contract?.address);
@@ -207,7 +259,8 @@ class AlchemyNftProvider implements NftProvider {
         metadata: withContractCreatorMetadata(
           {
             ...(nft.raw?.metadata || {}),
-            name: nft.raw?.metadata?.name || nft.name
+            name: nft.raw?.metadata?.name || nft.name,
+            chain: (nft as Record<string, unknown>)._chain || "Base"
           },
           nft.contract?.address || contractAddress,
           contractCreators
