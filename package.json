@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "smoke-test": "tsx scripts/smoke-test.ts",
     "smoke:acp-agent-wallet": "tsx scripts/smoke-acp-agent-wallet.ts",
     "og-card:compile": "tsx scripts/compile-og-card.ts",
     "og-card:deploy": "tsx scripts/deploy-og-card.ts",

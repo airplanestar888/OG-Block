@@ -58,7 +58,7 @@ export default function OgCardPage() {
   // runtime config (DB-backed, editable in admin portal → no redeploy)
   const [contractAddress, setContractAddress] = useState<`0x${string}` | undefined>(undefined);
   const [targetChainId, setTargetChainId] = useState<number | undefined>(undefined);
-  const [cardImage, setCardImage] = useState<string>("/og-card.png");
+  const [cardImage, setCardImage] = useState<string>("/api/og-card/image");
   const [configLoaded, setConfigLoaded] = useState(false);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function OgCardPage() {
       .then((data) => {
         if (data.contractAddress) setContractAddress(data.contractAddress as `0x${string}`);
         if (data.chainId) setTargetChainId(Number(data.chainId));
-        if (data.cardImageUrl) setCardImage(data.cardImageUrl);
+        if (data.cardImageUrl) setCardImage("/api/og-card/image");
       })
       .catch(() => {})
       .finally(() => setConfigLoaded(true));
