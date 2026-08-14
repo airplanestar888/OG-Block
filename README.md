@@ -3,7 +3,7 @@
 Production web application and culture score network on Base:
 
 - **X (Twitter) OAuth 2.0** login and profile identity
-- **Multi-Chain Verified NFT Holdings**: Calculates combined culture score across **Base Chain**, **Ethereum Mainnet (ETH)**, and **Robinhood Chain**
+- **Multi-Chain Verified NFT Holdings**: Calculates combined culture score across **Base Chain**, **Ethereum Mainnet (ETH)**, **Robinhood Chain**, and **Solana**
 - **Base Wallet Signature Verification**: One-click wallet connect & cryptographic message signing
 - **Secure Server Gateway & Image Proxy**: Private Supabase Storage assets streamed via `/api/og-card/image` without leaking bucket credentials or URLs
 - **ERC-721 On-Chain Metadata API**: OpenSea & EVM-compliant `/api/nft/metadata/:tokenId` endpoint with dynamic traits
@@ -42,6 +42,7 @@ Culture scores are calculated on the backend across verified holdings on:
 1. **Base Mainnet** (`Chain ID: 8453`)
 2. **Ethereum Mainnet (ETH)** (`Chain ID: 1`)
 3. **Robinhood Chain**
+4. **Solana**
 
 Scam & spam filtering:
 - `NFT_EXCLUDE_SPAM=true`: Alchemy removes classified spam collections.
@@ -104,7 +105,7 @@ NETWORK=testnet OG_CARD_CONTRACT=0x... BASESCAN_API_KEY=... \
 - `GET /api/me` — Current authenticated user profile
 - `POST /api/wallet/connect` — Human slot verification (signature validation)
 - `POST /api/wallet/disconnect` — Disconnect wallet slot
-- `POST /api/score/refresh` — Trigger score recalculation across Base, ETH & Robinhood
+- `POST /api/score/refresh` — Trigger score recalculation across Base, ETH, Robinhood & Solana
 - `GET /api/profile/:handle` — Public profile & score lookup (used by X extension)
 - `GET /api/leaderboard` — Full ranked culture board
 - `GET /api/leaderboard/history` — Delta and history entries

@@ -136,7 +136,8 @@ function shouldFilterContract(contractAddress: string) {
 const SUPPORTED_CHAINS = [
   { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com" },
   { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com" },
-  { id: 5678, name: "Robinhood", host: "base-mainnet.g.alchemy.com" }
+  { id: 5678, name: "Robinhood", host: "base-mainnet.g.alchemy.com" },
+  { id: 1399811149, name: "Solana", host: "solana-mainnet.g.alchemy.com" }
 ] as const;
 
 class MockNftProvider implements NftProvider {
@@ -168,6 +169,15 @@ class MockNftProvider implements NftProvider {
           name: "Robinhood Edition #108",
           chain: "Robinhood",
           attributes: [{ trait_type: "Tier", value: "Early" }]
+        }
+      },
+      {
+        contractAddress: shouldFilterContract(contractAddress) ? contractAddress : "0x9c37279c09c5d012469ee944aa04fba73491322a",
+        tokenId: "99",
+        metadata: {
+          name: "Solana Culture #99",
+          chain: "Solana",
+          attributes: [{ trait_type: "Status", value: "OG" }]
         }
       }
     ];
