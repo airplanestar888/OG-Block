@@ -7,7 +7,9 @@ import {
   getConfigValues,
   setConfigValue,
   OG_CARD_CONTRACT_KEY,
-  OG_CARD_CHAIN_ID_KEY
+  OG_CARD_CHAIN_ID_KEY,
+  OG_NFT_IMAGE_URL_KEY,
+  OG_CARD_IMAGE_URL_KEY
 } from "@/lib/app-config";
 import { env } from "@/lib/env";
 
@@ -17,7 +19,9 @@ const updateSchema = z.object({
     .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid contract address")
     .or(z.literal(""))
     .optional(),
-  chainId: z.coerce.number().int().positive().optional()
+  chainId: z.coerce.number().int().positive().optional(),
+  nftImageUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional(),
+  cardImageUrl: z.string().url("Must be a valid URL").or(z.literal("")).optional()
 });
 
 export async function GET() {
@@ -25,7 +29,12 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!isAdminUser(user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  const values = await getConfigValues([OG_CARD_CONTRACT_KEY, OG_CARD_CHAIN_ID_KEY]);
+  const values = await getConfigValues([
+    OG_CARD_CONTRACT_KEY,
+    OG_CARD_CHAIN_ID_KEY,
+    OG_NFT_IMAGE_URL_KEY,
+    OG_CARD_IMAGE_URL_KEY
+  ]);
 
   return NextResponse.json({
     // effective values (DB override → env fallback) plus the raw DB values
@@ -33,9 +42,13 @@ export async function GET() {
     chainId: values[OG_CARD_CHAIN_ID_KEY]
       ? Number(values[OG_CARD_CHAIN_ID_KEY])
       : env.NEXT_PUBLIC_OG_CARD_CHAIN_ID,
+    nftImageUrl: values[OG_NFT_IMAGE_URL_KEY] || "/og-nft-grid.png",
+    cardImageUrl: values[OG_CARD_IMAGE_URL_KEY] || "/og-card.png",
     source: {
       contractFromDb: values[OG_CARD_CONTRACT_KEY] !== null,
-      chainFromDb: values[OG_CARD_CHAIN_ID_KEY] !== null
+      chainFromDb: values[OG_CARD_CHAIN_ID_KEY] !== null,
+      nftImageFromDb: values[OG_NFT_IMAGE_URL_KEY] !== null,
+      cardImageFromDb: values[OG_CARD_IMAGE_URL_KEY] !== null
     }
   });
 }
@@ -55,7 +68,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message || "Invalid payload" }, { status: 400 });
   }
 
-  const { contractAddress, chainId } = parsed.data;
+  const { contractAddress, chainId, nftImageUrl, cardImageUrl } = parsed.data;
 
   if (contractAddress !== undefined) {
     // empty string clears the DB override (falls back to env)
@@ -68,12 +81,25 @@ export async function POST(request: Request) {
   if (chainId !== undefined) {
     await setConfigValue(OG_CARD_CHAIN_ID_KEY, String(chainId), user.x_handle);
   }
+  if (nftImageUrl !== undefined) {
+    await setConfigValue(OG_NFT_IMAGE_URL_KEY, nftImageUrl ? nftImageUrl.trim() : null, user.x_handle);
+  }
+  if (cardImageUrl !== undefined) {
+    await setConfigValue(OG_CARD_IMAGE_URL_KEY, cardImageUrl ? cardImageUrl.trim() : null, user.x_handle);
+  }
 
-  const values = await getConfigValues([OG_CARD_CONTRACT_KEY, OG_CARD_CHAIN_ID_KEY]);
+  const values = await getConfigValues([
+    OG_CARD_CONTRACT_KEY,
+    OG_CARD_CHAIN_ID_KEY,
+    OG_NFT_IMAGE_URL_KEY,
+    OG_CARD_IMAGE_URL_KEY
+  ]);
   return NextResponse.json({
     contractAddress: values[OG_CARD_CONTRACT_KEY] || env.NEXT_PUBLIC_OG_CARD_CONTRACT || "",
     chainId: values[OG_CARD_CHAIN_ID_KEY]
       ? Number(values[OG_CARD_CHAIN_ID_KEY])
-      : env.NEXT_PUBLIC_OG_CARD_CHAIN_ID
+      : env.NEXT_PUBLIC_OG_CARD_CHAIN_ID,
+    nftImageUrl: values[OG_NFT_IMAGE_URL_KEY] || "/og-nft-grid.png",
+    cardImageUrl: values[OG_CARD_IMAGE_URL_KEY] || "/og-card.png"
   });
 }

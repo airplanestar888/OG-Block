@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getOgCardConfig } from "@/lib/app-config";
+import { getOgCardConfig, getAppImages } from "@/lib/app-config";
 
-// Public: the OG Card page reads contract + chain at runtime from here,
-// so changing the address in the admin portal needs no redeploy.
+// Public: the OG Card page reads contract + chain + dynamic images at runtime from here,
+// so changing the address or images in the admin portal needs no redeploy.
 export async function GET() {
-  const config = await getOgCardConfig();
-  return NextResponse.json(config, {
+  const [config, images] = await Promise.all([getOgCardConfig(), getAppImages()]);
+  return NextResponse.json({ ...config, ...images }, {
     headers: { "Cache-Control": "no-store" }
   });
 }

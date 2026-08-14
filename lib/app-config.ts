@@ -7,10 +7,17 @@ import { env } from "@/lib/env";
 
 export const OG_CARD_CONTRACT_KEY = "og_card_contract";
 export const OG_CARD_CHAIN_ID_KEY = "og_card_chain_id";
+export const OG_NFT_IMAGE_URL_KEY = "og_nft_image_url";
+export const OG_CARD_IMAGE_URL_KEY = "og_card_image_url";
 
 export type OgCardConfig = {
   contractAddress: string | null;
   chainId: number;
+};
+
+export type AppImagesConfig = {
+  nftImageUrl: string;
+  cardImageUrl: string;
 };
 
 /// Read multiple config keys at once. Returns a map of key → value (string) or null.
@@ -33,7 +40,11 @@ export async function getConfigValues(keys: string[]): Promise<Record<string, st
 
 /// Resolve the OG Card contract config, DB first then env fallback.
 export async function getOgCardConfig(): Promise<OgCardConfig> {
-  const values = await getConfigValues([OG_CARD_CONTRACT_KEY, OG_CARD_CHAIN_ID_KEY]);
+  const values = await getConfigValues([
+    OG_CARD_CONTRACT_KEY,
+    OG_CARD_CHAIN_ID_KEY,
+    OG_CARD_IMAGE_URL_KEY
+  ]);
 
   const contractAddress =
     values[OG_CARD_CONTRACT_KEY] || env.NEXT_PUBLIC_OG_CARD_CONTRACT || null;
@@ -42,6 +53,16 @@ export async function getOgCardConfig(): Promise<OgCardConfig> {
   const chainId = chainIdRaw ? Number(chainIdRaw) : env.NEXT_PUBLIC_OG_CARD_CHAIN_ID;
 
   return { contractAddress, chainId };
+}
+
+/// Resolve dynamic images (Supabase Storage URL or fallback to local static assets).
+export async function getAppImages(): Promise<AppImagesConfig> {
+  const values = await getConfigValues([OG_NFT_IMAGE_URL_KEY, OG_CARD_IMAGE_URL_KEY]);
+
+  return {
+    nftImageUrl: values[OG_NFT_IMAGE_URL_KEY] || "/og-nft-grid.png",
+    cardImageUrl: values[OG_CARD_IMAGE_URL_KEY] || "/og-card.png"
+  };
 }
 
 /// Upsert a single config key. `updatedBy` is stored for audit.
@@ -53,3 +74,4 @@ export async function setConfigValue(key: string, value: string | null, updatedB
   );
   if (error) throw error;
 }
+
