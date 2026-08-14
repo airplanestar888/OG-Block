@@ -3,6 +3,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
 import { SiteNav } from "@/components/site-nav";
+import { NetworkGuard } from "@/components/network-guard";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.PUBLIC_APP_URL || "https://og-block.vercel.app"),
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased" suppressHydrationWarning>
         <Providers>
           <SiteNav />
+          <NetworkGuard />
           {children}
         </Providers>
         <Analytics />

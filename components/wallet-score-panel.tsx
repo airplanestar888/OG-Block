@@ -165,6 +165,31 @@ export function WalletScorePanel({
         )}
       </div>
 
+      {allowBrowserConnect && !verifiedWallet && browserWalletReady && chainId !== base.id ? (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-900">
+          <div className="flex items-center gap-2 font-medium">
+            <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            <span>Wrong Network: Your wallet is not on Base Mainnet.</span>
+          </div>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={async () => {
+              try {
+                setStatus("Switching network to Base...");
+                await switchChainAsync({ chainId: base.id });
+                setStatus("Switched to Base.");
+              } catch (err) {
+                setStatus(err instanceof Error ? err.message : "Network switch failed");
+              }
+            }}
+            className="focus-ring rounded-full bg-[#0000FF] px-3.5 py-1 text-xs font-semibold text-white hover:bg-[#141CB5]"
+          >
+            Switch to Base
+          </button>
+        </div>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
           <button
@@ -186,14 +211,33 @@ export function WalletScorePanel({
 
         {allowBrowserConnect && !verifiedWallet && browserWalletReady ? (
           <>
-            <button
-              className="focus-ring rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={busy}
-              onClick={verifyWallet}
-              type="button"
-            >
-              Verify wallet
-            </button>
+            {chainId === base.id ? (
+              <button
+                className="focus-ring rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={busy}
+                onClick={verifyWallet}
+                type="button"
+              >
+                Verify wallet
+              </button>
+            ) : (
+              <button
+                className="focus-ring rounded-full bg-[#0000FF] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#141CB5] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={busy}
+                onClick={async () => {
+                  try {
+                    setStatus("Switching network to Base...");
+                    await switchChainAsync({ chainId: base.id });
+                    setStatus("Switched to Base. You can now verify your wallet.");
+                  } catch (err) {
+                    setStatus(err instanceof Error ? err.message : "Network switch failed");
+                  }
+                }}
+                type="button"
+              >
+                Switch to Base & Verify
+              </button>
+            )}
             <button
               className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 hover:bg-black/5"
               onClick={() => disconnect()}

@@ -337,9 +337,26 @@ export default function OgCardPage() {
           <div className="space-y-3 text-center">
             <p className="font-mono text-xs text-black/45">{shortAddress(address) ?? address}</p>
             {wrongChain ? (
-              <p className="text-xs text-ember">
-                Wrong network. Minting will switch you to {targetChain.name}.
-              </p>
+              <div className="mx-auto max-w-sm rounded-xl border border-amber-500/20 bg-amber-500/10 p-3 text-xs text-amber-900">
+                <p className="font-medium">
+                  Wrong Network: You are not connected to {targetChain.name}.
+                </p>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      setError("");
+                      await switchChainAsync({ chainId: targetChain.id });
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Network switch failed");
+                    }
+                  }}
+                  className="focus-ring mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#0000FF] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#141CB5]"
+                >
+                  Switch to {targetChain.name}
+                </button>
+              </div>
             ) : null}
             <div className="flex items-center justify-center gap-3">
               <button
@@ -348,7 +365,7 @@ export default function OgCardPage() {
                 onClick={handleMint}
                 type="button"
               >
-                {txPending ? "Confirm in wallet…" : txConfirming ? "Minting…" : "Mint OG Card"}
+                {txPending ? "Confirm in wallet…" : txConfirming ? "Minting…" : wrongChain ? `Switch to ${targetChain.name} & Mint` : "Mint OG Card"}
               </button>
               <button
                 className="focus-ring rounded-full border border-black/15 px-4 py-3 text-sm font-semibold text-black/60 transition hover:bg-black/5"
