@@ -30,9 +30,16 @@ export async function POST(request: NextRequest) {
   const result = await calculateScoreForWallets(user.id, walletAddresses);
   await persistScore(user.id, result);
 
+  const { data: updated } = await supabase
+    .from("scores")
+    .select("rank")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   return NextResponse.json({
     score: result.score,
     isOg: result.isOg,
-    nftCount: result.nftCount
+    nftCount: result.nftCount,
+    rank: updated?.rank ?? null
   });
 }

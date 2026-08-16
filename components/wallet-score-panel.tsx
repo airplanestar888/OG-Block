@@ -5,12 +5,15 @@ import { useEffect, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
 import { base } from "wagmi/chains";
 import { shortAddress } from "@/lib/address";
-import { pickAvailableConnector } from "@/lib/wallet";
 import type { WalletSlot } from "@/lib/types";
+import { ScoreRevealModal } from "@/components/score-reveal-modal";
+import { ConnectWalletModal } from "@/components/connect-wallet-modal";
 
 type WalletScorePanelProps = {
   xUserId: string;
   xHandle: string;
+  xName: string | null;
+  xAvatar: string | null;
   walletSlot: WalletSlot;
   title: string;
   description: string;
@@ -21,6 +24,8 @@ type WalletScorePanelProps = {
 export function WalletScorePanel({
   xUserId,
   xHandle,
+  xName,
+  xAvatar,
   walletSlot,
   title,
   description,
@@ -29,13 +34,15 @@ export function WalletScorePanel({
 }: WalletScorePanelProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const { connect, connectors, isPending: connectPending } = useConnect();
+  const { isPending: connectPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChainAsync } = useSwitchChain();
   const { signMessageAsync } = useSignMessage();
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [revealOpen, setRevealOpen] = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -43,15 +50,6 @@ export function WalletScorePanel({
 
   const browserWalletReady = mounted && isConnected;
   const browserWalletAddress = mounted ? address : undefined;
-
-  async function refreshScoreAfterVerification() {
-    setStatus(`${title} verified. Recalculating combined OG score...`);
-    const response = await fetch("/api/score/refresh", { method: "POST" });
-    const payload = await response.json();
-    if (!response.ok) throw new Error(payload.error || "Score refresh failed");
-    setStatus(`Score and receipt refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
-    window.location.reload();
-  }
 
   async function verifyWallet() {
     if (!allowBrowserConnect || !address) return;
@@ -79,7 +77,8 @@ export function WalletScorePanel({
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Wallet verification failed");
-      await refreshScoreAfterVerification();
+      setStatus("Wallet verified. Generating your score card...");
+      setRevealOpen(true);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet verification failed");
     } finally {
@@ -195,14 +194,7 @@ export function WalletScorePanel({
           <button
             className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             disabled={!mounted || connectPending || busy}
-            onClick={async () => {
-              const connector = await pickAvailableConnector(connectors);
-              if (connector) {
-                connect({ connector });
-              } else {
-                setStatus("No EVM wallet detected. Please install MetaMask, OKX, Bitget, or Trust Wallet.");
-              }
-            }}
+            onClick={() => setConnectOpen(true)}
             type="button"
           >
             Connect wallet
@@ -271,6 +263,16 @@ export function WalletScorePanel({
       </div>
 
       {status ? <p className="mt-3 text-sm text-black/65">{status}</p> : null}
+
+      <ConnectWalletModal open={connectOpen} onClose={() => setConnectOpen(false)} />
+
+      <ScoreRevealModal
+        open={revealOpen}
+        onClose={() => setRevealOpen(false)}
+        xHandle={xHandle}
+        xName={xName}
+        xAvatar={xAvatar}
+      />
     </div>
   );
 }

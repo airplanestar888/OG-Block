@@ -21,6 +21,14 @@ function formatCompactNumber(value: number): string {
   return value.toLocaleString();
 }
 
+function formatUtcDate(value: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC"
+  }).format(new Date(value));
+}
+
 export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -37,6 +45,16 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   const featuredProfiles = leaderboard.slice(0, 3);
   const totalNfts = leaderboard.reduce((total, profile) => total + profile.nftCount, 0);
   const topScore = leaderboard[0]?.score ?? 0;
+  const latestGeneratedAt = useMemo(() => {
+    let latest: string | null = null;
+    for (const profile of leaderboard) {
+      const ts = profile.lastCalculatedAt;
+      if (ts && (!latest || new Date(ts).getTime() > new Date(latest).getTime())) {
+        latest = ts;
+      }
+    }
+    return latest;
+  }, [leaderboard]);
 
   return (
     <div className="space-y-8">
@@ -252,6 +270,15 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           </table>
         </div>
       </section>
+
+      {latestGeneratedAt ? (
+        <p className="-mt-2.5 text-left text-xs italic text-black/40">
+          Latest generated global score:{" "}
+          <time dateTime={latestGeneratedAt}>
+            {formatUtcDate(latestGeneratedAt)} UTC
+          </time>
+        </p>
+      ) : null}
 
     </div>
   );

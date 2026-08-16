@@ -73,6 +73,8 @@ export default async function DashboardPage() {
         <WalletScorePanel
           xUserId={user.x_user_id}
           xHandle={user.x_handle}
+          xName={user.x_name}
+          xAvatar={user.x_avatar}
           walletSlot="human"
           title="Wallet"
           description="Your main holder wallet. Its NFTs accumulate into the OG score."
@@ -81,6 +83,8 @@ export default async function DashboardPage() {
         <WalletScorePanel
           xUserId={user.x_user_id}
           xHandle={user.x_handle}
+          xName={user.x_name}
+          xAvatar={user.x_avatar}
           walletSlot="agent"
           title="Agent Wallet"
           description="Virtual IO / ACP agent wallet. Its NFTs also accumulate into the same OG score."

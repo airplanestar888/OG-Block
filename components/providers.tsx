@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { injected } from "@wagmi/core";
 import { http, createConfig } from "wagmi";
+import { walletConnect } from "wagmi/connectors";
 import { base, baseSepolia } from "wagmi/chains";
 import { WagmiProvider } from "wagmi";
 import { useState } from "react";
@@ -15,7 +16,11 @@ const wagmiConfig = createConfig({
     injected({ target: "okxWallet", shimDisconnect: true }),
     injected({ target: "bitKeep", shimDisconnect: true }),
     injected({ target: "trust", shimDisconnect: true }),
-    injected({ shimDisconnect: true })
+    injected({ shimDisconnect: true }),
+    walletConnect({
+      projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "",
+      showQrModal: true
+    })
   ],
   ssr: true,
   transports: {
