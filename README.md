@@ -5,9 +5,11 @@ Production web application and culture score network on Base:
 - **X (Twitter) OAuth 2.0** login and profile identity
 - **Multi-Chain Verified NFT Holdings**: Calculates combined culture score across **Base Chain**, **Ethereum Mainnet (ETH)**, **Robinhood Chain**, and **Solana**
 - **Base Wallet Signature Verification**: One-click wallet connect & cryptographic message signing
+- **Connect Wallet Popup + Mobile (WalletConnect)**: Branded wallet picker modal detects installed browser wallets and offers a "Mobile Wallet" option for phone-only users via WalletConnect QR pairing
+- **Score Reveal Card**: After wallet verification, a progress popup reveals a personal score card (PFP, handle, score, rank, NFTs) with **Share to X** and **Download PNG** actions
 - **Secure Server Gateway & Image Proxy**: Private Supabase Storage assets streamed via `/api/og-card/image` without leaking bucket credentials or URLs
 - **ERC-721 On-Chain Metadata API**: OpenSea & EVM-compliant `/api/nft/metadata/:tokenId` endpoint with dynamic traits
-- **Live Leaderboard with Score History**: 5-column symmetric ranking board, compact number formatting (`K`/`M`), and points delta (`▲ +X pts`)
+- **Live Leaderboard with Score History**: 5-column symmetric ranking board, compact number formatting (`K`/`M`), points delta (`▲ +X pts`), and a "latest generated global score" caption for freshness tracking
 - **Global Network Guard**: Instant wrong-network notification and 1-click automatic switch to Base
 - **Chrome Manifest V3 Extension**: Injects live culture score badge directly onto `x.com` profiles
 - **AI Agent Slot**: Crawlable `/agent-guide` and verified agent wallet slot via ACP CLI flow
@@ -63,6 +65,20 @@ NFTs from both slots are aggregated into one combined culture score and tracked 
 
 ---
 
+## Wallet Connection
+
+The dashboard "Connect wallet" button opens a branded picker modal that detects installed browser wallets (MetaMask, OKX, Bitget, Trust) by their provider flags and shows them as clickable options. A **Mobile Wallet** option uses WalletConnect so phone-only users can connect by scanning a QR code from their wallet app.
+
+After verification, a score reveal popup shows live progress, then reveals a personal score card with Share-to-X and Download-PNG actions.
+
+To enable the mobile/QR option, set a WalletConnect projectId:
+```
+NEXT_PUBLIC_WC_PROJECT_ID=   # free, from https://cloud.reown.com
+```
+Without it, only injected browser wallets are offered.
+
+---
+
 ## Secure Image Gateway & Supabase Storage
 
 Images can be hosted in **Supabase Storage** (Private or Public buckets) and configured dynamically at runtime:
@@ -105,10 +121,11 @@ NETWORK=testnet OG_CARD_CONTRACT=0x... BASESCAN_API_KEY=... \
 - `GET /api/me` — Current authenticated user profile
 - `POST /api/wallet/connect` — Human slot verification (signature validation)
 - `POST /api/wallet/disconnect` — Disconnect wallet slot
-- `POST /api/score/refresh` — Trigger score recalculation across Base, ETH, Robinhood & Solana
+- `POST /api/score/refresh` — Trigger score recalculation across Base, ETH, Robinhood & Solana (returns `score`, `isOg`, `nftCount`, `rank`)
 - `GET /api/profile/:handle` — Public profile & score lookup (used by X extension)
 - `GET /api/leaderboard` — Full ranked culture board
 - `GET /api/leaderboard/history` — Delta and history entries
+- `GET /api/avatar-proxy?url=` — Same-origin PFP proxy for client-side PNG capture (avoids canvas taint from cross-origin avatar images)
 - `GET /api/og-card/config` — Public runtime contract & image URLs
 - `GET /api/og-card/image` — Secure server-side image proxy
 - `GET /api/nft/metadata/:tokenId` — ERC-721 OpenSea compliant metadata
