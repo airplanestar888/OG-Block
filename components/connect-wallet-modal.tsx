@@ -125,11 +125,17 @@ export function ConnectWalletModal({ open, onClose }: ConnectWalletModalProps) {
                   disabled={isPending}
                 >
                   <div className="flex items-center gap-3">
-                    <span className="grid size-9 place-items-center rounded-lg bg-baseblue/10 text-sm font-bold text-baseblue">
-                      {isMobile ? "📱" : option.name.charAt(0)}
+                    <span className="grid size-9 place-items-center rounded-lg bg-baseblue/10 text-baseblue">
+                      {isMobile ? (
+                        <PhoneIcon className="size-5" />
+                      ) : option.id === "injected" ? (
+                        <GlobeIcon className="size-5" />
+                      ) : (
+                        <span className="text-sm font-bold">{option.name.charAt(0)}</span>
+                      )}
                     </span>
                     <div>
-                      <p className="text-sm font-semibold text-ink">{option.name}</p>
+                      <p className="text-xs italic text-ink">{option.name}</p>
                       {isMobile ? (
                         <p className="text-xs text-black/45">Connect from your phone</p>
                       ) : option.id === "injected" ? (
@@ -149,8 +155,7 @@ export function ConnectWalletModal({ open, onClose }: ConnectWalletModalProps) {
 
           {!hasSpecificInjected && !showGeneric ? (
             <p className="rounded-xl border border-black/10 bg-[#fbfcff] px-4 py-3 text-sm leading-6 text-black/55">
-              No browser wallet extension detected. Install MetaMask, OKX, Bitget, or Trust Wallet — or use{" "}
-              <span className="font-semibold text-ink">Mobile Wallet</span> to connect from your phone.
+              No browser wallet extension detected. Install MetaMask, OKX, Bitget, or Trust Wallet to connect from this browser.
             </p>
           ) : null}
 
@@ -166,5 +171,42 @@ export function ConnectWalletModal({ open, onClose }: ConnectWalletModalProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="6" y="2.5" width="12" height="19" rx="2.5" />
+      <line x1="11" y1="18.5" x2="13" y2="18.5" />
+    </svg>
+  );
+}
+
+function GlobeIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z" />
+    </svg>
   );
 }
