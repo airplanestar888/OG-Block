@@ -112,14 +112,8 @@ export function WalletScorePanel({
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Wallet disconnect failed");
       if (allowBrowserConnect && isConnected) disconnect();
-      setStatus(`${title} disconnected. Recalculating combined OG score...`);
-      setPrefetchedResult({
-        score: payload.score,
-        rank: payload.rank ?? null,
-        nftCount: payload.nftCount,
-        isOg: Boolean(payload.isOg)
-      });
-      setRevealOpen(true);
+      setStatus(`${title} disconnected. Combined OG score updated to ${payload.score}.`);
+      window.location.reload();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet disconnect failed");
     } finally {
