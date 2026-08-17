@@ -123,9 +123,7 @@ export function WalletScorePanel({
 
   async function refreshScore() {
     setBusy(true);
-    setStatus("Refreshing combined OG score...");
     try {
-      setStatus("Refreshing combined OG score...");
       openRevealModal();
     } finally {
       setBusy(false);
