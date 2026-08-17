@@ -82,7 +82,8 @@ create table if not exists og_card_claims (
   user_id uuid not null references users(id) on delete cascade,
   wallet_address text not null,
   claimed_at timestamptz not null default now(),
-  unique (wallet_address)
+  unique (wallet_address),
+  unique (user_id)
 );
 
 create index if not exists og_card_claims_user_id_idx on og_card_claims (user_id);
@@ -115,11 +116,28 @@ create index if not exists score_history_user_id_created_at_idx on score_history
 create index if not exists score_history_created_at_idx on score_history(created_at desc);
 create index if not exists score_history_points_delta_idx on score_history(points_delta);
 
+-- Wallet verification nonce table (single-use, auto-expiring).
+create table if not exists wallet_nonces (
+  nonce text primary key,
+  created_at timestamptz not null default now()
+);
+create index if not exists wallet_nonces_created_at_idx on wallet_nonces(created_at);
+
+-- Persistent rate limit counter (works across serverless instances).
+create table if not exists rate_limits (
+  id uuid primary key default gen_random_uuid(),
+  key text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists rate_limits_key_created_at_idx on rate_limits(key, created_at desc);
+
 alter table users enable row level security;
 alter table wallets enable row level security;
 alter table scores enable row level security;
 alter table nft_holdings enable row level security;
 alter table og_allowlist enable row level security;
+alter table wallet_nonces enable row level security;
+alter table rate_limits enable row level security;
 alter table nft_blocklist enable row level security;
 alter table og_card_claims enable row level security;
 alter table app_config enable row level security;

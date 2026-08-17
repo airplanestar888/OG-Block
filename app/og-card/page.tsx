@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useAccount, useChainId, useConnect, useDisconnect, useSwitchChain, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
+import { decodeEventLog, parseAbiItem } from "viem";
 import { base, baseSepolia } from "wagmi/chains";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { shortAddress } from "@/lib/address";
 import { pickAvailableConnector } from "@/lib/wallet";
 import { OgCardAbi } from "@/lib/og-card-abi";
+
+const MINTED_EVENT = parseAbiItem("event Minted(address indexed to, uint256 indexed tokenId)");
 
 const DEFAULT_CARD_IMAGE = "/api/og-card/image";
 
@@ -108,7 +111,7 @@ export default function OgCardPage() {
 
   // mint tx
   const { writeContract, data: txHash, isPending: txPending } = useWriteContract();
-  const { isLoading: txConfirming, isSuccess: txConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
+  const { data: receipt, isLoading: txConfirming, isSuccess: txConfirmed } = useWaitForTransactionReceipt({ hash: txHash });
 
   const busy = txPending || txConfirming;
 
@@ -129,26 +132,52 @@ export default function OgCardPage() {
       .finally(() => setLoading(false));
   }, [status]);
 
-  // after tx confirmed → record in Supabase + pop the success modal
+  // after tx confirmed → derive actual tokenId from receipt log, record claim, pop modal
   useEffect(() => {
-    if (!txConfirmed || !address) return;
-    setModalOpen(true);
-    const body: Record<string, unknown> = { walletAddress: address };
-    if (mintedTokenId !== null) {
-      body.tokenId = String(mintedTokenId);
-      body.tier = tierForNumber(mintedTokenId);
+    if (!txConfirmed || !address || !receipt || !contractAddress) return;
+
+    // Parse the Minted event from receipt logs to get the real tokenId.
+    let actualTokenId: number | null = null;
+    for (const log of receipt.logs) {
+      if (log.address.toLowerCase() !== contractAddress!.toLowerCase()) continue;
+      try {
+        const decoded = decodeEventLog({ abi: [MINTED_EVENT], data: log.data, topics: log.topics });
+        if (decoded.eventName === "Minted") {
+          actualTokenId = Number((decoded.args as { tokenId: bigint }).tokenId);
+          break;
+        }
+      } catch {
+        // not a Minted log, skip
+      }
     }
+
+    if (actualTokenId === null) {
+      setError("Mint succeeded but could not parse token ID from receipt. Your card is on-chain — refresh to update.");
+      return;
+    }
+
+    setMintedTokenId(actualTokenId);
+    setModalOpen(true);
+
+    const body: Record<string, unknown> = {
+      walletAddress: address,
+      tokenId: String(actualTokenId)
+    };
     if (targetChainId) body.chainId = targetChainId;
+
     fetch("/api/og-card/claim", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     })
-      .then((r) => r.json())
-      .then((data) => setClaim(data.claim))
-      .catch(() => {})
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok && data?.error) setError(data.error);
+        else setClaim(data.claim);
+      })
+      .catch(() => setError("Failed to record your claim. Your card is on-chain — try refreshing."))
       .finally(() => refetchOnChain());
-  }, [txConfirmed, address, refetchOnChain, mintedTokenId, targetChainId]);
+  }, [txConfirmed, address, receipt, contractAddress, targetChainId, refetchOnChain]);
 
   // lock body scroll while the modal is open
   useEffect(() => {
@@ -161,8 +190,6 @@ export default function OgCardPage() {
   async function handleMint() {
     if (!contractAddress || !address || !targetChainId) return;
     setError("");
-    // token id is assigned sequentially = current supply at mint time
-    if (nextNumber !== undefined) setMintedTokenId(nextNumber);
     try {
       if (chainId !== targetChainId) {
         await switchChainAsync({ chainId: targetChainId });

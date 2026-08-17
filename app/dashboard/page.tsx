@@ -20,29 +20,44 @@ export default async function DashboardPage() {
   if (!user) redirect("/login");
 
   const supabase = getSupabaseAdmin();
-  const [{ data: wallets }, { data: score }, { data: holdings }, { data: ogClaim }, userHistory] = await Promise.all([
-    supabase
-      .from("wallets")
-      .select("address,verified_at,wallet_slot")
-      .eq("user_id", user.id)
-      .in("wallet_slot", ["human", "agent"]),
-    supabase
-      .from("scores")
-      .select("score,rank,is_og,nft_count,last_calculated_at")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("nft_holdings")
-      .select("contract_address,token_id,metadata_json")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false }),
-    supabase
-      .from("og_card_claims")
-      .select("wallet_address,token_id,tier,chain_id,claimed_at")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    getUserScoreHistory(user.id, 15)
-  ]);
+  let wallets: Array<{ address: string; verified_at: string | null; wallet_slot: string }> | null = null;
+  let score: { score: number; rank: number | null; is_og: boolean; nft_count: number; last_calculated_at: string | null } | null = null;
+  let holdings: Array<{ contract_address: string; token_id: string; metadata_json: unknown }> | null = null;
+  let ogClaim: { wallet_address: string; token_id: string | null; tier: string | null; chain_id: number | null; claimed_at: string } | null = null;
+  let userHistory: Awaited<ReturnType<typeof getUserScoreHistory>> = [];
+
+  try {
+    [wallets, score, holdings, ogClaim, userHistory] = await Promise.all([
+      supabase
+        .from("wallets")
+        .select("address,verified_at,wallet_slot")
+        .eq("user_id", user.id)
+        .in("wallet_slot", ["human", "agent"])
+        .then((r) => r.data ?? []),
+      supabase
+        .from("scores")
+        .select("score,rank,is_og,nft_count,last_calculated_at")
+        .eq("user_id", user.id)
+        .maybeSingle()
+        .then((r) => r.data ?? null),
+      supabase
+        .from("nft_holdings")
+        .select("contract_address,token_id,metadata_json")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .then((r) => r.data ?? []),
+      supabase
+        .from("og_card_claims")
+        .select("wallet_address,token_id,tier,chain_id,claimed_at")
+        .eq("user_id", user.id)
+        .limit(1)
+        .then((r) => r.data?.[0] ?? null),
+      getUserScoreHistory(user.id, 15).catch(() => [])
+    ]);
+  } catch {
+    // If all queries fail, the error.tsx boundary will render.
+    throw new Error("Failed to load dashboard data");
+  }
 
 
   const humanWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "human");

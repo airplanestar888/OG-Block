@@ -63,13 +63,10 @@ export async function GET(request: NextRequest) {
 }
 
 function isAuthorizedCronRequest(request: NextRequest) {
+  // CRON_SECRET is required. Never fall back to User-Agent (spoofable).
+  if (!env.CRON_SECRET) return false;
   const authorization = request.headers.get("authorization");
-  const expected = env.CRON_SECRET ? `Bearer ${env.CRON_SECRET}` : null;
-
-  if (expected && authorization === expected) return true;
-  if (!expected && request.headers.get("user-agent")?.includes("vercel-cron")) return true;
-
-  return false;
+  return authorization === `Bearer ${env.CRON_SECRET}`;
 }
 
 function getWalletGroupsByUser(wallets: WalletRow[]) {

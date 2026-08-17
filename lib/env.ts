@@ -15,7 +15,7 @@ const serverEnvSchema = z.object({
   X_BEARER_TOKEN: z.string().optional(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url().optional(),
   SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
-  NFT_PROVIDER: z.enum(["alchemy", "simplehash", "reservoir", "rpc", "mock"]).default("mock"),
+  NFT_PROVIDER: z.enum(["alchemy", "simplehash", "reservoir", "rpc", "mock"]),
   NFT_PROVIDER_API_KEY: z.string().optional(),
   NFT_EXCLUDE_SPAM: z.enum(["true", "false"]).default("true").transform((value) => value === "true"),
   NFT_REQUIRE_VERIFIED_CONTRACT: z.enum(["true", "false"]).default("true").transform((value) => value === "true"),
@@ -37,12 +37,26 @@ const serverEnvSchema = z.object({
 export const env = serverEnvSchema.parse(process.env);
 
 export function assertServerEnv() {
+  const isProduction = process.env.NODE_ENV === "production";
+
   const missing = [
     ["NEXT_PUBLIC_SUPABASE_URL", env.NEXT_PUBLIC_SUPABASE_URL],
-    ["SUPABASE_SERVICE_ROLE_KEY", env.SUPABASE_SERVICE_ROLE_KEY]
+    ["SUPABASE_SERVICE_ROLE_KEY", env.SUPABASE_SERVICE_ROLE_KEY],
+    ["NEXTAUTH_SECRET", env.NEXTAUTH_SECRET],
+    ["X_CLIENT_ID", env.X_CLIENT_ID],
+    ["X_CLIENT_SECRET", env.X_CLIENT_SECRET],
+    ["CRON_SECRET", env.CRON_SECRET]
   ].filter(([, value]) => !value);
 
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.map(([key]) => key).join(", ")}`);
+  }
+
+  if (isProduction && !env.NFT_PROVIDER) {
+    throw new Error("NFT_PROVIDER must be set in production (cannot default to mock)");
+  }
+
+  if (isProduction && env.NFT_PROVIDER === "mock") {
+    throw new Error("NFT_PROVIDER=mock is not allowed in production");
   }
 }

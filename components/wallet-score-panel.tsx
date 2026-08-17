@@ -70,12 +70,17 @@ export function WalletScorePanel({
     setStatus("Waiting for wallet signature...");
 
     try {
+      const nonceRes = await fetch("/api/wallet/nonce");
+      if (!nonceRes.ok) throw new Error("Could not get verification nonce");
+      const { nonce } = await nonceRes.json();
+
       const message = [
         "OG-Block wallet slot verification",
         `Wallet slot: ${walletSlot}`,
         `X user id: ${xUserId}`,
         `X handle: ${xHandle}`,
         `Wallet: ${address}`,
+        `Nonce: ${nonce}`,
         `Timestamp: ${new Date().toISOString()}`
       ].join("\n");
       if (chainId !== base.id) {
@@ -86,7 +91,7 @@ export function WalletScorePanel({
       const response = await fetch("/api/wallet/connect", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, chainId: base.id, walletSlot, message, signature })
+        body: JSON.stringify({ address, chainId: base.id, walletSlot, message, signature, nonce })
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Wallet verification failed");
