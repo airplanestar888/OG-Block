@@ -161,7 +161,8 @@ export default function OgCardPage() {
 
     const body: Record<string, unknown> = {
       walletAddress: address,
-      tokenId: String(actualTokenId)
+      tokenId: String(actualTokenId),
+      txHash
     };
     if (targetChainId) body.chainId = targetChainId;
 

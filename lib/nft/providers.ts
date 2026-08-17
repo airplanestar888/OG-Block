@@ -133,11 +133,13 @@ function shouldFilterContract(contractAddress: string) {
   return normalized !== "all" && normalized !== "0x0000000000000000000000000000000000000000";
 }
 
+/// Chains that have a verified working Alchemy NFT v3 endpoint.
+/// Solana is disabled: the Alchemy NFT v3 API contract is not verified for
+/// Solana's non-EVM architecture. Re-enable only after verifying ownership checks.
 const SUPPORTED_CHAINS = [
   { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com" },
   { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com" },
-  { id: 5678, name: "Robinhood", host: "base-mainnet.g.alchemy.com" },
-  { id: 1399811149, name: "Solana", host: "solana-mainnet.g.alchemy.com" }
+  { id: 4663, name: "Robinhood", host: "robinhood-mainnet.g.alchemy.com" }
 ] as const;
 
 class MockNftProvider implements NftProvider {
@@ -231,7 +233,7 @@ class AlchemyNftProvider implements NftProvider {
     if (!env.NFT_PROVIDER_API_KEY) throw new Error("NFT_PROVIDER_API_KEY is required for Alchemy");
     const ownedNfts: AlchemyOwnedNft[] = [];
 
-    // Fetch in parallel across Base, Ethereum Mainnet, and Arbitrum
+    // Fetch in parallel across all supported EVM chains (Base, Ethereum, Robinhood).
     const results = await Promise.allSettled(
       SUPPORTED_CHAINS.map((c) =>
         fetchChainNftsFromAlchemy(c.host, c.name, address, contractAddress, env.NFT_PROVIDER_API_KEY!)
@@ -581,5 +583,19 @@ class RpcNftProvider implements NftProvider {
 export function getNftProvider(): NftProvider {
   if (env.NFT_PROVIDER === "alchemy") return new AlchemyNftProvider();
   if (env.NFT_PROVIDER === "rpc") return new RpcNftProvider();
+
+  // Fail closed: mock is only allowed when explicitly set AND not in production.
+  if (env.NFT_PROVIDER === "mock" && process.env.NODE_ENV !== "production") {
+    return new MockNftProvider();
+  }
+
+  // Any other value (including undefined) is a misconfiguration.
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      `NFT_PROVIDER="${env.NFT_PROVIDER ?? ""}" is not valid for production. Set NFT_PROVIDER to "alchemy" or "rpc".`
+    );
+  }
+
+  // Non-production fallback when provider is unset.
   return new MockNftProvider();
 }

@@ -50,12 +50,27 @@ export async function calculateScoreForWallets(userId: string, walletAddresses: 
   const provider = getNftProvider();
   const normalizedWallets = [...new Set(walletAddresses.map((address) => address.toLowerCase()))];
   const holdingsByKey = new Map<string, NftHolding>();
+  let providerHadError = false;
 
   for (const walletAddress of normalizedWallets) {
-    const holdings = await provider.getHoldings(walletAddress, scoreRules.targetCollection);
-    for (const holding of holdings) {
-      holdingsByKey.set(getHoldingKey(holding), holding);
+    try {
+      const holdings = await provider.getHoldings(walletAddress, scoreRules.targetCollection);
+      for (const holding of holdings) {
+        holdingsByKey.set(getHoldingKey(holding), holding);
+      }
+    } catch (err) {
+      // Fail closed: if the NFT provider errors, record it but continue other wallets.
+      // An empty result from ALL wallets will NOT silently produce score=0 unless
+      // we are certain the provider returned legitimately empty.
+      providerHadError = true;
+      console.error(`NFT provider error for wallet ${walletAddress}:`, err instanceof Error ? err.message : err);
     }
+  }
+
+  // If the provider errored AND no holdings were found, throw — do NOT persist a
+  // score of 0 that would silently overwrite a previously good score.
+  if (providerHadError && holdingsByKey.size === 0) {
+    throw new Error("NFT provider failed and no holdings could be verified — refusing to persist a potentially false score of 0");
   }
 
   const { data: allowlist, error: allowlistError } = await supabase

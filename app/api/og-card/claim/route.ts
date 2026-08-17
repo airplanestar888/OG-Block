@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { createPublicClient, http, parseEventLogs } from "viem";
+import { createPublicClient, http, decodeEventLog, parseAbiItem } from "viem";
 import { baseSepolia, base } from "viem/chains";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { getOgCardConfig } from "@/lib/app-config";
 import { rateLimit } from "@/lib/rate-limit";
 import { OgCardAbi } from "@/lib/og-card-abi";
+
+const MINTED_EVENT = parseAbiItem("event Minted(address indexed to, uint256 indexed tokenId)");
 
 const claimSchema = z.object({
   walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
@@ -25,11 +27,14 @@ function getChain(chainId: number) {
 
 /// Verify on-chain that the wallet actually minted an OG Card, and derive the
 /// real tokenId + tier from the contract — never from the client payload.
+/// When txHash is supplied, the server fetches the receipt and parses the
+/// Minted event for authoritative tokenId + recipient.
 async function verifyClaimOnChain(
   contractAddress: string,
   walletAddress: string,
   chainId: number,
-  clientTokenId?: string
+  clientTokenId?: string,
+  txHash?: string
 ): Promise<{ tokenId: string; tier: string }> {
   const chain = getChain(chainId);
   if (!chain) throw new Error(`Unsupported chain: ${chainId}`);
@@ -38,6 +43,61 @@ async function verifyClaimOnChain(
     chain,
     transport: http()
   });
+
+  // 0. If txHash is supplied, fetch the receipt and parse the Minted event.
+  //    This is the most authoritative source — the blockchain receipt.
+  if (txHash) {
+    const receipt = await client.waitForTransactionReceipt({ hash: txHash as `0x${string}` });
+    if (receipt.status !== "success") {
+      throw new Error("Mint transaction failed on-chain");
+    }
+
+    // Parse the Minted event from receipt logs.
+    for (const log of receipt.logs) {
+      if (log.address.toLowerCase() !== contractAddress.toLowerCase()) continue;
+      try {
+        const decoded = decodeEventLog({
+          abi: [MINTED_EVENT],
+          data: log.data,
+          topics: log.topics
+        });
+        if (decoded.eventName === "Minted") {
+          const args = decoded.args as { to: string; tokenId: bigint };
+          if (args.to.toLowerCase() !== walletAddress.toLowerCase()) {
+            throw new Error("Mint event recipient does not match this wallet");
+          }
+          const verifiedTokenId = args.tokenId;
+
+          // Verify ownership as a final guard.
+          const owner = await client.readContract({
+            address: contractAddress as `0x${string}`,
+            abi: OgCardAbi,
+            functionName: "ownerOf",
+            args: [verifiedTokenId]
+          });
+          if (owner.toLowerCase() !== walletAddress.toLowerCase()) {
+            throw new Error("Token ownership verification failed");
+          }
+
+          // Derive tier on-chain.
+          const tier = await client.readContract({
+            address: contractAddress as `0x${string}`,
+            abi: OgCardAbi,
+            functionName: "tierOf",
+            args: [verifiedTokenId]
+          });
+
+          return { tokenId: verifiedTokenId.toString(), tier };
+        }
+      } catch (e) {
+        if (e instanceof Error && e.message.includes("does not match")) throw e;
+        if (e instanceof Error && e.message.includes("failed")) throw e;
+        // Not a Minted log — skip.
+      }
+    }
+    // If txHash was provided but no Minted event found, fall through to
+    // the hasClaimed + ownerOf path as a secondary check.
+  }
 
   // 1. hasClaimed — did this wallet actually mint?
   const claimed = await client.readContract({
@@ -50,8 +110,7 @@ async function verifyClaimOnChain(
     throw new Error("Wallet has not minted an OG Card on-chain");
   }
 
-  // 2. Derive tokenId. If client supplied one, verify ownership; otherwise
-  //    find it by scanning the Minted event logs for this wallet.
+  // 2. Derive tokenId. If client supplied one, verify ownership.
   let tokenId: bigint | undefined;
 
   if (clientTokenId) {
@@ -127,7 +186,8 @@ export async function POST(request: Request) {
             config.contractAddress,
             walletAddress,
             chainId,
-            payload.data.tokenId
+            payload.data.tokenId,
+            payload.data.txHash
           );
           await supabase
             .from("og_card_claims")
@@ -153,7 +213,8 @@ export async function POST(request: Request) {
       config.contractAddress,
       walletAddress,
       chainId,
-      payload.data.tokenId
+      payload.data.tokenId,
+      payload.data.txHash
     );
   } catch (err) {
     return NextResponse.json(
