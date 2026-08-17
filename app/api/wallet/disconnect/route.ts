@@ -36,23 +36,40 @@ export async function POST(request: NextRequest) {
   if (walletsError) throw walletsError;
 
   const walletAddresses = (wallets || []).map((wallet) => wallet.address).filter(Boolean);
+
   if (walletAddresses.length === 0) {
+    // No wallets left — reset the score to zero.
     await resetScore(user.id);
+    const { data: resetRow } = await supabase
+      .from("scores")
+      .select("rank")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
     return NextResponse.json({
       score: 0,
       isOg: false,
       nftCount: 0,
+      rank: resetRow?.rank ?? null,
       wallets: []
     });
   }
 
+  // Recalculate the combined score over the remaining wallets.
   const result = await calculateScoreForWallets(user.id, walletAddresses);
   await persistScore(user.id, result);
+
+  const { data: updated } = await supabase
+    .from("scores")
+    .select("rank")
+    .eq("user_id", user.id)
+    .maybeSingle();
 
   return NextResponse.json({
     score: result.score,
     isOg: result.isOg,
     nftCount: result.nftCount,
+    rank: updated?.rank ?? null,
     wallets: wallets || []
   });
 }

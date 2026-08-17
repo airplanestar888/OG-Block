@@ -9,6 +9,10 @@ type ScoreRevealModalProps = {
   xHandle: string;
   xName: string | null;
   xAvatar: string | null;
+  // Optional pre-fetched result. When supplied, the modal skips the refresh
+  // fetch and reveals the card immediately (used for disconnect, where the
+  // panel already has the recalculated score).
+  prefetchedResult?: RevealResult | null;
 };
 
 type RevealResult = {
@@ -36,7 +40,7 @@ function formatCompactNumber(value: number): string {
   return value.toLocaleString();
 }
 
-export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: ScoreRevealModalProps) {
+export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefetchedResult }: ScoreRevealModalProps) {
   const [phase, setPhase] = useState<"progress" | "reveal" | "error">("progress");
   const [progressStep, setProgressStep] = useState(0);
   const [result, setResult] = useState<RevealResult | null>(null);
@@ -69,11 +73,21 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: Sco
   useEffect(() => {
     if (!open) return;
 
+    setErrorMsg("");
+    setAvatarFailed(false);
+
+    // If the caller already has the result (e.g. disconnect flow), reveal it
+    // immediately without a fetch or staged progress.
+    if (prefetchedResult) {
+      setResult(prefetchedResult);
+      setProgressStep(PROGRESS_STEPS.length - 1);
+      setPhase("reveal");
+      return;
+    }
+
     setPhase("progress");
     setProgressStep(0);
     setResult(null);
-    setErrorMsg("");
-    setAvatarFailed(false);
 
     const controller = new AbortController();
     const stepInterval = window.setInterval(() => {
@@ -86,7 +100,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: Sco
       controller.abort();
       window.clearInterval(stepInterval);
     };
-  }, [open, runRefresh]);
+  }, [open, runRefresh, prefetchedResult]);
 
   // Body scroll lock + escape to close.
   useEffect(() => {

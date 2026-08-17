@@ -9,6 +9,13 @@ import type { WalletSlot } from "@/lib/types";
 import { ScoreRevealModal } from "@/components/score-reveal-modal";
 import { ConnectWalletModal } from "@/components/connect-wallet-modal";
 
+type RevealResult = {
+  score: number;
+  rank: number | null;
+  nftCount: number;
+  isOg: boolean;
+};
+
 type WalletScorePanelProps = {
   xUserId: string;
   xHandle: string;
@@ -43,6 +50,7 @@ export function WalletScorePanel({
   const [mounted, setMounted] = useState(false);
   const [revealOpen, setRevealOpen] = useState(false);
   const [connectOpen, setConnectOpen] = useState(false);
+  const [prefetchedResult, setPrefetchedResult] = useState<RevealResult | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -50,6 +58,11 @@ export function WalletScorePanel({
 
   const browserWalletReady = mounted && isConnected;
   const browserWalletAddress = mounted ? address : undefined;
+
+  function openRevealModal() {
+    setPrefetchedResult(null);
+    setRevealOpen(true);
+  }
 
   async function verifyWallet() {
     if (!allowBrowserConnect || !address) return;
@@ -78,7 +91,7 @@ export function WalletScorePanel({
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Wallet verification failed");
       setStatus("Wallet verified. Generating your score card...");
-      setRevealOpen(true);
+      openRevealModal();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet verification failed");
     } finally {
@@ -99,8 +112,14 @@ export function WalletScorePanel({
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Wallet disconnect failed");
       if (allowBrowserConnect && isConnected) disconnect();
-      setStatus(`${title} disconnected. Combined OG score updated to ${payload.score}.`);
-      window.location.reload();
+      setStatus(`${title} disconnected. Recalculating combined OG score...`);
+      setPrefetchedResult({
+        score: payload.score,
+        rank: payload.rank ?? null,
+        nftCount: payload.nftCount,
+        isOg: Boolean(payload.isOg)
+      });
+      setRevealOpen(true);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Wallet disconnect failed");
     } finally {
@@ -112,13 +131,8 @@ export function WalletScorePanel({
     setBusy(true);
     setStatus("Refreshing combined OG score...");
     try {
-      const response = await fetch("/api/score/refresh", { method: "POST" });
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Score refresh failed");
-      setStatus(`Score and receipt refreshed: ${payload.score} points across ${payload.nftCount} NFT(s).`);
-      window.location.reload();
-    } catch (error) {
-      setStatus(error instanceof Error ? error.message : "Score refresh failed");
+      setStatus("Refreshing combined OG score...");
+      openRevealModal();
     } finally {
       setBusy(false);
     }
@@ -268,10 +282,14 @@ export function WalletScorePanel({
 
       <ScoreRevealModal
         open={revealOpen}
-        onClose={() => setRevealOpen(false)}
+        onClose={() => {
+          setRevealOpen(false);
+          setPrefetchedResult(null);
+        }}
         xHandle={xHandle}
         xName={xName}
         xAvatar={xAvatar}
+        prefetchedResult={prefetchedResult}
       />
     </div>
   );
