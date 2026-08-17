@@ -4,7 +4,10 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import fs from "fs";
 import path from "path";
 
-export const dynamic = "force-dynamic";
+// Cache the rendered image at the edge for a long time so BaseScan/OpenSea
+// image crawlers (which time out after a few seconds) almost always hit a
+// fast cached response instead of triggering an 8s cold Supabase fetch.
+export const revalidate = 3600;
 
 function parseSupabaseStorageUrl(url: string): { bucket: string; path: string } | null {
   try {
@@ -51,7 +54,7 @@ export async function GET() {
             return new NextResponse(buffer, {
               headers: {
                 "Content-Type": contentType,
-                "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400"
+                "Cache-Control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=1209600"
               }
             });
           }
@@ -76,7 +79,7 @@ export async function GET() {
           return new NextResponse(buffer, {
             headers: {
               "Content-Type": contentType,
-              "Cache-Control": "public, max-age=60, s-maxage=300, stale-while-revalidate=86400"
+              "Cache-Control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=1209600"
             }
           });
         }
@@ -92,7 +95,7 @@ export async function GET() {
       return new NextResponse(fileBuffer, {
         headers: {
           "Content-Type": "image/png",
-          "Cache-Control": "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800"
+          "Cache-Control": "public, max-age=86400, s-maxage=604800, stale-while-revalidate=1209600"
         }
       });
     }
