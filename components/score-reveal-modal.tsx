@@ -43,6 +43,8 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: Sco
   const [errorMsg, setErrorMsg] = useState("");
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const [clipboardNotice, setClipboardNotice] = useState<string>("");
   const cardRef = useRef<HTMLDivElement>(null);
 
   const runRefresh = useCallback(async (signal: AbortSignal) => {
@@ -103,33 +105,66 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: Sco
     };
   }, [open, phase, onClose]);
 
+  // Capture the card as a PNG data URL (shared by download & share-to-X).
+  async function captureCard(): Promise<string | null> {
+    if (!cardRef.current) return null;
+    try {
+      return await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true });
+    } catch {
+      return null;
+    }
+  }
+
   const handleDownload = async () => {
-    if (!cardRef.current || downloading) return;
+    if (downloading) return;
     setDownloading(true);
     try {
-      const dataUrl = await toPng(cardRef.current, {
-        pixelRatio: 2,
-        cacheBust: true
-      });
+      const dataUrl = await captureCard();
+      if (!dataUrl) return;
       const link = document.createElement("a");
       link.download = "og-block-card.png";
       link.href = dataUrl;
       link.click();
-    } catch {
-      // ignore — capture failure is non-fatal
     } finally {
       setDownloading(false);
     }
   };
 
-  const handleShareX = () => {
-    if (!result) return;
+  const handleShareX = async () => {
+    if (!result || sharing) return;
+    setSharing(true);
+    setClipboardNotice("");
+
+    // Try to copy the card PNG to the clipboard first, so the user can paste it
+    // (Ctrl/Cmd+V) directly into the X composer that we open below.
+    let copied = false;
+    try {
+      const dataUrl = await captureCard();
+      if (dataUrl && typeof navigator !== "undefined" && navigator.clipboard && "write" in navigator.clipboard) {
+        const blob = await (await fetch(dataUrl)).blob();
+        await navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob })
+        ]);
+        copied = true;
+      }
+    } catch {
+      // Clipboard write can fail on older browsers / non-secure contexts; the
+      // intent still opens so the user can at least share the text + link.
+    }
+
     const text = `I just scored ${formatCompactNumber(result.score)} pts${
       result.rank ? ` and ranked #${result.rank}` : ""
     } on OG-Block 🚀`;
     const url = `${window.location.origin}/leaderboard`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
+
+    setClipboardNotice(
+      copied
+        ? "Card image copied! Paste it (Ctrl/Cmd+V) into the X composer."
+        : "Couldn't copy the image to clipboard — use Download PNG, then attach it manually."
+    );
+    setSharing(false);
   };
 
   const handleDone = () => {
@@ -312,11 +347,17 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: Sco
             <div className="space-y-2 p-5 sm:p-6">
               <div className="flex gap-2">
                 <button
-                  className="focus-ring inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#000000] px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98]"
+                  className="focus-ring inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#000000] px-4 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={handleShareX}
                   type="button"
+                  disabled={sharing}
                 >
-                  <span aria-hidden="true">𝕏</span> Share to X
+                  {sharing ? (
+                    <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  ) : (
+                    <span aria-hidden="true">𝕏</span>
+                  )}
+                  {sharing ? "Preparing…" : "Share to X"}
                 </button>
                 <button
                   className="focus-ring inline-flex flex-1 items-center justify-center rounded-full border border-black/15 px-4 py-3 text-sm font-semibold text-black/70 transition hover:bg-black/5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
@@ -327,6 +368,11 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar }: Sco
                   {downloading ? "Saving…" : "Download PNG"}
                 </button>
               </div>
+              {clipboardNotice ? (
+                <p className="rounded-xl border border-black/10 bg-[#fbfcff] px-4 py-2.5 text-center text-xs text-black/65">
+                  {clipboardNotice}
+                </p>
+              ) : null}
               <button
                 className="focus-ring inline-flex w-full items-center justify-center rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98]"
                 onClick={handleDone}
