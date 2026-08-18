@@ -134,12 +134,14 @@ function shouldFilterContract(contractAddress: string) {
 }
 
 /// Chains that have a verified working Alchemy NFT v3 endpoint.
-/// Solana is disabled: the Alchemy NFT v3 API contract is not verified for
-/// Solana's non-EVM architecture. Re-enable only after verifying ownership checks.
+/// Solana uses the same /nft/v3/getNFTsForOwner format as EVM chains.
+/// Note: Solana addresses are base58 (not 0x). EVM wallets won't have Solana
+/// NFTs unless the user provides a Solana wallet address separately.
 const SUPPORTED_CHAINS = [
-  { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com" },
-  { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com" },
-  { id: 4663, name: "Robinhood", host: "robinhood-mainnet.g.alchemy.com" }
+  { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com", isEvm: true },
+  { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com", isEvm: true },
+  { id: 4663, name: "Robinhood", host: "robinhood-mainnet.g.alchemy.com", isEvm: true },
+  { id: 1399811149, name: "Solana", host: "solana-mainnet.g.alchemy.com", isEvm: false }
 ] as const;
 
 class MockNftProvider implements NftProvider {
@@ -233,9 +235,14 @@ class AlchemyNftProvider implements NftProvider {
     if (!env.NFT_PROVIDER_API_KEY) throw new Error("NFT_PROVIDER_API_KEY is required for Alchemy");
     const ownedNfts: AlchemyOwnedNft[] = [];
 
-    // Fetch in parallel across all supported EVM chains (Base, Ethereum, Robinhood).
+    // Fetch in parallel across all supported chains.
+    // Solana uses base58 addresses (non-0x) — skip it for EVM wallets to avoid
+    // pointless 403s. Solana NFTs require a Solana wallet address.
+    const isEvmAddress = address.startsWith("0x");
+    const chainsToFetch = SUPPORTED_CHAINS.filter((c) => c.isEvm === isEvmAddress);
+
     const results = await Promise.allSettled(
-      SUPPORTED_CHAINS.map((c) =>
+      chainsToFetch.map((c) =>
         fetchChainNftsFromAlchemy(c.host, c.name, address, contractAddress, env.NFT_PROVIDER_API_KEY!)
       )
     );
