@@ -349,10 +349,13 @@ function getBaseExplorerNftUrl(contractAddress: string, tokenId: string) {  retu
 }
 
 function getOgCardExplorerUrl(chainId: number, contractAddress: string | null, tokenId: string | null) {
-  const explorer = chainId === 84532 ? "https://sepolia.basescan.org" : "https://basescan.org";
-  if (contractAddress && tokenId) return `${explorer}/nft/${contractAddress}/${tokenId}`;
-  if (contractAddress) return `${explorer}/address/${contractAddress}`;
-  return explorer;
+  // Use Blockscout for the NFT instance view — it renders the token image
+  // reliably (BaseScan is slow/flaky to crawl NFT metadata images).
+  const blockscout = chainId === 84532 ? "https://base-sepolia.blockscout.com" : "https://base.blockscout.com";
+  const basescan = chainId === 84532 ? "https://sepolia.basescan.org" : "https://basescan.org";
+  if (contractAddress && tokenId) return `${blockscout}/token/${contractAddress}/instance/${tokenId}`;
+  if (contractAddress) return `${basescan}/address/${contractAddress}`;
+  return basescan;
 }
 
 function formatUtcDate(value: string) {
