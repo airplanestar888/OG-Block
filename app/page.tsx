@@ -41,8 +41,7 @@ export default async function HomePage() {
                 className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/50 sm:text-[0.95rem]"
                 style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
               >
-                Your NFT holdings have a rank. OG-Block makes that rank visible,
-                verifiable, and ready to carry anywhere culture lives.
+                Your NFT history becomes a score, rank, and proof of culture.
               </p>
             </div>
 
