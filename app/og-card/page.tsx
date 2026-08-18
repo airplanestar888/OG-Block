@@ -12,6 +12,40 @@ import { OgCardAbi } from "@/lib/og-card-abi";
 
 const MINTED_EVENT = parseAbiItem("event Minted(address indexed to, uint256 indexed tokenId)");
 
+function describeWalletError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+
+  if (/user rejected|rejected the request|denied|unauthorized/i.test(msg)) {
+    return "You rejected the request in your wallet. Try again and approve the transaction to mint your OG Card.";
+  }
+  if (/insufficient funds|insufficient balance/i.test(msg)) {
+    return "Not enough gas (ETH) in your wallet to cover the mint transaction. Add some ETH on Base and try again.";
+  }
+  if (/already claimed|AlreadyClaimed/i.test(msg)) {
+    return "This wallet has already minted an OG Card. Each wallet can only mint once.";
+  }
+  if (/sold out|SoldOut|MAX_SUPPLY/i.test(msg)) {
+    return "All 1000 OG Cards have been minted. No more available.";
+  }
+  if (/wrong network|chain.*mismatch|incorrect chain/i.test(msg)) {
+    return "Your wallet is on the wrong network. Switch to Base and try again.";
+  }
+  if (/switch.*chain|network.*switch/i.test(msg)) {
+    return "Couldn't switch your wallet to Base. Switch manually in your wallet, then try again.";
+  }
+  if (/timeout|timed out/i.test(msg)) {
+    return "The request timed out. Check your connection and try again.";
+  }
+  if (/contract.*not.*configured|not configured/i.test(msg)) {
+    return "OG Card contract is not configured yet. Please try again later.";
+  }
+
+  // Strip viem boilerplate — keep just the first meaningful line.
+  const firstLine = msg.split("\n")[0].trim();
+  if (firstLine && firstLine.length < 120) return firstLine;
+  return "Mint failed. Try again, or refresh the page and retry.";
+}
+
 const DEFAULT_CARD_IMAGE = "/api/og-card/image";
 
 // Base Builder attribution — appended to mint calldata so onchain activity
@@ -202,10 +236,10 @@ export default function OgCardPage() {
         chainId: targetChainId,
         dataSuffix: BUILDER_DATA_SUFFIX
       }, {
-        onError: (err) => setError(err.message || "Mint failed")
+        onError: (err) => setError(describeWalletError(err))
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Mint failed");
+      setError(describeWalletError(err));
     }
   }
 
