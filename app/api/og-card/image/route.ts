@@ -37,6 +37,14 @@ export async function GET() {
   try {
     const { cardImageUrl } = await getAppImages();
 
+    // Fast path: if the configured image is a PUBLIC Supabase (or any public)
+    // URL, redirect to it. The CDN serves the small optimized image directly —
+    // far faster than re-streaming through this function, and BaseScan/OpenSea
+    // crawlers follow the redirect. No secret to hide for a public bucket.
+    if (cardImageUrl && cardImageUrl.includes("/storage/v1/object/public/")) {
+      return NextResponse.redirect(cardImageUrl, { status: 308 });
+    }
+
     if (cardImageUrl && cardImageUrl.startsWith("http")) {
       // 1. Try direct Supabase Storage SDK download using Service Role Key (most secure & reliable)
       const parsedStorage = parseSupabaseStorageUrl(cardImageUrl);
