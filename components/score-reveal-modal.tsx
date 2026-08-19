@@ -144,11 +144,16 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
 
   const handleShareX = () => {
     if (!result) return;
-    const text = `I just scored ${formatCompactNumber(result.score)} pts${
-      result.rank ? ` and ranked #${result.rank}` : ""
-    } on OG-Block 🚀`;
-    const url = `${window.location.origin}/leaderboard`;
-    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    const cleanHandle = (xHandle || "").replace(/^@/, "");
+    const url = cleanHandle
+      ? `${window.location.origin}/u/${cleanHandle}`
+      : `${window.location.origin}/leaderboard`;
+    const text =
+      `I just scored ${formatCompactNumber(result.score)} pts${
+        result.rank ? ` and ranked #${result.rank}` : ""
+      } on OG-Block 🚀\n\n` +
+      `check your score → ${url}`;
+    const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
   };
 

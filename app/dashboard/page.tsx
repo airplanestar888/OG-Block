@@ -283,7 +283,16 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <div className="mt-4 divide-y divide-black/10">
+        <details className="group mt-4">
+          <summary className="focus-ring flex cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-black/15 px-5 py-2.5 text-sm font-semibold text-black/70 transition hover:bg-black/5 [&::-webkit-details-marker]:hidden">
+            <span className="group-open:hidden">
+              Show detail{userHistory.length > 0 ? ` (${userHistory.length})` : ""}
+            </span>
+            <span className="hidden group-open:inline">Hide detail</span>
+            <span className="text-xs transition group-open:rotate-180" aria-hidden="true">▼</span>
+          </summary>
+
+          <div className="mt-4 divide-y divide-black/10">
           {userHistory.map((item) => (
             <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
               <div>
@@ -338,7 +347,8 @@ export default async function DashboardPage() {
               No score history recorded yet. Connect a wallet to start tracking points and NFT additions.
             </div>
           ) : null}
-        </div>
+          </div>
+        </details>
       </section>
 
     </main>
