@@ -16,11 +16,12 @@ const NAV_LINKS = [
   { href: "/privacy", label: "Privacy" }
 ];
 
-export function SiteNavClient({ isLoggedIn, isAdmin = false }: { isLoggedIn: boolean; isAdmin?: boolean }) {
+export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const navLinks = isAdmin ? [...NAV_LINKS, { href: "/admin", label: "Admin" }] : NAV_LINKS;
+  // /admin is intentionally hidden from the header nav. Access it directly at /admin.
+  const navLinks = NAV_LINKS;
 
   useEffect(() => {
     setOpen(false);
