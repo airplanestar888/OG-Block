@@ -5,7 +5,7 @@ const linkClass =
 
 export function SiteFooter() {
   return (
-    <footer style={{ backgroundColor: "rgb(0, 82, 255)" }}>
+    <footer style={{ backgroundColor: "rgb(0, 0, 255)" }}>
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-5 py-8 text-center">
         <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
           <a
