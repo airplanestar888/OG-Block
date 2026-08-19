@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = "https://og-block.vercel.app";
+const DEFAULT_API_BASE = "https://www.joinog.xyz";
 
 const input = document.getElementById("apiBaseUrl");
 const debugInput = document.getElementById("debugEnabled");

@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE = "https://og-block.vercel.app";
+const DEFAULT_API_BASE = "https://www.joinog.xyz";
 const BADGE_ID = "base-culture-score-badge";
 const MY_SCORE_BADGE_ID = "base-culture-my-score-badge";
 const DEBUG_OVERLAY_ID = "base-culture-debug-overlay";

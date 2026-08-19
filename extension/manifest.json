@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Base Culture Score",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Display verified Base NFT score and OG rank on x.com profiles.",
   "permissions": ["storage"],
-  "host_permissions": ["https://x.com/*", "http://localhost:3000/*", "https://og-block.vercel.app/*", "https://*.vercel.app/*"],
+  "host_permissions": ["https://x.com/*", "https://www.joinog.xyz/*"],
   "background": {
     "service_worker": "background.js"
   },
