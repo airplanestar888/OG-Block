@@ -258,8 +258,8 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
             >
               {/* Header */}
               <div className="relative overflow-hidden px-6 pb-6 pt-8">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(0,82,255,0.55),transparent_55%)]" />
-                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,82,255,0.12)_1px,transparent_1px),linear-gradient(0deg,rgba(0,82,255,0.08)_1px,transparent_1px)] bg-[length:32px_32px]" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(0,0,255,0.55),transparent_55%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.12)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.08)_1px,transparent_1px)] bg-[length:32px_32px]" />
                 <div className="relative flex items-center gap-3.5">
                   {avatarSrc ? (
                     // eslint-disable-next-line @next/next/no-img-element

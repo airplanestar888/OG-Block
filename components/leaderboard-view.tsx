@@ -93,7 +93,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               key={`featured-${profile.xHandle || index}`}
               className={`relative overflow-hidden rounded-[1.5rem] border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
                 index === 0
-                  ? "border-baseblue/25 shadow-[0_10px_28px_rgba(0,82,255,0.08)]"
+                  ? "border-baseblue/25 shadow-[0_10px_28px_rgba(0,0,255,0.08)]"
                   : "border-black/10"
               }`}
             >

@@ -6,7 +6,7 @@ const config: Config = {
     extend: {
       colors: {
         ink: "#101418",
-        baseblue: "#0052ff",
+        baseblue: "#0000ff",
         mint: "#00c48c",
         ember: "#f97316"
       }

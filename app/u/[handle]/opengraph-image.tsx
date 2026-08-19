@@ -68,7 +68,7 @@ export default async function Image({ params }: { params: { handle: string } }) 
             right: 0,
             bottom: 0,
             background:
-              "radial-gradient(circle at 25% 0%, rgba(0,82,255,0.55), transparent 55%)"
+              "radial-gradient(circle at 25% 0%, rgba(0,0,255,0.55), transparent 55%)"
           }}
         />
 
@@ -134,7 +134,7 @@ export default async function Image({ params }: { params: { handle: string } }) 
               <span
                 style={{
                   display: "flex",
-                  background: "#0052FF",
+                  background: "#0000FF",
                   borderRadius: 9999,
                   padding: "14px 32px",
                   fontSize: 40,
