@@ -212,7 +212,7 @@ export default function OgCardPage() {
       })
       .catch(() => setError("Failed to record your claim. Your card is on-chain — try refreshing."))
       .finally(() => refetchOnChain());
-  }, [txConfirmed, address, receipt, contractAddress, targetChainId, refetchOnChain]);
+  }, [txConfirmed, address, receipt, contractAddress, targetChainId, txHash, refetchOnChain]);
 
   // lock body scroll while the modal is open
   useEffect(() => {
@@ -304,6 +304,7 @@ export default function OgCardPage() {
 
         <div className="relative flex items-center gap-4">
           {userAvatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={userAvatar}
               alt=""

@@ -3,6 +3,7 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
 import { SiteNav } from "@/components/site-nav";
+import { SiteFooter } from "@/components/site-footer";
 import { NetworkGuard } from "@/components/network-guard";
 
 export const metadata: Metadata = {
@@ -38,11 +39,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased" suppressHydrationWarning>
+      <body className="flex min-h-screen flex-col font-sans antialiased" suppressHydrationWarning>
         <Providers>
           <SiteNav />
           <NetworkGuard />
-          {children}
+          <div className="flex-1">{children}</div>
+          <SiteFooter />
         </Providers>
         <Analytics />
       </body>
