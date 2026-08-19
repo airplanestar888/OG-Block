@@ -75,7 +75,7 @@ export function WalletScorePanel({
       const { nonce } = await nonceRes.json();
 
       const message = [
-        "OG-Block wallet slot verification",
+        "OG BLOCK wallet slot verification",
         `Wallet slot: ${walletSlot}`,
         `X user id: ${xUserId}`,
         `X handle: ${xHandle}`,

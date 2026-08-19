@@ -113,7 +113,7 @@ export default async function DashboardPage() {
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges & Perks</p>
             <h2 className="mt-2 font-semibold text-ink">
-              {ogClaim ? "OG Card claimed." : "OG-Block badge field is ready."}
+              {ogClaim ? "OG Card claimed." : "OG BLOCK badge field is ready."}
             </h2>
             <p className="mt-1 max-w-2xl text-sm leading-6 text-black/60">
               {ogClaim

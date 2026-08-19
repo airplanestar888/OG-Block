@@ -42,14 +42,14 @@ export function SiteNavClient({ isLoggedIn, isAdmin = false }: { isLoggedIn: boo
         <Link href="/" className="focus-ring flex items-center gap-2.5 rounded-xl px-1 py-1">
           <Image
             src="/og-block-logo.svg"
-            alt="OG-Block"
+            alt="OG BLOCK"
             width={34}
             height={32}
             className="h-8 w-[34px] rounded-[9px] object-cover shadow-[0_6px_16px_rgba(0,82,255,0.18)]"
             priority
           />
           <span className="text-[0.95rem] font-black tracking-[-0.03em] text-[#0A0B0D]">
-            OG-Block
+            OG BLOCK
           </span>
         </Link>
 

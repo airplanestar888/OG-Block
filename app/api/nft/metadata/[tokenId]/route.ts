@@ -88,7 +88,7 @@ export async function GET(
 
     const metadata = {
       name: `OG Card #${tokenId}`,
-      description: "OG-Block OG Card - on-chain proof of early membership in the OG-Block culture network on Base.",
+      description: "OG BLOCK OG Card - on-chain proof of early membership in the OG BLOCK culture network on Base.",
       image: imageUrl,
       external_url: `${origin}/og-card`,
       attributes

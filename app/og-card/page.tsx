@@ -503,7 +503,7 @@ export default function OgCardPage() {
                   <>
                     Your OG Card is now on-chain.
                     <br />
-                    Welcome to the OG-Block network.
+                    Welcome to the OG BLOCK network.
                   </>
                 ) : (
                   "Confirming your mint on-chain…"

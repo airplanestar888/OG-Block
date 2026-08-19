@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 const linkClass =
-  "text-sm font-semibold text-[#0A0B0D]/60 transition hover:text-[#0000FF]";
+  "text-sm font-semibold text-white/85 transition hover:text-white";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-black/10 bg-white">
+    <footer style={{ backgroundColor: "rgb(0, 82, 255)" }}>
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-4 px-5 py-8 text-center">
         <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
           <a
@@ -31,7 +31,7 @@ export function SiteFooter() {
             Terms
           </Link>
         </nav>
-        <p className="text-xs text-[#0A0B0D]/45">© 2026 OG-Block</p>
+        <p className="text-sm font-bold text-white">© 2026 OG BLOCK</p>
       </div>
     </footer>
   );

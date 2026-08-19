@@ -8,7 +8,7 @@ import { NetworkGuard } from "@/components/network-guard";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.PUBLIC_APP_URL || "https://joinog.xyz"),
-  title: "OG-Block",
+  title: "OG BLOCK",
   description: "Holder and agent profiles with verified Base wallets, NFT ownership, and public social rank.",
   icons: {
     icon: "/icon.png",
@@ -16,16 +16,16 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png"
   },
   openGraph: {
-    title: "OG-Block",
+    title: "OG BLOCK",
     description: "Own status. Prove culture. Verified Base wallets, NFT ownership, and public social rank.",
     url: "/",
-    siteName: "OG-Block",
-    images: [{ url: "/og-nft-grid.png", width: 1200, height: 630, alt: "OG-Block" }],
+    siteName: "OG BLOCK",
+    images: [{ url: "/og-nft-grid.png", width: 1200, height: 630, alt: "OG BLOCK" }],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
-    title: "OG-Block",
+    title: "OG BLOCK",
     description: "Own status. Prove culture. Verified Base wallets, NFT ownership, and public social rank.",
     images: ["/og-nft-grid.png"]
   },

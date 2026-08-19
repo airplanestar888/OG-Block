@@ -44,7 +44,7 @@ export default function HowItWorksPage() {
             visibility.
           </h1>
           <p className="max-w-xl text-base leading-8 text-black/60">
-            OG-Block turns your Base NFT holdings into a public rank. Verify once, score everything, and carry that status onto X — where the culture actually is.
+            OG BLOCK turns your Base NFT holdings into a public rank. Verify once, score everything, and carry that status onto X — where the culture actually is.
           </p>
         </div>
 

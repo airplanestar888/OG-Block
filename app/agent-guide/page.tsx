@@ -2,20 +2,20 @@ import Link from "next/link";
 
 const agentSteps = [
   {
-    title: "Open OG-Block",
-    copy: "Go to the OG-Block website and start from Sign in or Dashboard."
+    title: "Open OG BLOCK",
+    copy: "Go to the OG BLOCK website and start from Sign in or Dashboard."
   },
   {
     title: "Use the connected X profile",
-    copy: "Sign in with the X account that should show the OG-Block badge."
+    copy: "Sign in with the X account that should show the OG BLOCK badge."
   },
   {
     title: "Use the agent wallet slot",
-    copy: "OG-Block uses one X profile. The agent wallet is an optional plus slot attached to that profile."
+    copy: "OG BLOCK uses one X profile. The agent wallet is an optional plus slot attached to that profile."
   },
   {
     title: "Verify Agent Wallet",
-    copy: "Sign the OG-Block wallet slot verification message with your own agent wallet only. Do not use the user's personal wallet."
+    copy: "Sign the OG BLOCK wallet slot verification message with your own agent wallet only. Do not use the user's personal wallet."
   },
   {
     title: "Update OG Score",
@@ -23,7 +23,7 @@ const agentSteps = [
   },
   {
     title: "Mint when eligible",
-    copy: "If a badge mint is available, mint the OG-Block badge from the verified agent wallet."
+    copy: "If a badge mint is available, mint the OG BLOCK badge from the verified agent wallet."
   }
 ];
 
@@ -43,7 +43,7 @@ export default function AgentGuidePage() {
                   letterSpacing: "0.02em",
                 }}
               >
-                Clear instructions for AI agents joining OG-Block.
+                Clear instructions for AI agents joining OG BLOCK.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-black/65">
                 This page is public on purpose. If any AI agent scans the website, it should be able to understand exactly how to sign in, verify its agent wallet, update OG Score, and mint a badge without confusing the main wallet flow.
@@ -61,7 +61,7 @@ export default function AgentGuidePage() {
             <aside id="agent-instruction" className="rounded-2xl border border-baseblue/15 bg-baseblue/[0.04] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">Copy this to your agent</p>
               <div className="mt-3 rounded-xl border border-baseblue/15 bg-white p-4 text-sm font-semibold leading-6 text-ink">
-                Sign in to OG-Block as my agent. Use your connected X profile, verify your agent wallet, update the OG Score, and mint the badge if eligible.
+                Sign in to OG BLOCK as my agent. Use your connected X profile, verify your agent wallet, update the OG Score, and mint the badge if eligible.
               </div>
               <p className="mt-3 text-xs leading-5 text-black/55">
                 Keep it simple: the agent should use its own agent wallet, complete verification, then mint only when eligible.
@@ -88,7 +88,7 @@ export default function AgentGuidePage() {
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Goal</h2>
               <p className="mt-2 text-sm leading-6 text-black/62">
-                Sign in to OG-Block, verify the agent wallet slot, refresh combined OG Score, and mint an OG-Block badge when the profile is eligible.
+                Sign in to OG BLOCK, verify the agent wallet slot, refresh combined OG Score, and mint an OG BLOCK badge when the profile is eligible.
               </p>
             </div>
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
@@ -99,17 +99,17 @@ export default function AgentGuidePage() {
             </div>
           </div>
           <pre className="mt-4 overflow-x-auto rounded-xl bg-ink p-4 text-xs leading-6 text-white"><code>{`AGENT_TASK: OG_BLOCK_AGENT_SIGN_IN
-SITE: OG-Block
+SITE: OG BLOCK
 WALLET_SLOT: agent
 CHAIN: Base
-USER_INSTRUCTION: Sign in to OG-Block as my agent.
+USER_INSTRUCTION: Sign in to OG BLOCK as my agent.
 REQUIRED_ACTIONS:
-1. Open OG-Block.
+1. Open OG BLOCK.
 2. Sign in with the connected X profile.
 3. Use the optional agent wallet slot.
 4. Verify the Agent Wallet slot with your own agent wallet.
 5. Refresh combined OG Score.
-6. Mint OG-Block badge if eligible.
+6. Mint OG BLOCK badge if eligible.
 DO_NOT_USE: user's personal wallet for agent verification.`}</code></pre>
         </section>
       </div>

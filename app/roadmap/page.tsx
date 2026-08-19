@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Roadmap | OG-Block",
-  description: "The OG-Block roadmap from the current Q2 cycle through the next Q2 release window."
+  title: "Roadmap | OG BLOCK",
+  description: "The OG BLOCK roadmap from the current Q2 cycle through the next Q2 release window."
 };
 
 const roadmap = [
@@ -11,7 +11,7 @@ const roadmap = [
     quarter: "Q2",
     label: "Now",
     title: "Sign in and wallet proof",
-    summary: "Stabilize the core loop where one X account becomes one OG-Block profile with a verified wallet and an optional agent wallet plus slot.",
+    summary: "Stabilize the core loop where one X account becomes one OG BLOCK profile with a verified wallet and an optional agent wallet plus slot.",
     items: [
       "Use Sign in with X as the only entry point.",
       "Keep one X profile per user, with a main wallet and optional agent wallet.",
@@ -29,7 +29,7 @@ const roadmap = [
       "Create the first Genesis score snapshot for verified wallets and agent wallet plus slots.",
       "Store score inputs, rank, NFT count, badge count, AgentIdentity status, and timestamp per snapshot.",
       "Add snapshot history to dashboard and profile views.",
-      "Introduce snapshot eligibility rules for OG-Block badges and allowlists.",
+      "Introduce snapshot eligibility rules for OG BLOCK badges and allowlists.",
       "Publish transparent scoring notes so holders understand why ranks move."
     ]
   },
@@ -43,7 +43,7 @@ const roadmap = [
       "Add Badge field, claim status, mint windows, and profile eligibility checks.",
       "Connect badges to community roles, gated channels, or partner allowlists.",
       "Support seasonal badge designs for future score snapshots.",
-      "Keep collection NFTs separate from OG-Block badge and perk proofs."
+      "Keep collection NFTs separate from OG BLOCK badge and perk proofs."
     ]
   },
   {
@@ -85,7 +85,7 @@ const coreModules = [
   },
   {
     title: "Badges & Perks",
-    copy: "Score a moment, mint the proof. OG-Block badges are collectible records of where you ranked."
+    copy: "Score a moment, mint the proof. OG BLOCK badges are collectible records of where you ranked."
   },
   {
     title: "X Extension",
@@ -126,7 +126,7 @@ export default function RoadmapPage() {
           </div>
           <div className="max-w-2xl lg:pb-2">
             <p className="text-base leading-8 text-black/60">
-              OG-Block is building the reputation layer that Base culture deserves — starting with a live score, locking it into snapshots, minting it as proof, and opening it up to agents and partners across the ecosystem.
+              OG BLOCK is building the reputation layer that Base culture deserves — starting with a live score, locking it into snapshots, minting it as proof, and opening it up to agents and partners across the ecosystem.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">

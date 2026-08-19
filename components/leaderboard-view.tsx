@@ -137,7 +137,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
           <div>
             <h2 className="font-semibold text-black/88">Culture board</h2>
-            <p className="mt-1 text-sm text-black/50">Live rankings across all verified OG-Block profiles.</p>
+            <p className="mt-1 text-sm text-black/50">Live rankings across all verified OG BLOCK profiles.</p>
           </div>
 
           <div className="flex items-center gap-3">

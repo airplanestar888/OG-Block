@@ -151,7 +151,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
     const text =
       `I just scored ${formatCompactNumber(result.score)} pts${
         result.rank ? ` and ranked #${result.rank}` : ""
-      } on OG-Block 🚀\n\n` +
+      } on OG BLOCK 🚀\n\n` +
       `check your score → ${url}`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
@@ -325,7 +325,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
               {/* Footer */}
               <div className="flex items-center justify-between border-t border-white/10 px-6 py-3.5">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">
-                  OG-Block
+                  OG BLOCK
                 </p>
                 <p className="text-xs text-white/35">
                   Base culture score

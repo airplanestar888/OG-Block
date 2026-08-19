@@ -70,7 +70,7 @@ export default async function HomePage() {
               <Image
                 className="nft-img h-full w-full object-cover"
                 src="/og-nft-grid.png"
-                alt="OG-Block NFT collection"
+                alt="OG BLOCK NFT collection"
                 width={1776}
                 height={864}
                 priority

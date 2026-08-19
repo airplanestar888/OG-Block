@@ -23,17 +23,17 @@ export async function generateMetadata(
 
   if (!profile) {
     return {
-      title: "Profile not found · OG-Block",
-      description: "This OG-Block profile could not be found."
+      title: "Profile not found · OG BLOCK",
+      description: "This OG BLOCK profile could not be found."
     };
   }
 
   const cleanHandle = profile.xHandle.replace(/^@/, "");
   const name = profile.xName || `@${cleanHandle}`;
-  const title = `${name} · OG-Block`;
+  const title = `${name} · OG BLOCK`;
   const description = profile.rank
-    ? `${formatCompactNumber(profile.score)} culture score · Rank #${profile.rank} · ${profile.nftCount} NFTs on OG-Block.`
-    : `${formatCompactNumber(profile.score)} culture score · ${profile.nftCount} NFTs on OG-Block.`;
+    ? `${formatCompactNumber(profile.score)} culture score · Rank #${profile.rank} · ${profile.nftCount} NFTs on OG BLOCK.`
+    : `${formatCompactNumber(profile.score)} culture score · ${profile.nftCount} NFTs on OG BLOCK.`;
   const pageUrl = `/u/${cleanHandle}`;
 
   return {
@@ -43,7 +43,7 @@ export async function generateMetadata(
       title,
       description,
       url: pageUrl,
-      siteName: "OG-Block",
+      siteName: "OG BLOCK",
       type: "profile"
     },
     twitter: {
@@ -132,7 +132,7 @@ export default async function PublicProfilePage(
 
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-white/10 px-6 py-3.5">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">OG-Block</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-white/45">OG BLOCK</p>
             <p className="text-xs text-white/35">Base culture score</p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export default async function PublicProfilePage(
             href="/"
             className="focus-ring inline-flex w-full items-center justify-center rounded-full border border-black/15 px-5 py-3 text-sm font-semibold text-black/70 transition hover:bg-black/5"
           >
-            Get your own OG-Block card
+            Get your own OG BLOCK card
           </Link>
         </div>
       </div>

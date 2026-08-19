@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getPublicProfileByHandle } from "@/lib/public-profiles";
 
 export const runtime = "nodejs";
-export const alt = "OG-Block culture score card";
+export const alt = "OG BLOCK culture score card";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

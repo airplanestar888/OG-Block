@@ -2,29 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | OG-Block",
-  description: "Terms of service for OG-Block and the Base Culture Score tools."
+  title: "Terms of Service | OG BLOCK",
+  description: "Terms of service for OG BLOCK and the Base Culture Score tools."
 };
 
 const sections = [
   {
     title: "Acceptance of terms",
     body: [
-      "By using OG-Block, its website, API, or the Base Culture Score Chrome extension, you agree to these terms.",
+      "By using OG BLOCK, its website, API, or the Base Culture Score Chrome extension, you agree to these terms.",
       "If you do not agree, do not use the service."
     ]
   },
   {
-    title: "What OG-Block is",
+    title: "What OG BLOCK is",
     body: [
-      "OG-Block lets users connect an X account and a Base wallet to calculate and display a public culture score, rank, and OG status.",
+      "OG BLOCK lets users connect an X account and a Base wallet to calculate and display a public culture score, rank, and OG status.",
       "Scores are derived from public on-chain NFT ownership and are provided for informational and entertainment purposes only."
     ]
   },
   {
     title: "No financial advice",
     body: [
-      "OG-Block does not provide financial, investment, or legal advice. Scores, ranks, and badges are not an endorsement of any token, NFT, or project.",
+      "OG BLOCK does not provide financial, investment, or legal advice. Scores, ranks, and badges are not an endorsement of any token, NFT, or project.",
       "You are solely responsible for any on-chain transactions you make, including minting the OG Card. Blockchain transactions are irreversible."
     ]
   },
@@ -38,7 +38,7 @@ const sections = [
   {
     title: "Wallets and ownership",
     body: [
-      "You are responsible for securing your wallet and private keys. OG-Block never has custody of your funds or NFTs.",
+      "You are responsible for securing your wallet and private keys. OG BLOCK never has custody of your funds or NFTs.",
       "Verifying a wallet only proves control of that address for scoring purposes."
     ]
   },
@@ -52,7 +52,7 @@ const sections = [
   {
     title: "Contact",
     body: [
-      "For questions about these terms, contact the OG-Block team through the official channels listed on the website or Chrome Web Store listing."
+      "For questions about these terms, contact the OG BLOCK team through the official channels listed on the website or Chrome Web Store listing."
     ]
   }
 ];
@@ -67,7 +67,7 @@ export default function TermsPage() {
         </h1>
         <p className="mt-4 text-sm leading-7 text-[#0A0B0D]/58">Last updated: August 19, 2026</p>
         <p className="mt-6 text-base leading-8 text-[#0A0B0D]/64">
-          These terms govern your use of OG-Block, its website, API, and the Base Culture Score tools.
+          These terms govern your use of OG BLOCK, its website, API, and the Base Culture Score tools.
         </p>
 
         <div className="mt-10 divide-y divide-[rgba(10,11,13,0.1)] border-y border-[rgba(10,11,13,0.1)]">
