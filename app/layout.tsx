@@ -6,7 +6,7 @@ import { SiteNav } from "@/components/site-nav";
 import { NetworkGuard } from "@/components/network-guard";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.PUBLIC_APP_URL || "https://og-block.vercel.app"),
+  metadataBase: new URL(process.env.PUBLIC_APP_URL || "https://joinog.xyz"),
   title: "OG-Block",
   description: "Holder and agent profiles with verified Base wallets, NFT ownership, and public social rank.",
   icons: {

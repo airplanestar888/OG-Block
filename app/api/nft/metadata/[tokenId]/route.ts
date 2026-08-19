@@ -30,7 +30,7 @@ export async function GET(
     }
 
     const tier = tierForTokenId(tokenId);
-    const origin = process.env.PUBLIC_APP_URL || "https://og-block.vercel.app";
+    const origin = process.env.PUBLIC_APP_URL || "https://joinog.xyz";
     const imageUrl = `${origin}/api/og-card/image`;
 
     // Lookup claim record and holder info from Supabase
