@@ -12,8 +12,7 @@ const NAV_LINKS = [
   { href: "/og-card", label: "OG Card" },
   { href: "/agent-guide", label: "Agents" },
   { href: "/roadmap", label: "Roadmap" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/privacy", label: "Privacy" }
+  { href: "/dashboard", label: "Dashboard" }
 ];
 
 export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: boolean }) {
