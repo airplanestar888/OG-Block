@@ -1,143 +1,34 @@
-# Base Culture Score (OG-Block)
+# OG BLOCK
 
-Production web application and culture score network on Base:
+Turn your Base NFT holdings into a public culture score. Connect your X account and wallet, and OG BLOCK scans your NFTs to calculate a score and rank.
 
-- **X (Twitter) OAuth 2.0** login and profile identity
-- **Multi-Chain Verified NFT Holdings**: Calculates combined culture score across **Base Chain**, **Ethereum Mainnet (ETH)**, **Robinhood Chain**, and **Solana**
-- **Base Wallet Signature Verification**: One-click wallet connect & cryptographic message signing
-- **Connect Wallet Popup + Mobile (WalletConnect)**: Branded wallet picker modal detects installed browser wallets and offers a "Mobile Wallet" option for phone-only users via WalletConnect QR pairing
-- **Score Reveal Card**: After wallet verification, a progress popup reveals a personal score card (PFP, handle, score, rank, NFTs) with **Share to X** and **Download PNG** actions
-- **Secure Server Gateway & Image Proxy**: Private Supabase Storage assets streamed via `/api/og-card/image` without leaking bucket credentials or URLs
-- **ERC-721 On-Chain Metadata API**: OpenSea & EVM-compliant `/api/nft/metadata/:tokenId` endpoint with dynamic traits
-- **Live Leaderboard with Score History**: 5-column symmetric ranking board, compact number formatting (`K`/`M`), points delta (`▲ +X pts`), and a "latest generated global score" caption for freshness tracking
-- **Global Network Guard**: Instant wrong-network notification and 1-click automatic switch to Base
-- **Chrome Manifest V3 Extension**: Injects live culture score badge directly onto `x.com` profiles
-- **AI Agent Slot**: Crawlable `/agent-guide` and verified agent wallet slot via ACP CLI flow
+## How the OG Score is calculated
 
----
+Your score is the sum of the points below, based on the NFTs held in your verified wallet(s):
 
-## Local Setup
+| Rule | Points |
+| --- | --- |
+| Holding at least one NFT | **100** (once) |
+| Each additional NFT after the first | **+25** each |
+| NFT with a rare trait | **+50** per NFT |
+| Early token (token ID below 500) | **+75** per NFT |
 
-```bash
-npm install
-cp .env.example .env.local
-npm run dev
+**Rare traits** (any one of these on an NFT counts):
+- `Background: Based Blue`
+- `Status: OG`
+- `Edition: Genesis`
+
+### Example
+
+A wallet holding 3 NFTs, where 1 has a rare trait and 2 are early tokens (ID < 500):
+
+```
+100                 (holds an NFT)
++ 25 × 2 = 50       (2 additional NFTs)
++ 50 × 1 = 50       (1 rare trait)
++ 75 × 2 = 150      (2 early tokens)
+─────────────────
+= 350 points
 ```
 
-Run tests & typecheck:
-```bash
-npm run typecheck    # TypeScript verification (0 errors)
-npm run smoke-test   # 15/15 automated assertion suite
-```
-
-### Required Supabase Setup:
-
-1. Create a project at [supabase.com](https://supabase.com).
-2. Run [`supabase/schema.sql`](supabase/schema.sql) in the **SQL Editor**, or apply the migrations in [`supabase/migrations`](supabase/migrations).
-3. Set `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` and Vercel.
-
----
-
-## Multi-Chain Culture Score
-
-Culture scores are calculated on the backend across verified holdings on:
-1. **Base Mainnet** (`Chain ID: 8453`)
-2. **Ethereum Mainnet (ETH)** (`Chain ID: 1`)
-3. **Robinhood Chain**
-4. **Solana**
-
-Scam & spam filtering:
-- `NFT_EXCLUDE_SPAM=true`: Alchemy removes classified spam collections.
-- `NFT_REQUIRE_VERIFIED_CONTRACT=true`: Only scores contracts with verified source code via Etherscan / BaseScan API v2 (`chainid=8453`).
-- `NFT_MIN_FLOOR_PRICE_ETH=0.001`: Minimum floor threshold.
-- `nft_blocklist` table in Supabase: Blocks known scam/phishing contracts and creators.
-
----
-
-## Wallet Slots
-
-Every X account maps to one profile with two optional wallet slots:
-
-- `human`: The main holder wallet. Connected, signed, and managed directly from the dashboard.
-- `agent`: An optional plus slot for AI agents. Verified through the agent/ACP flow, not browser connect.
-
-NFTs from both slots are aggregated into one combined culture score and tracked in the `score_history` table.
-
----
-
-## Wallet Connection
-
-The dashboard "Connect wallet" button opens a branded picker modal that detects installed browser wallets (MetaMask, OKX, Bitget, Trust) by their provider flags and shows them as clickable options. A **Mobile Wallet** option uses WalletConnect so phone-only users can connect by scanning a QR code from their wallet app.
-
-After verification, a score reveal popup shows live progress, then reveals a personal score card with Share-to-X and Download-PNG actions.
-
-To enable the mobile/QR option, set a WalletConnect projectId:
-```
-NEXT_PUBLIC_WC_PROJECT_ID=   # free, from https://cloud.reown.com
-```
-Without it, only injected browser wallets are offered.
-
----
-
-## Secure Image Gateway & Supabase Storage
-
-Images can be hosted in **Supabase Storage** (Private or Public buckets) and configured dynamically at runtime:
-
-- **Homepage NFT Hero Grid**: `og_nft_image_url`
-- **OG Card Artwork**: `og_card_image_url`
-
-### Security (Anti-Leak & Proxy):
-- External clients, wallets, and inspect elements only see `https://og-block.vercel.app/api/og-card/image`.
-- The server backend reads the image directly from Supabase Storage using the administrator `SUPABASE_SERVICE_ROLE_KEY` and streams the binary image directly.
-- Bucket names, tokens, and storage paths are never leaked to the browser.
-
----
-
-## OG Card (ERC-721 on Base)
-
-`/og-card` allows users to mint their official soulbound-style **OG Card** ERC-721 on Base:
-
-- Contract: [`contracts/OgCard.sol`](contracts/OgCard.sol) (OpenZeppelin ERC-721 + Ownable).
-- Supply cap: 1000 OG Cards (`#0–99` Genesis, `#100–499` Early, `#500–999` Member).
-- Attributed minting: Includes Base builder attribution (`bc_4va9iidy`) via wagmi `dataSuffix`.
-- On-chain metadata: `/api/nft/metadata/:tokenId` serves live attributes (Holder, Culture Score, Rank, Tier, Date).
-
-### Smart Contract CLI Scripts:
-
-```bash
-npm run og-card:compile                              # compile Solidity → contracts/OgCard.json
-NETWORK=testnet DEPLOYER_PRIVATE_KEY=0x... \
-  npm run og-card:deploy                             # deploy (omit NETWORK for mainnet)
-DEPLOYER_PRIVATE_KEY=0x... OG_CARD_CONTRACT=0x... \
-  npm run og-card:smoke                              # mint + assert on-chain metadata (Base Sepolia)
-NETWORK=testnet OG_CARD_CONTRACT=0x... BASESCAN_API_KEY=... \
-  npm run og-card:verify                             # submit source verification to Basescan
-```
-
----
-
-## API Endpoints
-
-- `GET /api/me` — Current authenticated user profile
-- `POST /api/wallet/connect` — Human slot verification (signature validation)
-- `POST /api/wallet/disconnect` — Disconnect wallet slot
-- `POST /api/score/refresh` — Trigger score recalculation across Base, ETH, Robinhood & Solana (returns `score`, `isOg`, `nftCount`, `rank`)
-- `GET /api/profile/:handle` — Public profile & score lookup (used by X extension)
-- `GET /api/leaderboard` — Full ranked culture board
-- `GET /api/leaderboard/history` — Delta and history entries
-- `GET /api/avatar-proxy?url=` — Same-origin PFP proxy for client-side PNG capture (avoids canvas taint from cross-origin avatar images)
-- `GET /api/og-card/config` — Public runtime contract & image URLs
-- `GET /api/og-card/image` — Secure server-side image proxy
-- `GET /api/nft/metadata/:tokenId` — ERC-721 OpenSea compliant metadata
-- `GET|POST /api/admin/config` — Admin runtime settings (contract, chain, Supabase images)
-- `GET /api/cron/refresh-scores` — Daily automated score refresh
-
----
-
-## Chrome Extension
-
-Load the `extension` folder in Chrome:
-1. Navigate to `chrome://extensions`.
-2. Enable **Developer mode**.
-3. Click **Load unpacked** and select the `extension` directory.
-4. Set backend URL in extension options (defaults to `https://og-block.vercel.app`).
+Both a main wallet and an optional agent wallet accumulate into the same score. Rank is your position on the public leaderboard, highest score first.
