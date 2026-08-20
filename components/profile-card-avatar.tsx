@@ -22,13 +22,13 @@ export function ProfileCardAvatar({
         src={src}
         alt={handle}
         onError={() => setFailed(true)}
-        className="size-16 shrink-0 rounded-full border-2 border-white/20 object-cover"
+        className="size-16 shrink-0 rounded-full border-[3px] border-[#0A0B0D] object-cover"
       />
     );
   }
 
   return (
-    <div className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-white/20 bg-white/10 text-2xl font-bold">
+    <div className="grid size-16 shrink-0 place-items-center rounded-full border-[3px] border-[#0A0B0D] bg-[#0000FF] text-2xl font-bold text-white">
       {initial}
     </div>
   );
