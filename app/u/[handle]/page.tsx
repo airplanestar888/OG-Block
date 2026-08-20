@@ -73,12 +73,13 @@ export default async function PublicProfilePage(
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(0,0,255,0.14),transparent_30%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
+      {/* plain background — soft blue spotlight only */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,255,0.10),transparent_50%)]" />
 
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
         {/* Culture score card — portrait on mobile, landscape on desktop */}
-        <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-transparent text-ink shadow-sm">
-          {/* Header — transparent so the page grid shows through */}
+        <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white text-ink shadow-sm">
+          {/* Header */}
           <div className="relative px-6 pb-6 pt-8 md:px-9 md:pt-9">
             <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold text-ink md:right-9 md:top-9 md:text-sm">
               Verified on-chain
