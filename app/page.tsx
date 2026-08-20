@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { PixelField } from "@/components/pixel-field";
+import { PoweredBy } from "@/components/powered-by";
 
 
 export default async function HomePage() {
@@ -105,6 +106,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── POWERED BY ───────────────────────────────── */}
+      <PoweredBy />
 
       {/* ── FEATURES ─────────────────────────────────── */}
       <section className="page-container relative pb-16 pt-2 sm:pb-20 sm:pt-4">
