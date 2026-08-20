@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 const NAV_LINKS = [
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/og-card", label: "OG Card" },
   { href: "/agent-guide", label: "Agents" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/dashboard", label: "Dashboard" }
@@ -58,8 +57,8 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
             <Link
               key={href}
               href={href}
-              className={`focus-ring rounded-lg px-3 py-2 text-[0.82rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] hover:text-[#0A0B0D] ${
-                pathname === href ? "text-[#0A0B0D]" : "text-[#0A0B0D]/50"
+              className={`focus-ring rounded-lg px-3 py-2 text-[0.82rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] text-[#0A0B0D] ${
+                pathname === href ? "text-[#0A0B0D]" : ""
               }`}
             >
               {label}
@@ -96,8 +95,8 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
               <Link
                 key={href}
                 href={href}
-                className={`rounded-lg px-3 py-3.5 text-[0.95rem] font-semibold transition hover:bg-[rgba(10,11,13,0.04)] ${
-                  pathname === href ? "text-[#0A0B0D]" : "text-[#0A0B0D]/60"
+                className={`rounded-lg px-3 py-3.5 text-[0.95rem] font-semibold transition hover:bg-[rgba(10,11,13,0.04)] text-[#0A0B0D] ${
+                  pathname === href ? "text-[#0A0B0D]" : ""
                 }`}
               >
                 {label}

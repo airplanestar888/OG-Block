@@ -148,7 +148,7 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
 
 export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProfile[]> {
   const supabase = getSupabaseAdmin();
-  const [{ data, error }, historyRes] = await Promise.all([
+  const [{ data, error }, historyRes, claimsRes] = await Promise.all([
     supabase
       .from("scores")
       .select("user_id,rank,score,nft_count,last_calculated_at,users(id,x_handle,x_name,x_avatar,profile_role)")
@@ -163,10 +163,26 @@ export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProf
       .then(
         (res) => res,
         () => ({ data: null })
+      ),
+    supabase
+      .from("og_card_claims")
+      .select("user_id")
+      .then(
+        (res) => res,
+        () => ({ data: null })
       )
   ]);
 
   if (error) throw error;
+
+  // Count OG Card badges per user (any claim = 1+ badge).
+  const badgeCountByUser = new Map<string, number>();
+  if (claimsRes?.data) {
+    for (const claim of claimsRes.data as Array<{ user_id: string }>) {
+      if (!claim.user_id) continue;
+      badgeCountByUser.set(claim.user_id, (badgeCountByUser.get(claim.user_id) || 0) + 1);
+    }
+  }
 
   const latestHistoryByUser = new Map<
     string,
@@ -201,7 +217,7 @@ export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProf
       score: row.score,
       rank: row.rank,
       nftCount: row.nft_count,
-      badgeCount: 0,
+      badgeCount: row.user_id ? badgeCountByUser.get(row.user_id) || 0 : 0,
       lastCalculatedAt: row.last_calculated_at,
       recentPointsDelta: pointsDelta,
       recentNftDelta: nftDelta,

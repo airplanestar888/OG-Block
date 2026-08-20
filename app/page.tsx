@@ -49,10 +49,10 @@ export default async function HomePage() {
             {/* CTAs */}
             <div className="reveal reveal-d2 flex flex-wrap gap-2.5 sm:gap-3">
               <Link
-                href={session ? "/dashboard" : "/login"}
+                href={session ? "/og-card" : "/login"}
                 className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
               >
-                {session ? "Open dashboard" : "Sign in"}
+                {session ? "Get your badge" : "Sign in"}
               </Link>
               <Link
                 href="/leaderboard"
@@ -160,7 +160,7 @@ export default async function HomePage() {
 /* ── Score metric cell ───────────────────────────── */
 function ScoreMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col justify-center px-3 py-2.5 sm:px-4 sm:py-3">
+    <div className="flex flex-1 flex-col justify-center px-3 py-2.5 sm:px-4 sm:py-3">
       <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF]/60 sm:text-[0.55rem]">
         {label}
       </p>

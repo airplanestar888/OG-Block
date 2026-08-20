@@ -9,7 +9,8 @@ const linkClass =
 // Idle particle wave (footer): small square pixels that drift right-to-left
 // like flowing water, with a vertical sine bob. Canvas 2D, no Three.js. Faded
 // into the solid blue footer via a left gradient so the text stays readable.
-const PARTICLE_COLORS = ["#ffffff", "#7c5cff", "#4d7cff", "#f5c518", "#00c48c"];
+// White-only palette (varying alpha gives the gradient/depth feel).
+const PARTICLE_COLORS = ["#ffffff"];
 
 function FooterWave() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
