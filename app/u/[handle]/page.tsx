@@ -79,8 +79,10 @@ export default async function PublicProfilePage(
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
         {/* Culture score card — portrait on mobile, landscape on desktop */}
         <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white text-ink shadow-sm">
-          {/* Header */}
-          <div className="relative px-6 pb-6 pt-8 md:px-9 md:pt-9">
+          {/* Header — thin gray grid + soft blue spotlight, like the X share card */}
+          <div className="relative overflow-hidden px-6 pb-6 pt-8 md:px-9 md:pt-9">
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(10,11,13,0.06)_1px,transparent_1px),linear-gradient(0deg,rgba(10,11,13,0.05)_1px,transparent_1px)] bg-[length:42px_42px]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(0,0,255,0.12),transparent_55%)]" />
             <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold text-ink md:right-9 md:top-9 md:text-sm">
               Verified on-chain
               <span className="grid size-4 place-items-center rounded-full bg-[#0000FF] text-[0.55rem] text-white md:size-5 md:text-[0.7rem]">✓</span>
