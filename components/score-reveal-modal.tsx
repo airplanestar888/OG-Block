@@ -256,8 +256,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
             {/* Personal card — capture target */}
             <div
               ref={cardRef}
-              className="relative flex flex-col bg-[#0A0B0D] text-white"
-              style={{ width: 400 }}
+              className="relative flex w-full flex-col bg-[#0A0B0D] text-white"
             >
               {/* Header */}
               <div className="relative overflow-hidden px-6 pb-6 pt-8">

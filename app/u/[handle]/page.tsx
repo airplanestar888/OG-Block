@@ -75,74 +75,71 @@ export default async function PublicProfilePage(
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(0,0,255,0.14),transparent_30%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
-      <div className="relative mx-auto w-full max-w-[400px] space-y-6">
-        {/* Culture score card */}
+      <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
+        {/* Culture score card — portrait on mobile, landscape on desktop */}
         <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white text-ink shadow-sm">
           {/* Header */}
-          <div className="relative overflow-hidden px-6 pb-6 pt-8">
+          <div className="relative overflow-hidden px-6 pb-6 pt-8 md:px-9 md:pt-9">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(0,0,255,0.10),transparent_55%)]" />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(10,11,13,0.05)_1px,transparent_1px),linear-gradient(0deg,rgba(10,11,13,0.04)_1px,transparent_1px)] bg-[length:32px_32px]" />
-            <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold text-ink">
+            <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold text-ink md:right-9 md:top-9 md:text-sm">
               Verified on-chain
-              <span className="grid size-4 place-items-center rounded-full bg-[#0000FF] text-[0.55rem] text-white">✓</span>
+              <span className="grid size-4 place-items-center rounded-full bg-[#0000FF] text-[0.55rem] text-white md:size-5 md:text-[0.7rem]">✓</span>
             </div>
             <div className="relative flex items-center gap-3.5">
               <ProfileCardAvatar src={avatarSrc} handle={cleanHandle} />
               <div className="min-w-0">
-                <p className="truncate text-base font-semibold leading-tight text-ink">{displayName}</p>
-                <p className="truncate text-sm text-black/50">@{cleanHandle}</p>
+                <p className="truncate text-base font-semibold leading-tight text-ink md:text-2xl">{displayName}</p>
+                <p className="truncate text-sm text-black/50 md:text-base">@{cleanHandle}</p>
               </div>
             </div>
           </div>
 
           {/* Body */}
-          <div className="relative space-y-5 px-6 pb-7 pt-2">
+          <div className="relative space-y-5 px-6 pb-7 pt-2 md:px-9 md:pb-9">
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">
                   Culture score
                 </p>
-                <p className="mt-1 text-5xl font-bold leading-none tracking-tight text-ink">
+                <p className="mt-1 text-5xl font-bold leading-none tracking-tight text-ink md:text-7xl">
                   {formatCompactNumber(profile.score)}
                 </p>
               </div>
               {profile.rank ? (
-                <span className="rounded-full bg-[#0000FF] px-3 py-1.5 text-sm font-bold text-white">
+                <span className="rounded-full bg-[#0000FF] px-3 py-1.5 text-sm font-bold text-white md:px-5 md:py-2.5 md:text-lg">
                   Rank #{profile.rank}
                 </span>
               ) : null}
             </div>
 
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+            {/* Stats — 2x2 on mobile, single row of 4 on desktop */}
+            <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3 md:p-4">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">NFTs</p>
-                <p className="mt-1 text-lg font-semibold text-ink">{profile.nftCount.toLocaleString()}</p>
+                <p className="mt-1 text-lg font-semibold text-ink md:text-2xl">{profile.nftCount.toLocaleString()}</p>
               </div>
-              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3 md:p-4">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">Status</p>
-                <p className="mt-1 text-lg font-semibold text-ink">
+                <p className="mt-1 text-lg font-semibold text-ink md:text-2xl">
                   {profile.tier ? profile.tier : profile.isOg ? "OG" : "Member"}
                 </p>
               </div>
-            </div>
-
-            {/* Verified breakdown — share of holdings that are rare / early */}
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3 md:p-4">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">Rare</p>
-                <p className="mt-1 text-lg font-semibold text-ink">{rarePct}%</p>
+                <p className="mt-1 text-lg font-semibold text-ink md:text-2xl">{rarePct}%</p>
                 <p className="text-[0.6rem] text-black/35">{profile.rareCount} of {profile.nftCount}</p>
               </div>
-              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3 md:p-4">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">Early</p>
-                <p className="mt-1 text-lg font-semibold text-ink">{earlyPct}%</p>
+                <p className="mt-1 text-lg font-semibold text-ink md:text-2xl">{earlyPct}%</p>
                 <p className="text-[0.6rem] text-black/35">{profile.earlyCount} of {profile.nftCount}</p>
               </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between border-t border-black/10 px-6 py-3.5">
+          <div className="flex items-center justify-between border-t border-black/10 px-6 py-3.5 md:px-9">
             <div className="flex items-center gap-2">
               <span className="inline-block size-4 rounded-[5px] bg-[#0000FF]" />
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink">OG BLOCK</p>
@@ -152,7 +149,7 @@ export default async function PublicProfilePage(
         </div>
 
         {/* Actions */}
-        <div className="space-y-2">
+        <div className="space-y-2 md:mx-auto md:flex md:max-w-[520px] md:space-y-0 md:gap-3">
           <ShareProfileButton handle={cleanHandle} score={profile.score} rank={profile.rank} />
           <Link
             href="/"
