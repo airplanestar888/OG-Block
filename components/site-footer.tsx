@@ -157,7 +157,6 @@ export function SiteFooter() {
             Terms
           </Link>
         </nav>
-        <p className="text-sm font-bold text-white">© 2026 OG BLOCK</p>
       </div>
     </footer>
   );
