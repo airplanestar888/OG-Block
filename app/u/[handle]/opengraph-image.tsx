@@ -42,6 +42,12 @@ export default async function Image({ params }: { params: { handle: string } }) 
   const rank = profile?.rank ?? null;
   const nftCount = profile?.nftCount ?? 0;
   const isOg = Boolean(profile?.isOg);
+  const tier = profile?.tier ?? null;
+  const statusLabel = tier ? tier : isOg ? "OG" : "Member";
+  const rareCount = profile?.rareCount ?? 0;
+  const earlyCount = profile?.earlyCount ?? 0;
+  const rarePct = nftCount > 0 ? Math.round((rareCount / nftCount) * 100) : 0;
+  const earlyPct = nftCount > 0 ? Math.round((earlyCount / nftCount) * 100) : 0;
   const initial = (cleanHandle || "?").charAt(0).toUpperCase();
   const avatar = await fetchAvatarDataUrl(profile?.xAvatar);
 
@@ -111,6 +117,23 @@ export default async function Image({ params }: { params: { handle: string } }) 
             <span style={{ fontSize: 48, fontWeight: 700 }}>{displayName}</span>
             <span style={{ fontSize: 30, color: "rgba(255,255,255,0.55)" }}>@{cleanHandle}</span>
           </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginLeft: "auto",
+              gap: "10px",
+              background: "rgba(45,212,191,0.15)",
+              border: "2px solid rgba(45,212,191,0.35)",
+              color: "#5eead4",
+              borderRadius: 9999,
+              padding: "12px 24px",
+              fontSize: 26,
+              fontWeight: 700
+            }}
+          >
+            ✓ Verified on-chain
+          </div>
         </div>
 
         {/* Score */}
@@ -149,7 +172,7 @@ export default async function Image({ params }: { params: { handle: string } }) 
         </div>
 
         {/* Stats row */}
-        <div style={{ display: "flex", gap: "24px", marginTop: "auto" }}>
+        <div style={{ display: "flex", gap: "20px", marginTop: "auto" }}>
           <div
             style={{
               display: "flex",
@@ -158,11 +181,11 @@ export default async function Image({ params }: { params: { handle: string } }) 
               border: "2px solid rgba(255,255,255,0.1)",
               background: "rgba(255,255,255,0.04)",
               borderRadius: 20,
-              padding: "24px 28px"
+              padding: "22px 26px"
             }}
           >
-            <span style={{ fontSize: 24, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>NFTS</span>
-            <span style={{ fontSize: 44, fontWeight: 700, marginTop: "6px" }}>
+            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>NFTS</span>
+            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>
               {nftCount.toLocaleString()}
             </span>
           </div>
@@ -174,26 +197,53 @@ export default async function Image({ params }: { params: { handle: string } }) 
               border: "2px solid rgba(255,255,255,0.1)",
               background: "rgba(255,255,255,0.04)",
               borderRadius: 20,
-              padding: "24px 28px"
+              padding: "22px 26px"
             }}
           >
-            <span style={{ fontSize: 24, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>STATUS</span>
-            <span style={{ fontSize: 44, fontWeight: 700, marginTop: "6px" }}>
-              {isOg ? "OG" : "Member"}
-            </span>
+            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>RARE</span>
+            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>{rarePct}%</span>
           </div>
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "flex-end",
-              flex: 1
+              flex: 1,
+              border: "2px solid rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.04)",
+              borderRadius: 20,
+              padding: "22px 26px"
             }}
           >
-            <span style={{ fontSize: 34, fontWeight: 800, letterSpacing: 5 }}>OG-BLOCK</span>
-            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.35)" }}>Base culture score</span>
+            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>EARLY</span>
+            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>{earlyPct}%</span>
           </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              flex: 1,
+              border: "2px solid rgba(255,255,255,0.1)",
+              background: "rgba(255,255,255,0.04)",
+              borderRadius: 20,
+              padding: "22px 26px"
+            }}
+          >
+            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>STATUS</span>
+            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>{statusLabel}</span>
+          </div>
+        </div>
+
+        {/* Wordmark */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: "28px"
+          }}
+        >
+          <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: 5 }}>OG BLOCK</span>
+          <span style={{ fontSize: 22, color: "rgba(255,255,255,0.35)" }}>Base culture score</span>
         </div>
       </div>
     ),

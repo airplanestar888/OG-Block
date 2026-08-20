@@ -68,6 +68,8 @@ export default async function PublicProfilePage(
   const avatarSrc = profile.xAvatar
     ? `/api/avatar-proxy?url=${encodeURIComponent(profile.xAvatar)}`
     : null;
+  const rarePct = profile.nftCount > 0 ? Math.round((profile.rareCount / profile.nftCount) * 100) : 0;
+  const earlyPct = profile.nftCount > 0 ? Math.round((profile.earlyCount / profile.nftCount) * 100) : 0;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
@@ -80,6 +82,9 @@ export default async function PublicProfilePage(
           <div className="relative overflow-hidden px-6 pb-6 pt-8">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_30%_0%,rgba(0,0,255,0.55),transparent_55%)]" />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.12)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.08)_1px,transparent_1px)] bg-[length:32px_32px]" />
+            <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1 rounded-full bg-teal-400/15 px-2.5 py-1 text-[0.65rem] font-bold text-teal-300 ring-1 ring-inset ring-teal-400/30">
+              <span aria-hidden="true">✓</span> Verified on-chain
+            </div>
             <div className="relative flex items-center gap-3.5">
               {avatarSrc ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -125,7 +130,23 @@ export default async function PublicProfilePage(
               </div>
               <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-white/40">Status</p>
-                <p className="mt-1 text-lg font-semibold">{profile.isOg ? "OG" : "Member"}</p>
+                <p className="mt-1 text-lg font-semibold">
+                  {profile.tier ? profile.tier : profile.isOg ? "OG" : "Member"}
+                </p>
+              </div>
+            </div>
+
+            {/* Verified breakdown — share of holdings that are rare / early */}
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-white/40">Rare</p>
+                <p className="mt-1 text-lg font-semibold">{rarePct}%</p>
+                <p className="text-[0.6rem] text-white/35">{profile.rareCount} of {profile.nftCount}</p>
+              </div>
+              <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-white/40">Early</p>
+                <p className="mt-1 text-lg font-semibold">{earlyPct}%</p>
+                <p className="text-[0.6rem] text-white/35">{profile.earlyCount} of {profile.nftCount}</p>
               </div>
             </div>
           </div>

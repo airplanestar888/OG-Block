@@ -14,6 +14,9 @@ export type PublicScoreProfile = {
   rank: number | null;
   isOg: boolean;
   nftCount: number;
+  rareCount: number;
+  earlyCount: number;
+  tier: string | null;
   hasAgentIdentity: boolean;
   agentIdentityTokenId: string | null;
   lastCalculatedAt: string | null;

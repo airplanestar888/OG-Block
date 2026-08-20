@@ -2,6 +2,20 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getNftProvider } from "@/lib/nft/providers";
 import type { PublicLeaderboardProfile, PublicScoreProfile } from "@/lib/types";
 import { shortAddress } from "@/lib/address";
+import { scoreRules } from "@/lib/config/score-rules";
+
+function metadataHasRareTrait(metadata: unknown): boolean {
+  if (!metadata || typeof metadata !== "object") return false;
+  const attributes = (metadata as { attributes?: unknown }).attributes;
+  if (!Array.isArray(attributes)) return false;
+  return attributes.some((attribute) => {
+    if (!attribute || typeof attribute !== "object") return false;
+    const trait = attribute as { trait_type?: unknown; value?: unknown };
+    return scoreRules.rareTraits.some(
+      (rare) => trait.trait_type === rare.trait_type && trait.value === rare.value
+    );
+  });
+}
 
 type LeaderboardRow = {
   user_id?: string;
@@ -70,7 +84,7 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   if (userError) throw userError;
   if (!user) return null;
 
-  const [{ data: wallets, error: walletError }, { data: score, error: scoreError }] = await Promise.all([
+  const [{ data: wallets, error: walletError }, { data: score, error: scoreError }, { data: holdings, error: holdingsError }, { data: ogClaim, error: ogClaimError }] = await Promise.all([
     supabase
       .from("wallets")
       .select("address,wallet_slot")
@@ -80,11 +94,32 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
       .from("scores")
       .select("score,rank,is_og,nft_count,last_calculated_at")
       .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("nft_holdings")
+      .select("token_id,metadata_json")
+      .eq("user_id", user.id),
+    supabase
+      .from("og_card_claims")
+      .select("tier")
+      .eq("user_id", user.id)
+      .limit(1)
       .maybeSingle()
   ]);
 
   if (walletError) throw walletError;
   if (scoreError) throw scoreError;
+  if (holdingsError) throw holdingsError;
+  if (ogClaimError) throw ogClaimError;
+
+  // Verified breakdown from the same on-chain holdings the score is built from.
+  let rareCount = 0;
+  let earlyCount = 0;
+  for (const holding of holdings || []) {
+    if (metadataHasRareTrait(holding.metadata_json)) rareCount += 1;
+    const tokenId = Number(holding.token_id);
+    if (Number.isFinite(tokenId) && tokenId < scoreRules.earlyTokenThreshold) earlyCount += 1;
+  }
 
   const humanWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "human");
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
@@ -102,6 +137,9 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
     rank: score?.rank || null,
     isOg: Boolean(score?.is_og),
     nftCount: score?.nft_count || 0,
+    rareCount,
+    earlyCount,
+    tier: ogClaim?.tier || null,
     hasAgentIdentity: agentIdentity.hasAgentIdentity,
     agentIdentityTokenId: agentIdentity.agentIdentityTokenId,
     lastCalculatedAt: score?.last_calculated_at || null
