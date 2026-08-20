@@ -30,16 +30,25 @@ export async function POST(request: NextRequest) {
   const result = await calculateScoreForWallets(user.id, walletAddresses);
   await persistScore(user.id, result);
 
-  const { data: updated } = await supabase
-    .from("scores")
-    .select("rank")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const [{ data: updated }, { data: ogClaim }] = await Promise.all([
+    supabase
+      .from("scores")
+      .select("rank")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("og_card_claims")
+      .select("tier")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle()
+  ]);
 
   return NextResponse.json({
     score: result.score,
     isOg: result.isOg,
     nftCount: result.nftCount,
-    rank: updated?.rank ?? null
+    rank: updated?.rank ?? null,
+    tier: ogClaim?.tier ?? null
   });
 }

@@ -14,6 +14,7 @@ type RevealResult = {
   rank: number | null;
   nftCount: number;
   isOg: boolean;
+  tier: string | null;
 };
 
 type WalletScorePanelProps = {

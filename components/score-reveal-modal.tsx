@@ -20,6 +20,7 @@ type RevealResult = {
   rank: number | null;
   nftCount: number;
   isOg: boolean;
+  tier: string | null;
 };
 
 const PROGRESS_STEPS = [
@@ -59,7 +60,8 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
         score: payload.score,
         rank: payload.rank ?? null,
         nftCount: payload.nftCount,
-        isOg: Boolean(payload.isOg)
+        isOg: Boolean(payload.isOg),
+        tier: payload.tier ?? null
       });
       setPhase("reveal");
     } catch (err) {
@@ -316,7 +318,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
                       Status
                     </p>
                     <p className="mt-1 text-lg font-semibold">
-                      {result?.isOg ? "OG" : "Member"}
+                      {result?.tier ? result.tier : result?.isOg ? "OG" : "Member"}
                     </p>
                   </div>
                 </div>
