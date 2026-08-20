@@ -23,9 +23,9 @@ export function ShareProfileButton({ handle, score, rank }: ShareProfileButtonPr
     // per-URL for days; a unique query makes each share a "new" URL).
     const url = `${window.location.origin}/u/${handle}?s=${Date.now().toString(36)}`;
     const text =
-      `Check out @${handle} — ${formatCompactNumber(score)} culture score${
+      `I'm OG on OG BLOCK — ${formatCompactNumber(score)} culture score${
         rank ? ` · Rank #${rank}` : ""
-      } on OG BLOCK\n\n` +
+      }.\n\n` +
       `check your score → ${url}`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intent, "_blank", "noopener,noreferrer");

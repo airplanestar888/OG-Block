@@ -152,9 +152,9 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
       ? `${window.location.origin}/u/${cleanHandle}?s=${Date.now().toString(36)}`
       : `${window.location.origin}/leaderboard`;
     const text =
-      `I just scored ${formatCompactNumber(result.score)} pts${
-        result.rank ? ` and ranked #${result.rank}` : ""
-      } on OG BLOCK\n\n` +
+      `I'm OG on OG BLOCK — ${formatCompactNumber(result.score)} pts${
+        result.rank ? ` · Rank #${result.rank}` : ""
+      }.\n\n` +
       `check your score → ${url}`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
