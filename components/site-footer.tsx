@@ -41,7 +41,7 @@ function FooterWave() {
     let particles: Particle[] = [];
 
     function makeParticle(atRightEdge: boolean): Particle {
-      const size = 2 + Math.floor(Math.random() * 4);
+      const size = 4 + Math.floor(Math.random() * 8);
       const baseY = Math.random() * h;
       return {
         x: atRightEdge ? w + Math.random() * 40 : Math.random() * w,
@@ -68,7 +68,7 @@ function FooterWave() {
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
 
-      const count = Math.max(40, Math.floor((w * h) / 2600));
+      const count = Math.max(80, Math.floor((w * h) / 1300));
       particles = Array.from({ length: count }, () => makeParticle(false));
     }
     build();
