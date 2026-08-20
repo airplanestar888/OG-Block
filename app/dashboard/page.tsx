@@ -77,7 +77,7 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Stat label="Score" value={score?.score ?? 0} />
         <Stat label="Rank" value={score?.rank ? `#${score.rank}` : "Unranked"} />
         <Stat label="NFTs" value={score?.nft_count ?? 0} />
