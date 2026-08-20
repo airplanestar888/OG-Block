@@ -28,7 +28,7 @@ export function ProfileCardAvatar({
   }
 
   return (
-    <div className="grid size-16 shrink-0 place-items-center rounded-full border-[3px] border-[#0A0B0D] bg-[#0000FF] text-2xl font-bold text-white">
+    <div className="grid size-16 shrink-0 place-items-center rounded-full border-[3px] border-[#0A0B0D] bg-black/10 text-2xl font-bold text-black/50">
       {initial}
     </div>
   );
