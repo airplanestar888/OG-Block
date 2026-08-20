@@ -1,14 +1,14 @@
 const STACK = [
-  { name: "Base", src: "/logos/base-square-black.svg", h: 26 },
+  // Base lockup = blue/black square + "base" wordmark. Use the black lockup and
+  // normalize to mono-black like the rest for a consistent row.
+  { name: "Base", src: "/logos/base-lockup-black.svg", h: 24 },
   { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
   { name: "Robinhood", src: "/logos/robinhood.svg", h: 26 },
   { name: "Virtual IO", src: "/logos/virtual-io.svg", h: 24 },
   { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 }
 ];
 
-// Trust strip: the stack we're built on. Logos ship in mixed colors (white,
-// dark, full-color PNG), so we normalize them all to mono-black via filter for
-// a consistent look on the white page background.
+// Trust strip: the stack we're built on. All logos normalized to mono-black.
 export function PoweredBy() {
   return (
     <section className="page-container py-8 sm:py-10">
