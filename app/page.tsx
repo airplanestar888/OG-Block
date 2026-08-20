@@ -160,7 +160,7 @@ export default async function HomePage() {
 /* ── Score metric cell ───────────────────────────── */
 function ScoreMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-1 flex-col justify-center px-3 py-2.5 sm:px-4 sm:py-3">
+    <div className="flex flex-1 flex-col justify-center px-3 py-2.5 text-center sm:px-4 sm:py-3">
       <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF]/60 sm:text-[0.55rem]">
         {label}
       </p>
