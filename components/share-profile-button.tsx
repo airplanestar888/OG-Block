@@ -23,7 +23,7 @@ export function ShareProfileButton({ handle, score, rank }: ShareProfileButtonPr
     const text =
       `Check out @${handle} — ${formatCompactNumber(score)} culture score${
         rank ? ` · Rank #${rank}` : ""
-      } on OG BLOCK 🚀\n\n` +
+      } on OG BLOCK\n\n` +
       `check your score → ${url}`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intent, "_blank", "noopener,noreferrer");

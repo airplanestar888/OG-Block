@@ -151,7 +151,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
     const text =
       `I just scored ${formatCompactNumber(result.score)} pts${
         result.rank ? ` and ranked #${result.rank}` : ""
-      } on OG BLOCK 🚀\n\n` +
+      } on OG BLOCK\n\n` +
       `check your score → ${url}`;
     const intent = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
     window.open(intent, "_blank", "noopener,noreferrer");
