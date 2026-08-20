@@ -1,7 +1,7 @@
 const STACK = [
   // Base lockup = blue/black square + "base" wordmark. Use the black lockup and
   // normalize to mono-black like the rest for a consistent row.
-  { name: "Base", src: "/logos/base-lockup-black.svg", h: 24 },
+  { name: "Base", src: "/logos/base-lockup-black.svg", h: 19 },
   { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
   { name: "Robinhood", src: "/logos/robinhood.svg", h: 26 },
   { name: "Virtual IO", src: "/logos/virtual-io.svg", h: 24 },
