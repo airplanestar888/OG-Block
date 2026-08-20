@@ -48,7 +48,7 @@ export default function HowItWorksPage() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-px border border-black/10 bg-black/10 md:grid-cols-5">
+        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 md:grid-cols-5">
           {steps.map((step, index) => (
             <article key={step.title} className="bg-white/74 p-5 backdrop-blur">
               <p className="text-xs font-bold text-baseblue">0{index + 1}</p>
@@ -59,10 +59,10 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">
-            Open dashboard
+          <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/og-card">
+            Get your badge
           </Link>
-          <Link className="border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
+          <Link className="rounded-full border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
             View leaderboard
           </Link>
         </div>

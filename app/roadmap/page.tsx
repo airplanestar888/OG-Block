@@ -129,17 +129,17 @@ export default function RoadmapPage() {
               OG BLOCK is building the reputation layer that Base culture deserves — starting with a live score, locking it into snapshots, minting it as proof, and opening it up to agents and partners across the ecosystem.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link className="bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/dashboard">
-                Open dashboard
+              <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/og-card">
+                Get your badge
               </Link>
-              <Link className="border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
+              <Link className="rounded-full border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
                 View leaderboard
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 grid gap-px border border-black/10 bg-black/10 lg:grid-cols-5">
+        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 lg:grid-cols-5">
           {roadmap.map((phase) => (
             <article key={`${phase.quarter}-${phase.label}`} className="flex min-h-[28rem] flex-col bg-white/78 p-5 backdrop-blur">
               <div>
@@ -175,7 +175,7 @@ export default function RoadmapPage() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             {coreModules.map((module) => (
-              <div key={module.title} className="min-h-28 border border-black/10 bg-white/74 p-4 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
+              <div key={module.title} className="min-h-28 rounded-xl border border-black/10 bg-white/74 p-4 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
                 <div className="flex items-center gap-3">
                   <span className="h-2 w-2 shrink-0 rounded-full bg-baseblue" />
                   <h3 className="font-semibold text-black/84">{module.title}</h3>
