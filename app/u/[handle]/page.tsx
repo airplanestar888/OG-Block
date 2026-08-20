@@ -77,8 +77,8 @@ export default async function PublicProfilePage(
 
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
         {/* Culture score card — portrait on mobile, landscape on desktop */}
-        <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-transparent text-ink">
-          {/* Header */}
+        <div className="relative flex flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-transparent text-ink shadow-sm">
+          {/* Header — transparent so the page grid shows through */}
           <div className="relative px-6 pb-6 pt-8 md:px-9 md:pt-9">
             <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold text-ink md:right-9 md:top-9 md:text-sm">
               Verified on-chain
@@ -93,8 +93,8 @@ export default async function PublicProfilePage(
             </div>
           </div>
 
-          {/* Body */}
-          <div className="relative space-y-5 px-6 pb-7 pt-2 md:px-9 md:pb-9">
+          {/* Body — solid white */}
+          <div className="relative space-y-5 bg-white px-6 pb-7 pt-6 md:px-9 md:pb-9 md:pt-7">
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">
@@ -136,8 +136,8 @@ export default async function PublicProfilePage(
             </div>
           </div>
 
-          {/* Footer */}
-          <div className="flex items-center justify-between border-t border-black/10 px-6 py-3.5 md:px-9">
+          {/* Footer — solid white */}
+          <div className="flex items-center justify-between border-t border-black/10 bg-white px-6 py-3.5 md:px-9">
             <div className="flex items-center gap-2">
               <span className="inline-block size-4 rounded-[5px] bg-[#0000FF]" />
               <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink">OG BLOCK</p>
