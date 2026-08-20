@@ -8,3 +8,6 @@ dist
 tsconfig.tsbuildinfo
 .zcode/
 supabase/.temp/
+
+# Chrome Web Store build artifact
+og-block-extension-*.zip
