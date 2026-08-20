@@ -129,10 +129,10 @@ export default function RoadmapPage() {
               OG BLOCK is building the reputation layer that Base culture deserves — starting with a live score, locking it into snapshots, minting it as proof, and opening it up to agents and partners across the ecosystem.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white" href="/og-card">
+              <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80" href="/og-card">
                 Get your badge
               </Link>
-              <Link className="rounded-full border border-black/15 bg-white/70 px-5 py-3 text-sm font-semibold text-black/65" href="/leaderboard">
+              <Link className="rounded-full border border-[rgba(10,11,13,0.12)] bg-white/70 px-5 py-3 text-sm font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D]" href="/leaderboard">
                 View leaderboard
               </Link>
             </div>
