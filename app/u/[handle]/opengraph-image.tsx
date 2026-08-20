@@ -115,7 +115,7 @@ export default async function Image({ params }: { params: { handle: string } }) 
               height: p.size,
               background: p.color,
               borderRadius: 6,
-              transform: p.diamond ? "rotate(45deg)" : "none"
+              ...(p.diamond ? { transform: "rotate(45deg)" } : {})
             }}
           />
         ))}
