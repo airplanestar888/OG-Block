@@ -6,12 +6,12 @@ import { useEffect, useRef } from "react";
 const linkClass =
   "text-sm font-semibold text-white/85 transition hover:text-white";
 
-// Idle candle-bar animation (base.org CTA vibe) drawn on canvas 2D — no
-// Three.js. Blue-on-blue bars that rise/fall on the right, faded into the
-// solid footer via a left gradient so the text stays readable.
-const BAR_COLORS = ["#ffffff", "#7c5cff", "#4d7cff", "#f5c518", "#00c48c"];
+// Idle particle wave (footer): small square pixels that drift right-to-left
+// like flowing water, with a vertical sine bob. Canvas 2D, no Three.js. Faded
+// into the solid blue footer via a left gradient so the text stays readable.
+const PARTICLE_COLORS = ["#ffffff", "#7c5cff", "#4d7cff", "#f5c518", "#00c48c"];
 
-function FooterCandles() {
+function FooterWave() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
 
@@ -26,8 +26,36 @@ function FooterCandles() {
     let w = 0;
     let h = 0;
 
-    type Bar = { x: number; base: number; h: number; target: number; w: number; color: string; speed: number };
-    let bars: Bar[] = [];
+    type Particle = {
+      x: number;
+      y: number;
+      baseY: number;
+      size: number;
+      color: string;
+      speed: number;
+      amp: number;
+      phase: number;
+      freq: number;
+      alpha: number;
+    };
+    let particles: Particle[] = [];
+
+    function makeParticle(atRightEdge: boolean): Particle {
+      const size = 2 + Math.floor(Math.random() * 4);
+      const baseY = Math.random() * h;
+      return {
+        x: atRightEdge ? w + Math.random() * 40 : Math.random() * w,
+        y: baseY,
+        baseY,
+        size,
+        color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
+        speed: 18 + Math.random() * 42, // px/sec leftward
+        amp: 6 + Math.random() * 20, // vertical wave amplitude
+        phase: Math.random() * Math.PI * 2,
+        freq: 0.6 + Math.random() * 1.4,
+        alpha: 0.4 + Math.random() * 0.5,
+      };
+    }
 
     function build() {
       const parent = canvas.parentElement;
@@ -40,38 +68,35 @@ function FooterCandles() {
       canvas.style.width = `${w}px`;
       canvas.style.height = `${h}px`;
 
-      const gap = 10;
-      const count = Math.max(8, Math.floor(w / gap));
-      bars = Array.from({ length: count }, (_, i) => {
-        const bw = 2 + Math.random() * 3;
-        const bh = 8 + Math.random() * (h * 0.6);
-        return {
-          x: i * gap + gap * 0.5,
-          base: h * 0.5 + (Math.random() - 0.5) * h * 0.3,
-          h: bh,
-          target: bh,
-          w: bw,
-          color: BAR_COLORS[Math.floor(Math.random() * BAR_COLORS.length)],
-          speed: 0.01 + Math.random() * 0.03,
-        };
-      });
+      const count = Math.max(40, Math.floor((w * h) / 2600));
+      particles = Array.from({ length: count }, () => makeParticle(false));
     }
     build();
     window.addEventListener("resize", build, { passive: true });
 
+    let prev = performance.now();
+    let t = 0;
     function tick() {
+      const now = performance.now();
+      const dt = Math.min((now - prev) / 1000, 0.05);
+      prev = now;
+      t += dt;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       ctx.scale(dpr, dpr);
-      for (const b of bars) {
-        // ease toward target height; pick a new target when close
-        b.h += (b.target - b.h) * b.speed;
-        if (Math.abs(b.target - b.h) < 2) {
-          b.target = 8 + Math.random() * (h * 0.6);
+      for (const p of particles) {
+        // flow leftward
+        p.x -= p.speed * dt;
+        // wave bob
+        p.y = p.baseY + Math.sin(t * p.freq + p.phase) * p.amp;
+        // recycle off the left edge back to the right
+        if (p.x < -8) {
+          Object.assign(p, makeParticle(true));
         }
-        ctx.globalAlpha = 0.85;
-        ctx.fillStyle = b.color;
-        ctx.fillRect(b.x - b.w / 2, b.base - b.h / 2, b.w, b.h);
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, p.size, p.size);
       }
       ctx.restore();
       rafRef.current = requestAnimationFrame(tick);
@@ -92,7 +117,7 @@ export function SiteFooter() {
     <footer className="relative overflow-hidden" style={{ backgroundColor: "rgb(0, 0, 255)" }}>
       {/* animation layer (right side), faded into solid blue toward the left */}
       <div className="pointer-events-none absolute inset-y-0 right-0 w-2/3">
-        <FooterCandles />
+        <FooterWave />
         <div
           className="absolute inset-0"
           style={{ background: "linear-gradient(to right, rgb(0,0,255) 22%, transparent 75%)" }}
