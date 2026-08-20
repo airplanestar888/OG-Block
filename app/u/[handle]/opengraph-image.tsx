@@ -59,9 +59,10 @@ export default async function Image({ params }: { params: { handle: string } }) 
           height: "100%",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "space-between",
           background: "#0A0B0D",
           color: "#ffffff",
-          padding: "72px",
+          padding: "64px",
           fontFamily: "sans-serif",
           position: "relative"
         }}
@@ -79,17 +80,17 @@ export default async function Image({ params }: { params: { handle: string } }) 
         />
 
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
           {avatar ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={avatar}
               alt=""
-              width={140}
-              height={140}
+              width={120}
+              height={120}
               style={{
-                width: 140,
-                height: 140,
+                width: 120,
+                height: 120,
                 borderRadius: 9999,
                 border: "4px solid rgba(255,255,255,0.2)",
                 objectFit: "cover"
@@ -98,15 +99,15 @@ export default async function Image({ params }: { params: { handle: string } }) 
           ) : (
             <div
               style={{
-                width: 140,
-                height: 140,
+                width: 120,
+                height: 120,
                 borderRadius: 9999,
                 border: "4px solid rgba(255,255,255,0.2)",
                 background: "rgba(255,255,255,0.1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 64,
+                fontSize: 56,
                 fontWeight: 700
               }}
             >
@@ -114,8 +115,8 @@ export default async function Image({ params }: { params: { handle: string } }) 
             </div>
           )}
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: 48, fontWeight: 700 }}>{displayName}</span>
-            <span style={{ fontSize: 30, color: "rgba(255,255,255,0.55)" }}>@{cleanHandle}</span>
+            <span style={{ fontSize: 46, fontWeight: 700 }}>{displayName}</span>
+            <span style={{ fontSize: 28, color: "rgba(255,255,255,0.55)" }}>@{cleanHandle}</span>
           </div>
           <div
             style={{
@@ -127,20 +128,23 @@ export default async function Image({ params }: { params: { handle: string } }) 
               border: "2px solid rgba(45,212,191,0.35)",
               color: "#5eead4",
               borderRadius: 9999,
-              padding: "12px 24px",
-              fontSize: 26,
+              padding: "12px 22px",
+              fontSize: 24,
               fontWeight: 700
             }}
           >
-            ✓ Verified on-chain
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17l-5-5" stroke="#5eead4" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Verified on-chain
           </div>
         </div>
 
         {/* Score */}
-        <div style={{ display: "flex", flexDirection: "column", marginTop: "64px" }}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
           <span
             style={{
-              fontSize: 26,
+              fontSize: 24,
               fontWeight: 700,
               letterSpacing: 6,
               textTransform: "uppercase",
@@ -149,8 +153,8 @@ export default async function Image({ params }: { params: { handle: string } }) 
           >
             Culture score
           </span>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: "28px", marginTop: "8px" }}>
-            <span style={{ fontSize: 190, fontWeight: 800, lineHeight: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "28px", marginTop: "6px" }}>
+            <span style={{ fontSize: 128, fontWeight: 800, lineHeight: 1 }}>
               {formatCompactNumber(score)}
             </span>
             {rank ? (
@@ -159,10 +163,9 @@ export default async function Image({ params }: { params: { handle: string } }) 
                   display: "flex",
                   background: "#0000FF",
                   borderRadius: 9999,
-                  padding: "14px 32px",
-                  fontSize: 40,
-                  fontWeight: 700,
-                  marginBottom: "28px"
+                  padding: "12px 28px",
+                  fontSize: 34,
+                  fontWeight: 700
                 }}
               >
                 Rank #{rank}
@@ -172,65 +175,29 @@ export default async function Image({ params }: { params: { handle: string } }) 
         </div>
 
         {/* Stats row */}
-        <div style={{ display: "flex", gap: "20px", marginTop: "auto" }}>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              border: "2px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)",
-              borderRadius: 20,
-              padding: "22px 26px"
-            }}
-          >
-            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>NFTS</span>
-            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>
-              {nftCount.toLocaleString()}
-            </span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              border: "2px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)",
-              borderRadius: 20,
-              padding: "22px 26px"
-            }}
-          >
-            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>RARE</span>
-            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>{rarePct}%</span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              border: "2px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)",
-              borderRadius: 20,
-              padding: "22px 26px"
-            }}
-          >
-            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>EARLY</span>
-            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>{earlyPct}%</span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              flex: 1,
-              border: "2px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.04)",
-              borderRadius: 20,
-              padding: "22px 26px"
-            }}
-          >
-            <span style={{ fontSize: 22, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>STATUS</span>
-            <span style={{ fontSize: 40, fontWeight: 700, marginTop: "6px" }}>{statusLabel}</span>
-          </div>
+        <div style={{ display: "flex", gap: "16px" }}>
+          {[
+            { label: "NFTS", value: nftCount.toLocaleString() },
+            { label: "RARE", value: `${rarePct}%` },
+            { label: "EARLY", value: `${earlyPct}%` },
+            { label: "STATUS", value: statusLabel }
+          ].map((cell) => (
+            <div
+              key={cell.label}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                border: "2px solid rgba(255,255,255,0.1)",
+                background: "rgba(255,255,255,0.04)",
+                borderRadius: 20,
+                padding: "20px 24px"
+              }}
+            >
+              <span style={{ fontSize: 20, color: "rgba(255,255,255,0.4)", letterSpacing: 3 }}>{cell.label}</span>
+              <span style={{ fontSize: 38, fontWeight: 700, marginTop: "6px" }}>{cell.value}</span>
+            </div>
+          ))}
         </div>
 
         {/* Wordmark */}
@@ -238,11 +205,10 @@ export default async function Image({ params }: { params: { handle: string } }) 
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: "28px"
+            justifyContent: "space-between"
           }}
         >
-          <span style={{ fontSize: 32, fontWeight: 800, letterSpacing: 5 }}>OG BLOCK</span>
+          <span style={{ fontSize: 30, fontWeight: 800, letterSpacing: 5 }}>OG BLOCK</span>
           <span style={{ fontSize: 22, color: "rgba(255,255,255,0.35)" }}>Base culture score</span>
         </div>
       </div>
