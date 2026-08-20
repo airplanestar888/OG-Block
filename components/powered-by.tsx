@@ -1,6 +1,6 @@
 const STACK = [
   { name: "Base", src: "/logos/base-square-black.svg", h: 26 },
-  { name: "Ethereum", src: "/logos/ethereum.png", h: 26 },
+  { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
   { name: "Robinhood", src: "/logos/robinhood.svg", h: 26 },
   { name: "Virtual IO", src: "/logos/virtual-io.svg", h: 24 },
   { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 }

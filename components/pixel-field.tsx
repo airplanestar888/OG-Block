@@ -36,11 +36,20 @@ export function PixelField() {
     let cx = 0;
     let cy = 0;
 
-    // ── Cursor trail (base.org-style candle bars) ──────────────
+    // ── Cursor trail (our square pixels that follow + fade) ────
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d") ?? null;
-    type Candle = { x: number; y: number; w: number; h: number; color: string; life: number; max: number };
-    const candles: Candle[] = [];
+    type Particle = {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      color: string;
+      life: number;
+      max: number;
+    };
+    const particles: Particle[] = [];
     let lastSpawn = 0;
     let dpr = 1;
 
@@ -73,24 +82,25 @@ export function PixelField() {
       el.style.setProperty("--cursor-x", `${lx}px`);
       el.style.setProperty("--cursor-y", `${ly}px`);
 
-      // Spawn a small cluster of candle bars, throttled.
+      // Spawn a small cluster of square pixels near the cursor, throttled.
       const now = performance.now();
-      if (now - lastSpawn > 28) {
+      if (now - lastSpawn > 32) {
         lastSpawn = now;
-        const count = 1 + Math.floor(Math.random() * 3);
+        const count = 1 + Math.floor(Math.random() * 2);
         for (let k = 0; k < count; k++) {
-          const h = 6 + Math.random() * 26;
-          candles.push({
-            x: lx + (Math.random() - 0.5) * 34,
-            y: ly + (Math.random() - 0.5) * 34,
-            w: 2 + Math.random() * 2,
-            h,
+          const size = 3 + Math.floor(Math.random() * 5);
+          particles.push({
+            x: lx + (Math.random() - 0.5) * 18,
+            y: ly + (Math.random() - 0.5) * 18,
+            vx: (Math.random() - 0.5) * 0.25,
+            vy: (Math.random() - 0.5) * 0.25 - 0.05,
+            size,
             color: TRAIL_COLORS[Math.floor(Math.random() * TRAIL_COLORS.length)],
             life: 0,
-            max: 600 + Math.random() * 500,
+            max: 550 + Math.random() * 450,
           });
         }
-        if (candles.length > 140) candles.splice(0, candles.length - 140);
+        if (particles.length > 120) particles.splice(0, particles.length - 120);
       }
     }
 
@@ -111,23 +121,26 @@ export function PixelField() {
         bit.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
       });
 
-      // Draw + age the trail candles
+      // Draw + age the trail pixels
       if (ctx && canvas) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
         ctx.scale(dpr, dpr);
-        for (let i = candles.length - 1; i >= 0; i--) {
-          const c = candles[i];
-          c.life += dt;
-          const t = c.life / c.max;
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.life += dt;
+          const t = p.life / p.max;
           if (t >= 1) {
-            candles.splice(i, 1);
+            particles.splice(i, 1);
             continue;
           }
+          // drift a little as it fades
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
           // ease-out fade
-          ctx.globalAlpha = (1 - t) * 0.55;
-          ctx.fillStyle = c.color;
-          ctx.fillRect(c.x - c.w / 2, c.y - c.h / 2, c.w, c.h);
+          ctx.globalAlpha = (1 - t) * 0.7;
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
         }
         ctx.restore();
       }
