@@ -147,8 +147,9 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
   const handleShareX = () => {
     if (!result) return;
     const cleanHandle = (xHandle || "").replace(/^@/, "");
+    // Cache-bust so X fetches a fresh card preview instead of a stale one.
     const url = cleanHandle
-      ? `${window.location.origin}/u/${cleanHandle}`
+      ? `${window.location.origin}/u/${cleanHandle}?s=${Date.now().toString(36)}`
       : `${window.location.origin}/leaderboard`;
     const text =
       `I just scored ${formatCompactNumber(result.score)} pts${

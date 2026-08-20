@@ -19,7 +19,9 @@ type ShareProfileButtonProps = {
 
 export function ShareProfileButton({ handle, score, rank }: ShareProfileButtonProps) {
   const handleShare = () => {
-    const url = `${window.location.origin}/u/${handle}`;
+    // Cache-bust so X always fetches a fresh card preview (X caches OG images
+    // per-URL for days; a unique query makes each share a "new" URL).
+    const url = `${window.location.origin}/u/${handle}?s=${Date.now().toString(36)}`;
     const text =
       `Check out @${handle} — ${formatCompactNumber(score)} culture score${
         rank ? ` · Rank #${rank}` : ""
