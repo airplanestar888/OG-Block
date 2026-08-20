@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublicProfileByHandle } from "@/lib/public-profiles";
 import { ShareProfileButton } from "@/components/share-profile-button";
+import { ProfileCardAvatar } from "@/components/profile-card-avatar";
 
 function formatCompactNumber(value: number): string {
   const absValue = Math.abs(value);
@@ -64,7 +65,6 @@ export default async function PublicProfilePage(
 
   const cleanHandle = profile.xHandle.replace(/^@/, "");
   const displayName = profile.xName || `@${cleanHandle}`;
-  const initial = (cleanHandle || "?").charAt(0).toUpperCase();
   const avatarSrc = profile.xAvatar
     ? `/api/avatar-proxy?url=${encodeURIComponent(profile.xAvatar)}`
     : null;
@@ -86,18 +86,7 @@ export default async function PublicProfilePage(
               <span aria-hidden="true">✓</span> Verified on-chain
             </div>
             <div className="relative flex items-center gap-3.5">
-              {avatarSrc ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={avatarSrc}
-                  alt={cleanHandle}
-                  className="size-16 shrink-0 rounded-full border-2 border-white/20 object-cover"
-                />
-              ) : (
-                <div className="grid size-16 shrink-0 place-items-center rounded-full border-2 border-white/20 bg-white/10 text-2xl font-bold">
-                  {initial}
-                </div>
-              )}
+              <ProfileCardAvatar src={avatarSrc} handle={cleanHandle} />
               <div className="min-w-0">
                 <p className="truncate text-base font-semibold leading-tight">{displayName}</p>
                 <p className="truncate text-sm text-white/55">@{cleanHandle}</p>
