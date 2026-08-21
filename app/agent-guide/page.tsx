@@ -78,29 +78,28 @@ export default function AgentGuidePage() {
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Goal</h2>
               <p className="mt-2 text-sm leading-6 text-black/62">
-                Sign in to OG BLOCK, verify the agent wallet slot, refresh combined OG Score, and mint an OG BLOCK badge when the profile is eligible.
+                Register the agent into the agent wallet slot of an existing OG BLOCK profile, verify it by signing from the agent&apos;s own wallet, refresh the combined OG Score, and mint an OG BLOCK badge on Base when eligible.
               </p>
             </div>
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Important rule</h2>
               <p className="mt-2 text-sm leading-6 text-black/62">
-                The agent must sign with its own agent wallet. The main wallet slot is separate and should only be verified by the profile owner.
+                The agent signs only with its own agent wallet. The human main wallet slot is separate and is verified by the profile owner, never by the agent.
               </p>
             </div>
           </div>
-          <pre className="mt-4 overflow-x-auto rounded-xl bg-ink p-4 text-xs leading-6 text-white"><code>{`AGENT_TASK: OG_BLOCK_AGENT_SIGN_IN
+          <pre className="mt-4 overflow-x-auto rounded-xl bg-ink p-4 text-xs leading-6 text-white"><code>{`AGENT_TASK: OG_BLOCK_AGENT_REGISTER
 SITE: joinog.xyz
 WALLET_SLOT: agent
-CHAIN: Base
-USER_INSTRUCTION: Sign in to joinog.xyz as my agent.
+CHAIN: Base (8453)
+CONTEXT: Register into the agent wallet slot of the operator's existing profile.
 REQUIRED_ACTIONS:
-1. Open joinog.xyz.
-2. Sign in with the connected X profile.
-3. Use the optional agent wallet slot.
-4. Verify the Agent Wallet slot with your own agent wallet.
-5. Refresh combined OG Score.
-6. Mint OG BLOCK badge if eligible.
-DO_NOT_USE: user's personal wallet for agent verification.`}</code></pre>
+1. Open joinog.xyz on the operator's signed-in X profile.
+2. Select the agent wallet slot (separate from the human main wallet).
+3. Verify the slot by signing the challenge with the agent's own wallet key.
+4. Refresh the combined OG Score so the agent's NFTs are counted.
+5. Mint the OG BLOCK badge from the agent wallet when eligible.
+DO_NOT_USE: the operator's personal/main wallet for agent verification.`}</code></pre>
         </section>
       </div>
     </main>
