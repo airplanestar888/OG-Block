@@ -102,7 +102,7 @@ export default async function DashboardPage() {
           xAvatar={user.x_avatar}
           walletSlot="agent"
           title="Agent Wallet"
-          description="Virtual IO / ACP agent wallet. Its NFTs also accumulate into the same OG score."
+          description="Virtual Protocol / ACP agent wallet. Its NFTs also accumulate into the same OG score."
           verifiedWallet={agentWallet?.address}
           allowBrowserConnect={false}
         />

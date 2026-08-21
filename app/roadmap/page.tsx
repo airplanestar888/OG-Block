@@ -53,7 +53,7 @@ const roadmap = [
     summary: "Make agent wallets a clean plus feature for any AI agent while keeping special identity badges, like AgentIdentity, as extension-only proofs.",
     items: [
       "Publish a public agent guide that any AI agent can scan and follow.",
-      "Show AgentIdentity-powered Virtual IO only in the X extension when the NFT is actually held.",
+      "Show AgentIdentity-powered Virtual Protocol only in the X extension when the NFT is actually held.",
       "Expose agent wallet status on dashboard without turning the whole profile into an agent type.",
       "Create safety controls for revoking or rotating agent wallets.",
       "Test agent use cases for campaign participation, claims, and automation."
