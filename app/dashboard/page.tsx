@@ -402,7 +402,10 @@ function getTraitSummary(attributes: unknown) {
       if (!attribute || typeof attribute !== "object") return "";
       const trait = attribute as { trait_type?: unknown; value?: unknown };
       if (typeof trait.trait_type !== "string" || typeof trait.value !== "string") return "";
-      return `${trait.trait_type}: ${trait.value}`;
+      // Shorten any full 0x wallet address in a trait value so we don't expose
+      // it in full on the public receipt (e.g. "Sender: 0x6c03…6815").
+      const value = trait.value.replace(/0x[a-fA-F0-9]{40}/g, (addr) => `${addr.slice(0, 6)}…${addr.slice(-4)}`);
+      return `${trait.trait_type}: ${value}`;
     })
     .filter(Boolean)
     .slice(0, 3)
