@@ -1,0 +1,74 @@
+{
+  "slug": "og-block",
+  "title": "OG BLOCK",
+  "tagline": "Scores verified on-chain NFT holdings into a public Base culture rank, and tracks agent wallets as first-class holders alongside their operators",
+  "description": "OG BLOCK turns real NFT holdings on Base into a public culture score and leaderboard, instead of ranking people by followers or engagement. A profile has both a human wallet and an agent wallet slot: each is verified independently by signing from its own key, and NFTs from either wallet accumulate into one combined score. Agent wallets are recognized on-chain through an AgentIdentity NFT, so an autonomous agent gets its own cultural reputation that is pulled, verified, and ranked publicly. Live on testnet with 11 profiles onboarded and 529 NFTs tracked.",
+  "status": "live",
+  "topic": "agents",
+  "topics": ["agents", "base", "wallet", "nft", "reputation", "leaderboard"],
+  "builder": {
+    "name": "airplanestar",
+    "url": "https://x.com/airplanestar_"
+  },
+  "links": {
+    "repo": "https://github.com/airplanestar888/OG-Block",
+    "demo": "https://www.joinog.xyz/leaderboard",
+    "share": "https://www.joinog.xyz",
+    "feedback": "https://github.com/airplanestar888/OG-Block/issues/new?title=Feedback%3A%20OG%20BLOCK"
+  },
+  "primitives": ["wallet"],
+  "visual": {
+    "kind": "live app",
+    "eyebrow": "base + agent wallet",
+    "title": "on-chain culture score",
+    "posterUrl": "https://www.joinog.xyz/opengraph-image"
+  },
+  "skills": [],
+  "artifacts": [
+    {
+      "label": "Live app — joinog.xyz",
+      "href": "https://www.joinog.xyz",
+      "kind": "demo"
+    },
+    {
+      "label": "Public leaderboard (live scores)",
+      "href": "https://www.joinog.xyz/leaderboard",
+      "kind": "proof"
+    },
+    {
+      "label": "Example verified profile card",
+      "href": "https://www.joinog.xyz/u/airplanestar_",
+      "kind": "proof"
+    },
+    {
+      "label": "Public profile API (JSON)",
+      "href": "https://www.joinog.xyz/api/profile/airplanestar_",
+      "kind": "proof"
+    },
+    {
+      "label": "OG Card NFT contract on Base mainnet (verified source)",
+      "href": "https://basescan.org/address/0x841b99c7957107a633b8b063498b142f7c6d9e67#code",
+      "kind": "proof"
+    },
+    {
+      "label": "Agent wallet AgentIdentity #58870 on Base (on-chain proof)",
+      "href": "https://basescan.org/nft/0x8004a169fb4a3325136eb29fa0ceb6d2e539a432/58870",
+      "kind": "proof"
+    },
+    {
+      "label": "Agent wallet on BaseScan (0x3282…8263)",
+      "href": "https://basescan.org/address/0x3282f5ae930f8be53695de152cf890b9385e8263",
+      "kind": "proof"
+    },
+    {
+      "label": "Source repository",
+      "href": "https://github.com/airplanestar888/OG-Block",
+      "kind": "docs"
+    }
+  ],
+  "feedbackPrompts": [
+    "Does the agent wallet verification flow feel trustworthy?",
+    "Is the scoring model fair for on-chain holdings?",
+    "Which EconomyOS primitive should OG BLOCK integrate next?"
+  ]
+}

@@ -11,6 +11,7 @@
  *
  * Run: NETWORK=testnet OG_CARD_CONTRACT=0x... BASESCAN_API_KEY=... npx tsx scripts/verify-og-card.ts
  */
+import "dotenv/config";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { encodeAbiParameters } from "viem";
@@ -35,8 +36,9 @@ async function main() {
   const rawVersion: string = artifact.compiler; // "0.8.28+commit.7893614a.Emscripten.clang"
   const compilerVersion = `v${rawVersion.split(".Emscripten")[0]}`;
 
-  // Etherscan v2 unified endpoint (works for Base via chainid param)
-  const endpoint = "https://api.etherscan.io/v2/api";
+  // Etherscan v2 unified endpoint (works for Base via chainid param).
+  // chainid must be on the URL query string for v2, not only in the body.
+  const endpoint = `https://api.etherscan.io/v2/api?chainid=${chainId}`;
 
   const params = new URLSearchParams({
     chainid: String(chainId),

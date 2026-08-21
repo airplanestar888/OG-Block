@@ -9,8 +9,8 @@ import { Base64 } from "@openzeppelin/contracts/utils/Base64.sol";
 /// @title OG-Block OG Card
 /// @notice Soul-bound-ish membership card. One OG Card per wallet, minter pays gas.
 ///         Metadata is generated fully on-chain (name, description, image, attributes).
-///         The base image is served from an off-chain URL that the owner can update
-///         without redeploying (setImageURI), while all textual/trait data is on-chain.
+///         The base image URL is set once in the constructor and is immutable —
+///         there is no setter, so the artwork can never change after deployment.
 contract OgCard is ERC721, Ownable {
     using Strings for uint256;
 
@@ -26,7 +26,8 @@ contract OgCard is ERC721, Ownable {
     // one-per-wallet guard
     mapping(address => bool) public hasClaimed;
 
-    // off-chain art (e.g. https://og-block.vercel.app/og-card.png). Owner-updatable.
+    // off-chain art (e.g. https://og-block.vercel.app/og-card.png). Set once at
+    // deploy and immutable — no setter, so the image can never change after mint.
     string public imageURI;
 
     // collection-level description used in tokenURI + contractURI
@@ -34,7 +35,6 @@ contract OgCard is ERC721, Ownable {
         "OG-Block OG Card - on-chain proof of early membership in the OG-Block culture network on Base.";
 
     event Minted(address indexed to, uint256 indexed tokenId);
-    event ImageURIUpdated(string imageURI);
 
     error AlreadyClaimed();
     error NonexistentToken();
@@ -130,8 +130,19 @@ contract OgCard is ERC721, Ownable {
 
     // ─── Admin ──────────────────────────────────────────
 
-    function setImageURI(string calldata newImageURI) external onlyOwner {
-        imageURI = newImageURI;
-        emit ImageURIUpdated(newImageURI);
+    /// @notice Owner-only mint to a specific address. Used to migrate/airdrop
+    ///         cards to wallets that already claimed on a previous deployment.
+    ///         Same one-per-wallet and supply guards as public mint().
+    function airdropMint(address to) external onlyOwner {
+        if (hasClaimed[to]) revert AlreadyClaimed();
+        if (_nextTokenId >= MAX_SUPPLY) revert SoldOut();
+
+        uint256 tokenId = _nextTokenId++;
+        hasClaimed[to] = true;
+        minterOf[tokenId] = to;
+        mintedAt[tokenId] = uint64(block.timestamp);
+
+        _safeMint(to, tokenId);
+        emit Minted(to, tokenId);
     }
 }

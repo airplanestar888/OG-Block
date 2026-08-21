@@ -8,6 +8,13 @@ export const OgCardAbi = [
   },
   {
     type: "function",
+    name: "airdropMint",
+    inputs: [{ name: "to", type: "address" }],
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
     name: "hasClaimed",
     inputs: [{ name: "", type: "address" }],
     outputs: [{ name: "", type: "bool" }],
@@ -82,13 +89,6 @@ export const OgCardAbi = [
     inputs: [],
     outputs: [{ name: "", type: "string" }],
     stateMutability: "view"
-  },
-  {
-    type: "function",
-    name: "setImageURI",
-    inputs: [{ name: "newImageURI", type: "string" }],
-    outputs: [],
-    stateMutability: "nonpayable"
   },
   {
     type: "event",

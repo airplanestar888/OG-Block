@@ -8,6 +8,7 @@
  *
  * Run: npx tsx scripts/deploy-og-card.ts
  */
+import "dotenv/config";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { base, baseSepolia } from "viem/chains";
