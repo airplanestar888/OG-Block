@@ -131,6 +131,18 @@ create table if not exists rate_limits (
 );
 create index if not exists rate_limits_key_created_at_idx on rate_limits(key, created_at desc);
 
+-- Agent link codes: OTP-style one-time codes for autonomous agent registration
+-- into an operator's agent wallet slot (no browser OAuth).
+create table if not exists agent_link_codes (
+  code text primary key,
+  user_id uuid not null references users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  used_at timestamptz
+);
+create index if not exists agent_link_codes_user_id_idx on agent_link_codes(user_id);
+create index if not exists agent_link_codes_expires_at_idx on agent_link_codes(expires_at);
+
 alter table users enable row level security;
 alter table wallets enable row level security;
 alter table scores enable row level security;
@@ -142,6 +154,7 @@ alter table nft_blocklist enable row level security;
 alter table og_card_claims enable row level security;
 alter table app_config enable row level security;
 alter table score_history enable row level security;
+alter table agent_link_codes enable row level security;
 
 -- The app uses SUPABASE_SERVICE_ROLE_KEY on trusted Next.js API routes.
 -- Keep public anon access locked down unless you later add explicit client-side policies.

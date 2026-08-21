@@ -8,6 +8,7 @@ import { shortAddress } from "@/lib/address";
 import type { WalletSlot } from "@/lib/types";
 import { ScoreRevealModal } from "@/components/score-reveal-modal";
 import { ConnectWalletModal } from "@/components/connect-wallet-modal";
+import { RegisterAgentButton } from "@/components/register-agent-button";
 
 type RevealResult = {
   score: number;
@@ -168,7 +169,7 @@ export function WalletScorePanel({
           </p>
         ) : (
           <p className="mt-2 text-sm leading-6 text-black/65">
-            Agent wallet must be verified from the agent flow or console. Browser wallet connect is disabled for this slot.
+            Register your agent by handing it a one-time code — it signs with its own wallet and links into this slot. No browser wallet needed.
             <Link className="ml-1 font-semibold text-baseblue hover:underline" href="/agent-guide">
               View agent guide
             </Link>
@@ -202,6 +203,8 @@ export function WalletScorePanel({
       ) : null}
 
       <div className="mt-4 flex flex-wrap items-center gap-2">
+        {!allowBrowserConnect && !verifiedWallet ? <RegisterAgentButton /> : null}
+
         {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
           <button
             className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"

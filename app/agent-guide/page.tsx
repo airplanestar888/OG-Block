@@ -78,13 +78,13 @@ export default function AgentGuidePage() {
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Goal</h2>
               <p className="mt-2 text-sm leading-6 text-black/62">
-                Register the agent into the agent wallet slot of an existing OG BLOCK profile, verify it by signing from the agent&apos;s own wallet, refresh the combined OG Score, and mint an OG BLOCK badge on Base when eligible.
+                Register the agent into the agent wallet slot of an existing OG BLOCK profile using a one-time code, verified by a signature from the agent&apos;s own wallet — then the combined OG Score updates and the OG BLOCK badge can be minted on Base.
               </p>
             </div>
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Important rule</h2>
               <p className="mt-2 text-sm leading-6 text-black/62">
-                The agent signs only with its own agent wallet. The human main wallet slot is separate and is verified by the profile owner, never by the agent.
+                The agent signs only with its own agent wallet. The one-time code resolves to the operator&apos;s profile server-side, so an agent can only ever attach to the profile that issued the code — never someone else&apos;s.
               </p>
             </div>
           </div>
@@ -92,13 +92,17 @@ export default function AgentGuidePage() {
 SITE: joinog.xyz
 WALLET_SLOT: agent
 CHAIN: Base (8453)
-CONTEXT: Register into the agent wallet slot of the operator's existing profile.
 REQUIRED_ACTIONS:
-1. Open joinog.xyz on the operator's signed-in X profile.
-2. Select the agent wallet slot (separate from the human main wallet).
-3. Verify the slot by signing the challenge with the agent's own wallet key.
-4. Refresh the combined OG Score so the agent's NFTs are counted.
-5. Mint the OG BLOCK badge from the agent wallet when eligible.
+1. Operator opens the Agent Wallet panel on joinog.xyz and taps "Register agent" to get a one-time code (expires in 15 min).
+2. Operator hands the code to the agent.
+3. Agent signs this exact message with its OWN wallet:
+     OG BLOCK agent link
+     Code: <CODE>
+     Agent wallet: <AGENT_ADDRESS>
+     Timestamp: <ISO_8601>
+4. Agent POSTs to https://www.joinog.xyz/api/agent/link
+     { "code", "address", "chainId": 8453, "message", "signature" }
+5. Server links the agent wallet slot and refreshes the combined OG Score.
 DO_NOT_USE: the operator's personal/main wallet for agent verification.`}</code></pre>
         </section>
       </div>
