@@ -3,9 +3,11 @@ const STACK = [
   // normalize to mono-black like the rest for a consistent row.
   { name: "Base", src: "/logos/base-lockup-black.svg", h: 19 },
   { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
-  { name: "Robinhood", src: "/logos/robinhood.svg", h: 26 },
-  { name: "Virtual IO", src: "/logos/virtual-io.svg", h: 24 },
-  { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 }
+  { name: "Etherscan", src: "/logos/etherscan.svg", h: 20 },
+  { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 },
+  { name: "MetaMask", src: "/logos/metamask.svg", h: 24 },
+  { name: "WalletConnect", src: "/logos/walletconnect.svg", h: 18 },
+  { name: "Virtual IO", src: "/logos/virtual-io.svg", h: 24 }
 ];
 
 // Trust strip: the stack we're built on. All logos normalized to mono-black.
