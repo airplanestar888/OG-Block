@@ -20,6 +20,48 @@ function getHoldingKey(holding: NftHolding) {
   return `${holding.contractAddress.toLowerCase()}:${holding.tokenId}`;
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/// Fetch one wallet's holdings, following the provider's indexing flow.
+/// A wallet that was just verified may not be indexed yet, so we retry a few
+/// times with a delay instead of trusting a premature empty/failed result.
+/// If it still fails after retries, we THROW — the caller must not persist a
+/// partial/undercounted score.
+async function fetchWalletHoldings(
+  provider: ReturnType<typeof getNftProvider>,
+  walletAddress: string,
+  options: { retryOnEmpty: boolean }
+): Promise<NftHolding[]> {
+  const maxAttempts = 3;
+  const delayMs = 5000;
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const holdings = await provider.getHoldings(walletAddress, scoreRules.targetCollection);
+      // Empty right after verification usually means the wallet isn't indexed
+      // yet — give the infra time and retry before accepting zero.
+      if (holdings.length === 0 && options.retryOnEmpty && attempt < maxAttempts) {
+        await sleep(delayMs);
+        continue;
+      }
+      return holdings;
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts) {
+        await sleep(delayMs);
+        continue;
+      }
+    }
+  }
+
+  throw new Error(
+    `NFT provider failed for wallet ${walletAddress} after ${maxAttempts} attempts: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`
+  );
+}
+
 function calculateFromHoldings(holdings: NftHolding[], isOg: boolean): ScoreResult {
   const nftCount = holdings.length;
   let score = nftCount > 0 ? scoreRules.points.holdsProjectNft : 0;
@@ -45,32 +87,25 @@ export async function calculateScore(userId: string, walletAddress: string): Pro
   return calculateScoreForWallets(userId, [walletAddress]);
 }
 
-export async function calculateScoreForWallets(userId: string, walletAddresses: string[]): Promise<ScoreResult> {
+export async function calculateScoreForWallets(
+  userId: string,
+  walletAddresses: string[],
+  options: { retryOnEmpty?: boolean } = {}
+): Promise<ScoreResult> {
   const supabase = getSupabaseAdmin();
   const provider = getNftProvider();
   const normalizedWallets = [...new Set(walletAddresses.map((address) => address.toLowerCase()))];
   const holdingsByKey = new Map<string, NftHolding>();
-  let providerHadError = false;
 
+  // Fetch every wallet. If ANY wallet fails after retries, we throw — never
+  // persist a partial score that silently drops a wallet's NFTs.
   for (const walletAddress of normalizedWallets) {
-    try {
-      const holdings = await provider.getHoldings(walletAddress, scoreRules.targetCollection);
-      for (const holding of holdings) {
-        holdingsByKey.set(getHoldingKey(holding), holding);
-      }
-    } catch (err) {
-      // Fail closed: if the NFT provider errors, record it but continue other wallets.
-      // An empty result from ALL wallets will NOT silently produce score=0 unless
-      // we are certain the provider returned legitimately empty.
-      providerHadError = true;
-      console.error(`NFT provider error for wallet ${walletAddress}:`, err instanceof Error ? err.message : err);
+    const holdings = await fetchWalletHoldings(provider, walletAddress, {
+      retryOnEmpty: options.retryOnEmpty ?? false
+    });
+    for (const holding of holdings) {
+      holdingsByKey.set(getHoldingKey(holding), holding);
     }
-  }
-
-  // If the provider errored AND no holdings were found, throw — do NOT persist a
-  // score of 0 that would silently overwrite a previously good score.
-  if (providerHadError && holdingsByKey.size === 0) {
-    throw new Error("NFT provider failed and no holdings could be verified — refusing to persist a potentially false score of 0");
   }
 
   const { data: allowlist, error: allowlistError } = await supabase

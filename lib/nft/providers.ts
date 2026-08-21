@@ -3,6 +3,8 @@ import { env } from "@/lib/env";
 import { getNftBlocklist, type NftBlocklist } from "@/lib/nft/blocklist";
 import type { NftHolding } from "@/lib/types";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const baseChain = {
   id: 8453,
   name: "Base",
@@ -460,26 +462,43 @@ async function isContractSourceVerifiedOnBasescan(contractAddress: string) {
   url.searchParams.set("address", contractAddress);
   url.searchParams.set("apikey", env.BASESCAN_API_KEY);
 
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  // Distinguish a real answer from a failed lookup. A definitive response tells
+  // us verified true/false; repeated network/rate-limit failures must NOT be
+  // treated as "unverified" (that silently drops genuine NFTs). Throw instead
+  // so the scoring layer can retry rather than persist an undercount.
+  for (let attempt = 0; attempt < 4; attempt += 1) {
     try {
       const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
-      if (!response.ok) continue;
+      if (!response.ok) {
+        await sleep(1200);
+        continue;
+      }
 
       const payload = (await response.json()) as BasescanSourceCodeResponse;
+      // Rate limit / transient API error → retry, do not conclude "unverified".
+      if (payload.status === "0" && /rate limit|max .*rate|busy/i.test(payload.message || "")) {
+        await sleep(1200);
+        continue;
+      }
+
       const source = Array.isArray(payload.result) ? payload.result[0] : null;
-      if (!source) continue;
+      if (!source) {
+        await sleep(1200);
+        continue;
+      }
 
       const sourceCode = source.SourceCode?.trim();
       const abi = source.ABI?.trim();
       const contractName = source.ContractName?.trim();
 
+      // Definitive answer — verified only if source is actually published.
       return Boolean(sourceCode && contractName && abi && abi !== "Contract source code not verified");
     } catch {
-      if (attempt === 2) return false;
+      await sleep(1200);
     }
   }
 
-  return false;
+  throw new Error(`BaseScan verification lookup failed for ${contractAddress}`);
 }
 
 async function getContractCreatorFromBasescan(contractAddress: string): Promise<ContractCreator | null> {

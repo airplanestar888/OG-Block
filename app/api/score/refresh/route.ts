@@ -4,6 +4,10 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { rateLimit } from "@/lib/rate-limit";
 
+// Retries (wallet indexing + BaseScan lookups) can push this past the default
+// 10s function limit; give it room so a slow lookup doesn't get killed mid-run.
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   const user = await getOrCreateCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Connect a human or agent wallet first" }, { status: 400 });
   }
 
-  const result = await calculateScoreForWallets(user.id, walletAddresses);
+  const result = await calculateScoreForWallets(user.id, walletAddresses, { retryOnEmpty: true });
   await persistScore(user.id, result);
 
   const [{ data: updated }, { data: ogClaim }] = await Promise.all([

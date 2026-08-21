@@ -20,14 +20,12 @@ export const metadata: Metadata = {
     description: "Own status. Prove culture. Verified Base wallets, NFT ownership, and public social rank.",
     url: "/",
     siteName: "OG BLOCK",
-    images: [{ url: "/og-nft-grid.png", width: 1200, height: 630, alt: "OG BLOCK" }],
     type: "website"
   },
   twitter: {
     card: "summary_large_image",
     title: "OG BLOCK",
-    description: "Own status. Prove culture. Verified Base wallets, NFT ownership, and public social rank.",
-    images: ["/og-nft-grid.png"]
+    description: "Own status. Prove culture. Verified Base wallets, NFT ownership, and public social rank."
   },
   other: {
     "base:app_id": "6a794e61d198f685bc61e2b3",
