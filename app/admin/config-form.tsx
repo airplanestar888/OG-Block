@@ -35,6 +35,26 @@ export function AdminConfigForm({
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState("");
+
+  async function refreshAllScores() {
+    if (refreshing) return;
+    setRefreshing(true);
+    setRefreshMsg("");
+    try {
+      const res = await fetch("/api/admin/refresh-all", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Refresh failed");
+      setRefreshMsg(
+        `Refreshed ${data.refreshed}/${data.total} profiles${data.failed ? ` · ${data.failed} failed` : ""}. Leaderboard updated.`
+      );
+    } catch (e) {
+      setRefreshMsg(e instanceof Error ? e.message : "Refresh failed");
+    } finally {
+      setRefreshing(false);
+    }
+  }
 
   async function save() {
     setSaving(true);
@@ -150,6 +170,25 @@ export function AdminConfigForm({
               {dbCardImage ? "Source: Supabase DB override" : "Source: default /og-card.png"}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Scores maintenance */}
+      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-sm">
+        <h2 className="font-semibold text-ink">Scores</h2>
+        <p className="mt-1 text-sm text-black/55">
+          Recalculate every profile&apos;s culture score from on-chain holdings across all verified wallets, then rebuild leaderboard ranks. Use after scoring changes or to fix stale scores.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <button
+            className="focus-ring rounded-full border border-[#0000FF]/30 bg-[#0000FF]/[0.06] px-6 py-2.5 text-sm font-semibold text-[#0000FF] transition hover:bg-[#0000FF]/10 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={refreshing}
+            onClick={refreshAllScores}
+            type="button"
+          >
+            {refreshing ? "Refreshing all scores…" : "Refresh all scores"}
+          </button>
+          {refreshMsg ? <span className="text-sm font-medium text-black/70">{refreshMsg}</span> : null}
         </div>
       </div>
 
