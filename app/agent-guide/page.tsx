@@ -1,27 +1,27 @@
 const agentSteps = [
   {
-    title: "Open OG BLOCK",
-    copy: "Go to the OG BLOCK website and start from Sign in or Dashboard."
+    title: "Operator generates a code",
+    copy: "The profile owner opens the Agent Wallet panel on joinog.xyz and taps Register agent to get a one-time code (expires in 15 minutes)."
   },
   {
-    title: "Use the connected X profile",
-    copy: "Sign in with the X account that should show the OG BLOCK badge."
+    title: "Hand the code to the agent",
+    copy: "The operator gives the one-time code to the agent. No login or browser session is shared — just the code."
   },
   {
-    title: "Use the agent wallet slot",
-    copy: "OG BLOCK uses one X profile. The agent wallet is an optional plus slot attached to that profile."
+    title: "Sign the challenge",
+    copy: "The agent signs the exact challenge message with its OWN agent wallet: 'OG BLOCK agent link', the code, its wallet address, and a timestamp."
   },
   {
-    title: "Verify Agent Wallet",
-    copy: "Sign the OG BLOCK wallet slot verification message with your own agent wallet only. Do not use the user's personal wallet."
+    title: "POST to the link endpoint",
+    copy: "The agent POSTs { code, address, chainId: 8453, message, signature } to https://www.joinog.xyz/api/agent/link."
   },
   {
-    title: "Update OG Score",
-    copy: "Refresh the combined OG Score. Main wallet NFTs and agent wallet NFTs can accumulate into one score."
+    title: "Slot linked + score updated",
+    copy: "The server verifies the code and signature, links the wallet into the agent slot, and refreshes the combined OG Score automatically."
   },
   {
     title: "Mint when eligible",
-    copy: "If a badge mint is available, mint the OG BLOCK badge from the verified agent wallet."
+    copy: "Once linked, the OG BLOCK badge can be minted from the agent wallet on Base when the profile is eligible."
   }
 ];
 
@@ -44,17 +44,17 @@ export default function AgentGuidePage() {
                 Clear instructions for AI agents joining OG BLOCK.
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-black/65">
-                This page is public on purpose. If any AI agent scans the website, it should be able to understand exactly how to sign in, verify its agent wallet, update OG Score, and mint a badge without confusing the main wallet flow.
+                This page is public on purpose. Any AI agent that scans it should understand exactly how to register into a profile&apos;s agent wallet slot using a one-time code, sign with its own wallet, get its NFTs counted in the combined OG Score, and mint a badge — without ever touching the operator&apos;s main wallet.
               </p>
             </div>
 
             <aside id="agent-instruction" className="rounded-2xl border border-baseblue/15 bg-baseblue/[0.04] p-5">
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">Copy this to your agent</p>
               <div className="mt-3 rounded-xl border border-baseblue/15 bg-white p-4 text-sm font-semibold leading-6 text-ink">
-                Sign in to joinog.xyz as my agent. Use your connected X profile, verify your agent wallet, update the OG Score, and mint the badge if eligible.
+                Register as my agent on joinog.xyz using the one-time code I give you. Sign the challenge with your own agent wallet, then POST it to /api/agent/link so your wallet is added to my agent slot.
               </div>
               <p className="mt-3 text-xs leading-5 text-black/55">
-                Keep it simple: the agent should use its own agent wallet, complete verification, then mint only when eligible.
+                Keep it simple: get the code from the operator, sign with your own agent wallet, and register. The badge can be minted once linked.
               </p>
             </aside>
           </div>
