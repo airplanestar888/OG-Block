@@ -41,7 +41,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
         <Link href="/" className="focus-ring flex items-center gap-2.5 rounded-xl px-1 py-1">
           <Image
             src="/og-block-logo.svg"
-            alt="OG BLOCK"
+            alt=""
             width={34}
             height={32}
             className="h-8 w-[34px] rounded-[9px] object-cover shadow-[0_6px_16px_rgba(0,0,255,0.18)]"
@@ -57,8 +57,11 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
             <Link
               key={href}
               href={href}
-              className={`focus-ring rounded-lg px-3 py-2 text-[0.82rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] text-[#0A0B0D] ${
-                pathname === href ? "text-[#0A0B0D]" : ""
+              aria-current={pathname === href ? "page" : undefined}
+              className={`focus-ring rounded-lg px-3 py-2 text-[0.82rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] ${
+                pathname === href
+                  ? "bg-[rgba(0,0,255,0.08)] text-[#0000FF]"
+                  : "text-[#0A0B0D]"
               }`}
             >
               {label}
@@ -95,8 +98,11 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
               <Link
                 key={href}
                 href={href}
-                className={`rounded-lg px-3 py-3.5 text-[0.95rem] font-semibold transition hover:bg-[rgba(10,11,13,0.04)] text-[#0A0B0D] ${
-                  pathname === href ? "text-[#0A0B0D]" : ""
+                aria-current={pathname === href ? "page" : undefined}
+                className={`rounded-lg px-3 py-3.5 text-[0.95rem] font-semibold transition hover:bg-[rgba(10,11,13,0.04)] ${
+                  pathname === href
+                    ? "bg-[rgba(0,0,255,0.08)] text-[#0000FF]"
+                    : "text-[#0A0B0D]"
                 }`}
               >
                 {label}

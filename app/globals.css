@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900;1,14..32,400&display=swap');
-
 /* ─── Tokens ─────────────────────────────────────── */
 :root {
   --blue:      #0000FF;
@@ -32,7 +30,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--surface);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
@@ -220,8 +218,11 @@ img, video {
 
 /* ─── Utilities ──────────────────────────────────── */
 .font-display {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), 'Inter', sans-serif;
   letter-spacing: -0.03em;
   line-height: 0.92;
   font-weight: 800;
+}
+.font-bebas {
+  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
 }

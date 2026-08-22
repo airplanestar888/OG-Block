@@ -31,9 +31,8 @@ export default function HowItWorksPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">How it works</p>
         <div className="mt-2 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start">
           <h1
-            className="text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+            className="font-bebas text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
             style={{
-              fontFamily: "'Bebas Neue', sans-serif",
               letterSpacing: "0.02em",
             }}
           >
@@ -43,7 +42,7 @@ export default function HowItWorksPage() {
             <br />
             visibility.
           </h1>
-          <p className="max-w-xl text-base leading-8 text-black/60">
+          <p className="max-w-xl text-base leading-8 text-black/70">
             OG BLOCK turns your Base NFT holdings into a public rank. Verify once, score everything, and carry that status onto X — where the culture actually is.
           </p>
         </div>
@@ -53,7 +52,7 @@ export default function HowItWorksPage() {
             <article key={step.title} className="bg-white/74 p-5 backdrop-blur">
               <p className="text-xs font-bold text-baseblue">0{index + 1}</p>
               <h2 className="mt-5 text-lg font-semibold text-black">{step.title}</h2>
-              <p className="mt-3 text-sm leading-6 text-black/60">{step.copy}</p>
+              <p className="mt-3 text-sm leading-6 text-black/70">{step.copy}</p>
             </article>
           ))}
         </div>

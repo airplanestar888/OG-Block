@@ -111,9 +111,8 @@ export default function RoadmapPage() {
         <div className="mt-2 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <div>
             <h1
-              className="text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+              className="font-bebas text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
               style={{
-                fontFamily: "'Bebas Neue', sans-serif",
                 letterSpacing: "0.02em",
               }}
             >
@@ -125,7 +124,7 @@ export default function RoadmapPage() {
             </h1>
           </div>
           <div className="max-w-2xl lg:pb-2">
-            <p className="text-base leading-8 text-black/60">
+            <p className="text-base leading-8 text-black/70">
               OG BLOCK is building the reputation layer that Base culture deserves — starting with a live score, locking it into snapshots, minting it as proof, and opening it up to agents and partners across the ecosystem.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -150,12 +149,12 @@ export default function RoadmapPage() {
                   </span>
                 </div>
                 <h2 className="mt-6 text-xl font-semibold leading-tight text-black/88">{phase.title}</h2>
-                <p className="mt-3 text-sm leading-6 text-black/60">{phase.summary}</p>
+                <p className="mt-3 text-sm leading-6 text-black/70">{phase.summary}</p>
               </div>
 
               <ul className="mt-6 space-y-3 border-t border-black/10 pt-5">
                 {phase.items.map((item) => (
-                  <li key={item} className="flex gap-3 text-sm leading-6 text-black/60">
+                  <li key={item} className="flex gap-3 text-sm leading-6 text-black/70">
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-baseblue" />
                     <span>{item}</span>
                   </li>
@@ -180,7 +179,7 @@ export default function RoadmapPage() {
                   <span className="h-2 w-2 shrink-0 rounded-full bg-baseblue" />
                   <h3 className="font-semibold text-black/84">{module.title}</h3>
                 </div>
-                <p className="mt-3 text-sm leading-6 text-black/60">{module.copy}</p>
+                <p className="mt-3 text-sm leading-6 text-black/70">{module.copy}</p>
               </div>
             ))}
           </div>

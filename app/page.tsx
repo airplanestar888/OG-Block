@@ -28,9 +28,8 @@ export default async function HomePage() {
             {/* Headline */}
             <div className="reveal reveal-d1 flex flex-col gap-3">
               <h1
-                className="leading-[0.94] text-[#0A0B0D]"
+                className="font-bebas leading-[0.94] text-[#0A0B0D]"
                 style={{
-                  fontFamily:    "'Bebas Neue', sans-serif",
                   fontSize:      "clamp(3.2rem, 6.58vw, 4.89rem)",
                   letterSpacing: "0.01em",
                 }}
@@ -39,7 +38,7 @@ export default async function HomePage() {
                 Prove culture.
               </h1>
               <p
-                className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/50 sm:text-[0.95rem]"
+                className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/70 sm:text-[0.95rem]"
                 style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
               >
                 Your NFT history becomes a score, rank, and proof of culture.
@@ -84,7 +83,7 @@ export default async function HomePage() {
               {/* Label — hidden xs */}
               <div className="score-label-col flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-3 py-2.5 sm:px-4 sm:py-3">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0000FF]" />
-                <span className="whitespace-nowrap text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/36 sm:text-[0.6rem]">
+                <span className="whitespace-nowrap text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/60 sm:text-[0.6rem]">
                   NFT Score
                 </span>
               </div>
@@ -99,7 +98,7 @@ export default async function HomePage() {
               {/* Live — hidden xs */}
               <div className="score-live-col flex items-center gap-1.5 border-l border-[rgba(10,11,13,0.07)] px-3 sm:px-4">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#00c48c]" />
-                <span className="text-[0.58rem] font-semibold text-[#0A0B0D]/36 sm:text-[0.6rem]">Live</span>
+                <span className="text-[0.58rem] font-semibold text-[#0A0B0D]/60 sm:text-[0.6rem]">Live</span>
               </div>
             </div>
 
@@ -125,7 +124,7 @@ export default async function HomePage() {
               className="feature-row flex items-center justify-between gap-4 py-4 sm:gap-6 sm:py-5"
             >
               <div className="flex items-center gap-4 sm:gap-5">
-                <span className="w-6 shrink-0 text-[0.65rem] font-semibold tabular-nums text-[#0A0B0D]/22 sm:w-7 sm:text-[0.68rem]">
+                <span className="w-6 shrink-0 text-[0.65rem] font-semibold tabular-nums text-[#0A0B0D]/45 sm:w-7 sm:text-[0.68rem]">
                   {num}
                 </span>
                 <div>
@@ -135,12 +134,12 @@ export default async function HomePage() {
                   >
                     {title}
                   </p>
-                  <p className="mt-0.5 text-[0.75rem] text-[#0A0B0D]/44 sm:text-[0.78rem]">{copy}</p>
+                  <p className="mt-0.5 text-[0.75rem] text-[#0A0B0D]/65 sm:text-[0.78rem]">{copy}</p>
                 </div>
               </div>
               <svg
                 width="13" height="13" viewBox="0 0 14 14" fill="none"
-                className="shrink-0 text-[#0A0B0D]/18"
+                className="shrink-0 text-[#0A0B0D]/40"
                 aria-hidden="true"
               >
                 <path
@@ -161,7 +160,7 @@ export default async function HomePage() {
 function ScoreMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-1 flex-col justify-center px-3 py-2.5 text-center sm:px-4 sm:py-3">
-      <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF]/60 sm:text-[0.55rem]">
+      <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF] sm:text-[0.55rem]">
         {label}
       </p>
       <p className="mt-0.5 text-[0.95rem] font-bold leading-none tracking-tight text-[#0A0B0D] sm:text-[1.1rem]">

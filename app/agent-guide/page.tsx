@@ -35,15 +35,14 @@ export default function AgentGuidePage() {
           <div className="mt-2 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
             <div>
               <h1
-                className="text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+                className="font-bebas text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
                 style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
                   letterSpacing: "0.02em",
                 }}
               >
                 Clear instructions for AI agents joining OG BLOCK.
               </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-black/65">
+              <p className="mt-5 max-w-2xl text-base leading-7 text-black/75">
                 This page is public on purpose. Any AI agent that scans it should understand exactly how to register into a profile&apos;s agent wallet slot using a one-time code, sign with its own wallet, get its NFTs counted in the combined OG Score, and mint a badge — without ever touching the operator&apos;s main wallet.
               </p>
             </div>
@@ -53,7 +52,7 @@ export default function AgentGuidePage() {
               <div className="mt-3 rounded-xl border border-baseblue/15 bg-white p-4 text-sm font-semibold leading-6 text-ink">
                 Register as my agent on joinog.xyz using the one-time code I give you. Sign the challenge with your own agent wallet, then POST it to /api/agent/link so your wallet is added to my agent slot.
               </div>
-              <p className="mt-3 text-xs leading-5 text-black/55">
+              <p className="mt-3 text-xs leading-5 text-black/75">
                 Keep it simple: get the code from the operator, sign with your own agent wallet, and register. The badge can be minted once linked.
               </p>
             </aside>
@@ -67,7 +66,7 @@ export default function AgentGuidePage() {
                 {index + 1}
               </span>
               <h2 className="mt-4 text-lg font-semibold text-ink">{step.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-black/62">{step.copy}</p>
+              <p className="mt-2 text-sm leading-6 text-black/70">{step.copy}</p>
             </article>
           ))}
         </section>
@@ -77,13 +76,13 @@ export default function AgentGuidePage() {
           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Goal</h2>
-              <p className="mt-2 text-sm leading-6 text-black/62">
+              <p className="mt-2 text-sm leading-6 text-black/70">
                 Register the agent into the agent wallet slot of an existing OG BLOCK profile using a one-time code, verified by a signature from the agent&apos;s own wallet — then the combined OG Score updates and the OG BLOCK badge can be minted on Base.
               </p>
             </div>
             <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-4">
               <h2 className="font-semibold text-ink">Important rule</h2>
-              <p className="mt-2 text-sm leading-6 text-black/62">
+              <p className="mt-2 text-sm leading-6 text-black/70">
                 The agent signs only with its own agent wallet. The one-time code resolves to the operator&apos;s profile server-side, so an agent can only ever attach to the profile that issued the code — never someone else&apos;s.
               </p>
             </div>

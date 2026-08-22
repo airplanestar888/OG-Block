@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { XAvatar } from "@/components/x-avatar";
 import type { PublicLeaderboardProfile } from "@/lib/types";
@@ -31,6 +33,7 @@ function formatUtcDate(value: string) {
 
 export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const filteredProfiles = useMemo(() => {
     return leaderboard.filter((profile) => {
@@ -63,9 +66,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Leaderboard</p>
           <h1
-            className="mt-2 max-w-2xl text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+            className="font-bebas mt-2 max-w-2xl text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
             style={{
-              fontFamily: "'Bebas Neue', sans-serif",
               letterSpacing: "0.02em",
             }}
           >
@@ -91,7 +93,10 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           {featuredProfiles.map((profile, index) => (
             <article
               key={`featured-${profile.xHandle || index}`}
+              onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
               className={`relative overflow-hidden rounded-[1.5rem] border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
+                profile.xHandle ? "cursor-pointer" : ""
+              } ${
                 index === 0
                   ? "border-baseblue/25 shadow-[0_10px_28px_rgba(0,0,255,0.08)]"
                   : "border-black/10"
@@ -107,12 +112,24 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                         Rank #{profile.rank || index + 1}
                       </p>
                       {profile.profileRole === "agent" ? (
-                        <span className="rounded bg-black/[0.06] px-1.5 py-0.2 text-[0.65rem] font-bold uppercase text-black/60">
+                        <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
                           Agent
                         </span>
                       ) : null}
                     </div>
-                    <h2 className="mt-1 font-semibold text-black/88">@{profile.xHandle}</h2>
+                    <h2 className="mt-1 font-semibold text-black/88">
+                      {profile.xHandle ? (
+                        <Link
+                          href={`/u/${profile.xHandle}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="transition hover:text-baseblue hover:underline"
+                        >
+                          @{profile.xHandle}
+                        </Link>
+                      ) : (
+                        `@${profile.xHandle}`
+                      )}
+                    </h2>
                   </div>
                 </div>
 
@@ -137,7 +154,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
           <div>
             <h2 className="font-semibold text-black/88">Culture board</h2>
-            <p className="mt-1 text-sm text-black/50">Live rankings across all verified OG BLOCK profiles.</p>
+            <p className="mt-1 text-sm text-black/65">Live rankings across all verified OG BLOCK profiles.</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -146,9 +163,10 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               <input
                 type="text"
                 placeholder="Search @handle..."
+                aria-label="Search profiles by X handle or name"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-black/10 bg-[#fbfcff] px-3.5 py-1.5 text-xs text-ink placeholder:text-black/40 focus:border-baseblue focus:outline-none focus:ring-1 focus:ring-baseblue"
+                className="w-full rounded-xl border border-black/10 bg-[#fbfcff] px-3.5 py-1.5 text-xs text-ink placeholder:text-black/50 focus:border-baseblue focus:outline-none focus:ring-1 focus:ring-baseblue"
               />
               {searchQuery ? (
                 <button
@@ -189,7 +207,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 return (
                   <tr
                     key={profile.xHandle || index}
-                    className="transition hover:bg-baseblue/[0.025]"
+                    onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
+                    className={`transition hover:bg-baseblue/[0.05] ${profile.xHandle ? "cursor-pointer" : ""}`}
                   >
                     {/* Rank */}
                     <td className="px-6 py-4 text-center">
@@ -204,9 +223,21 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                         <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <p className="truncate font-semibold text-black/85">@{profile.xHandle}</p>
+                            <p className="truncate font-semibold text-black/85">
+                              {profile.xHandle ? (
+                                <Link
+                                  href={`/u/${profile.xHandle}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="transition hover:text-baseblue hover:underline"
+                                >
+                                  @{profile.xHandle}
+                                </Link>
+                              ) : (
+                                `@${profile.xHandle}`
+                              )}
+                            </p>
                             {profile.profileRole === "agent" ? (
-                              <span className="rounded bg-black/[0.06] px-1.5 py-0.2 text-[0.65rem] font-bold uppercase text-black/60">
+                              <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
                                 Agent
                               </span>
                             ) : null}
@@ -287,7 +318,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 function HeroStat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="border-r border-black/10 bg-white/70 px-4 py-3 last:border-r-0">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/40">{label}</p>
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/55">{label}</p>
       <p className="mt-1 text-lg font-semibold text-black/88">{value}</p>
     </div>
   );
@@ -296,7 +327,7 @@ function HeroStat({ label, value }: { label: string; value: string | number }) {
 function MiniStat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-3 text-center">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/55">{label}</p>
       <p className="mt-1 font-semibold text-black/88">{value}</p>
     </div>
   );
