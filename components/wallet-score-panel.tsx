@@ -137,8 +137,7 @@ export function WalletScorePanel({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
-      <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
+    <div className="rounded-2xl border border-black/10 bg-white/78 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
       <div className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -158,7 +157,7 @@ export function WalletScorePanel({
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl border border-black/10 bg-gradient-to-b from-[#fbfcff] to-white p-4">
+      <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.02] p-4">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/40">
           {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent setup"}
         </p>

@@ -89,12 +89,11 @@ export default async function DashboardPage() {
     : [];
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] text-ink">
-      {/* Base DNA backdrop — soft blue glow + hairline pixel grid, fading out */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(0,0,255,0.10),transparent_45%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.045)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:42px_42px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-5 py-12 text-ink">
+      {/* Roadmap-style backdrop — blue glow + hairline grid */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
-      <div className="relative mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <div className="relative mx-auto max-w-6xl space-y-6">
         {/* Profile header */}
         <section className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -104,22 +103,20 @@ export default async function DashboardPage() {
               <h1 className="text-3xl font-semibold tracking-tight text-ink">{user.x_name || user.x_handle}</h1>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 shadow-sm">
-            <span className="size-2 rounded-full bg-[#0000FF]" />
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/60">
+          <div className="flex items-center gap-2 border border-baseblue/20 bg-baseblue/10 px-3 py-1.5">
+            <span className="size-2 rounded-full bg-baseblue" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-baseblue">
               {score?.rank ? `Rank #${score.rank}` : "Unranked"}
             </p>
           </div>
         </section>
 
-        {/* Culture score hero — premium white card with Base gradient strip */}
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.07)]">
-          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
-          <div className="relative p-6 md:p-8">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_-10%,rgba(0,0,255,0.10),transparent_50%)]" />
-            <div className="relative flex flex-wrap items-end justify-between gap-6">
+        {/* Culture score — roadmap-style flat card with hairline stat grid */}
+        <section className="overflow-hidden rounded-2xl border border-black/10 bg-black/10">
+          <div className="bg-white/78 p-6 backdrop-blur md:p-8">
+            <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
-                <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-black/40">Culture score</p>
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Culture score</p>
                 <p className="mt-2 text-6xl font-bold leading-none tracking-tight text-ink md:text-7xl">
                   {(score?.score ?? 0).toLocaleString()}
                 </p>
@@ -129,12 +126,12 @@ export default async function DashboardPage() {
                     : "Verify your wallet to generate your combined score."}
                 </p>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <HeroStat label="NFTs counted" value={score?.nft_count ?? 0} />
-                <HeroStat label="Badges" value={badgeCount} />
-                <HeroStat label="Status" value={ogClaim?.tier ? ogClaim.tier : score?.is_og ? "OG" : "Member"} />
-              </div>
             </div>
+          </div>
+          <div className="grid grid-cols-3 gap-px bg-black/10">
+            <HeroStat label="NFTs counted" value={score?.nft_count ?? 0} />
+            <HeroStat label="Badges" value={badgeCount} />
+            <HeroStat label="Status" value={ogClaim?.tier ? ogClaim.tier : score?.is_og ? "OG" : "Member"} />
           </div>
         </section>
 
@@ -162,8 +159,8 @@ export default async function DashboardPage() {
           />
         </div>
 
-        {/* Badges & Perks — blue-tinted gradient card */}
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-baseblue/15 bg-gradient-to-br from-[#0000FF]/[0.06] via-white to-white p-6 shadow-sm md:p-8">
+        {/* Badges & Perks — roadmap-style flat card */}
+        <section className="rounded-2xl border border-black/10 bg-white/78 p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges &amp; perks</p>
@@ -177,21 +174,21 @@ export default async function DashboardPage() {
               </p>
               {!ogClaim ? (
                 <Link
-                  className="focus-ring mt-4 inline-flex rounded-full bg-[#0000FF] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,255,0.25)] transition hover:bg-[#141CB5]"
+                  className="focus-ring mt-4 inline-flex rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5]"
                   href="/og-card"
                 >
                   Claim OG Card
                 </Link>
               ) : null}
             </div>
-            <div className="rounded-2xl border border-baseblue/15 bg-white px-6 py-4 text-center shadow-sm">
+            <div className="rounded-xl border border-baseblue/20 bg-baseblue/10 px-6 py-4 text-center">
               <p className="text-3xl font-semibold text-ink">{badgeCount}</p>
               <p className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
             </div>
           </div>
 
           {ogClaim ? (
-            <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
+            <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-black/10 bg-white/74 p-4">
               <Image
                 className="rounded-lg object-cover"
                 src="/api/og-card/image"
@@ -229,17 +226,16 @@ export default async function DashboardPage() {
           ) : null}
         </section>
 
-        {/* Blockchain Legacy — white receipt card */}
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm md:p-8">
-          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
-          <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+        {/* Blockchain Legacy — roadmap-style flat receipt card */}
+        <section className="rounded-2xl border border-black/10 bg-white/78 p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur md:p-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">Blockchain Legacy</h2>
               <p className="mt-1 text-sm text-black/55">
                 Verified collection receipts — only verified contracts appear here.
               </p>
             </div>
-            <div className="grid grid-cols-3 overflow-hidden rounded-xl border border-black/10 text-center text-xs shadow-sm">
+            <div className="grid w-full max-w-xs grid-cols-3 gap-px overflow-hidden rounded-xl border border-black/10 bg-black/10 text-center text-xs sm:w-auto">
               <ReceiptStat label="Items" value={score?.nft_count ?? (holdings || []).length} />
               <ReceiptStat label="Score" value={score?.score ?? 0} />
               <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
@@ -262,7 +258,7 @@ export default async function DashboardPage() {
               const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
 
               return (
-                <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-2xl border border-black/[0.08] bg-gradient-to-b from-[#fbfcff] to-white p-4 md:grid-cols-[1fr_auto]">
+                <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-xl border border-black/10 bg-white/74 p-4 md:grid-cols-[1fr_auto]">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-md bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
@@ -298,7 +294,7 @@ export default async function DashboardPage() {
                     </Link>
                   </div>
 
-                  <div className="min-w-52 rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
+                  <div className="min-w-52 rounded-xl border border-black/10 bg-[#fbfcff] p-4">
                     <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Score impact</p>
                     <p className="mt-2 text-3xl font-semibold text-black">+{scoreBreakdown.total}</p>
                     <div className="mt-3 space-y-1">
@@ -315,17 +311,16 @@ export default async function DashboardPage() {
             })}
 
             {(countedHoldings || []).length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-black/15 bg-[#fbfcff] px-4 py-10 text-center text-sm text-black/50">
+              <div className="rounded-xl border border-black/10 bg-white/74 px-4 py-10 text-center text-sm text-black/50">
                 No verified collection receipts yet — verify a wallet holding NFTs from verified contracts.
               </div>
             ) : null}
           </div>
         </section>
 
-        {/* Score History & NFT Activity */}
-        <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm md:p-8">
-          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+        {/* Score History & NFT Activity — roadmap-style flat card */}
+        <section className="rounded-2xl border border-black/10 bg-white/78 p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">Score History &amp; NFT Activity</h2>
               <p className="mt-1 text-sm text-black/55">
@@ -437,18 +432,18 @@ function formatUtcDate(value: string) {
 
 function HeroStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="min-w-28 rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-5 py-4 text-center shadow-sm">
-      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
-      <p className="mt-1 text-xl font-semibold text-ink">{value}</p>
+    <div className="bg-white/78 px-4 py-4 text-center backdrop-blur">
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/40">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-black/88">{value}</p>
     </div>
   );
 }
 
 function ReceiptStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="border-r border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-4 py-3 last:border-r-0">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/45">{label}</p>
-      <p className="mt-1 font-semibold text-ink">{value}</p>
+    <div className="bg-white/78 px-4 py-3 backdrop-blur">
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
+      <p className="mt-1 font-semibold text-black/88">{value}</p>
     </div>
   );
 }

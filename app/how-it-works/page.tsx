@@ -39,8 +39,7 @@ export default function HowItWorksPage() {
             Proof, status, visibility.
           </h1>
 
-          <div className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
-            <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
+          <div className="rounded-2xl border border-black/10 bg-white/78 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
             <div className="p-6">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Why it matters</p>
@@ -77,7 +76,7 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,255,0.25)] transition duration-200 hover:bg-[#141CB5] active:opacity-80" href="/og-card">
+          <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80" href="/og-card">
             Get your badge
           </Link>
           <Link className="rounded-full border border-[rgba(10,11,13,0.12)] bg-white/70 px-5 py-3 text-sm font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D]" href="/leaderboard">
