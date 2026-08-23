@@ -113,7 +113,7 @@ export default async function DashboardPage() {
 
         {/* Culture score — roadmap-style flat card with hairline stat grid */}
         <section className="overflow-hidden rounded-2xl border border-black/10 bg-black/10">
-          <div className="bg-white p-6 md:p-8">
+          <div className="bg-[#fbfcff] p-6 md:p-8">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Culture score</p>
