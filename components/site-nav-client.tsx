@@ -44,7 +44,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
             alt=""
             width={34}
             height={32}
-            className="h-8 w-[34px] rounded-[9px] object-cover shadow-[0_6px_16px_rgba(0,0,255,0.18)]"
+            className="h-8 w-[34px] rounded-[9px] object-cover"
             priority
           />
           <span className="text-[0.95rem] font-black tracking-[-0.03em] text-[#0A0B0D]">
