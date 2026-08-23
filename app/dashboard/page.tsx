@@ -89,291 +89,327 @@ export default async function DashboardPage() {
     : [];
 
   return (
-    <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
-      <section className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <XAvatar src={user.x_avatar} handle={user.x_handle} size={64} />
-          <div>
-            <p className="text-sm text-black/60">@{user.x_handle}</p>
-            <h1 className="text-3xl font-semibold tracking-tight text-ink">{user.x_name || user.x_handle}</h1>
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] text-ink">
+      {/* Base DNA backdrop — soft blue glow + hairline pixel grid, fading out */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(0,0,255,0.10),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.045)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:42px_42px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
+
+      <div className="relative mx-auto max-w-6xl space-y-6 px-4 py-8">
+        {/* Profile header */}
+        <section className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <XAvatar src={user.x_avatar} handle={user.x_handle} size={64} />
+            <div>
+              <p className="text-sm text-black/50">@{user.x_handle}</p>
+              <h1 className="text-3xl font-semibold tracking-tight text-ink">{user.x_name || user.x_handle}</h1>
+            </div>
           </div>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Stat label="Score" value={score?.score ?? 0} />
-        <Stat label="Rank" value={score?.rank ? `#${score.rank}` : "Unranked"} />
-        <Stat label="NFTs" value={score?.nft_count ?? 0} />
-        <Stat label="Badges" value={badgeCount} />
-      </section>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <WalletScorePanel
-          xUserId={user.x_user_id}
-          xHandle={user.x_handle}
-          xName={user.x_name}
-          xAvatar={user.x_avatar}
-          walletSlot="human"
-          title="Wallet"
-          description="Your main holder wallet. Its NFTs accumulate into the OG score."
-          verifiedWallet={humanWallet?.address}
-        />
-        <WalletScorePanel
-          xUserId={user.x_user_id}
-          xHandle={user.x_handle}
-          xName={user.x_name}
-          xAvatar={user.x_avatar}
-          walletSlot="agent"
-          title="Agent Wallet"
-          description="Virtual Protocol agent wallet. Its NFTs also accumulate into the same OG score."
-          verifiedWallet={agentWallet?.address}
-          allowBrowserConnect={false}
-        />
-      </div>
-
-      <section className="rounded-lg border border-baseblue/15 bg-baseblue/[0.04] p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges & Perks</p>
-            <h2 className="mt-2 font-semibold text-ink">
-              {ogClaim ? "OG Card claimed." : "OG BLOCK badge field is ready."}
-            </h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-black/60">
-              {ogClaim
-                ? "Your Official OG Badge is minted on Base. More perks unlock over time."
-                : "Claim your Official OG Badge NFT to fill this field. Collection NFTs stay in Blockchain Legacy below."}
+          <div className="flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 shadow-sm">
+            <span className="size-2 rounded-full bg-[#0000FF]" />
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/60">
+              {score?.rank ? `Rank #${score.rank}` : "Unranked"}
             </p>
-            {!ogClaim ? (
-              <Link
-                className="mt-3 inline-flex rounded-full bg-baseblue px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                href="/og-card"
-              >
-                Claim OG Card
-              </Link>
-            ) : null}
           </div>
-          <div className="rounded-xl border border-baseblue/15 bg-white px-5 py-4 text-center">
-            <p className="text-3xl font-semibold text-ink">{badgeCount}</p>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
-          </div>
-        </div>
+        </section>
 
-        {ogClaim ? (
-          <div className="mt-5 flex flex-wrap items-center gap-4 rounded-xl border border-baseblue/15 bg-white p-4">
-            <Image
-              className="rounded-lg object-cover"
-              src="/api/og-card/image"
-              alt="OG Card"
-              width={72}
-              height={72}
-              unoptimized
-            />
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold text-ink">
-                OG Card{ogClaim.token_id ? ` #${ogClaim.token_id}` : ""}
-              </p>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                {ogClaim.tier ? (
-                  <span className="rounded-full bg-baseblue/10 px-2.5 py-1 font-bold uppercase tracking-[0.08em] text-baseblue">
-                    {ogClaim.tier}
-                  </span>
-                ) : null}
-                <span className="font-mono text-black/50">{shortAddress(ogClaim.wallet_address)}</span>
+        {/* Culture score hero — premium white card with Base gradient strip */}
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.07)]">
+          <div className="h-[3px] w-full bg-gradient-to-r from-[#0000FF] via-[#4D7CFF] to-transparent" />
+          <div className="relative p-6 md:p-8">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_-10%,rgba(0,0,255,0.10),transparent_50%)]" />
+            <div className="relative flex flex-wrap items-end justify-between gap-6">
+              <div>
+                <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-black/40">Culture score</p>
+                <p className="mt-2 text-6xl font-bold leading-none tracking-tight text-ink md:text-7xl">
+                  {(score?.score ?? 0).toLocaleString()}
+                </p>
+                <p className="mt-3 text-xs text-black/45">
+                  {score?.last_calculated_at
+                    ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}`
+                    : "Verify your wallet to generate your combined score."}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <HeroStat label="NFTs counted" value={score?.nft_count ?? 0} />
+                <HeroStat label="Badges" value={badgeCount} />
+                <HeroStat label="Status" value={ogClaim?.tier ? ogClaim.tier : score?.is_og ? "OG" : "Member"} />
               </div>
             </div>
-            {ogClaim.token_id && ogClaim.chain_id ? (
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  className="rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 hover:border-baseblue hover:text-baseblue"
-                  href={getOgCardExplorerUrl(ogClaim.chain_id, ogCardConfig?.contractAddress ?? null, ogClaim.token_id)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  BaseScan
-                </Link>
-              </div>
-            ) : null}
           </div>
-        ) : null}
-      </section>
+        </section>
 
-      <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="font-semibold text-ink">Blockchain Legacy</h2>
-            <p className="mt-1 text-sm text-black/60">
-              {score?.last_calculated_at ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}` : "Verify your wallet or agent wallet to generate your combined receipt."}
-            </p>
-          </div>
-          <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-black/10 text-center text-xs">
-            <ReceiptStat label="Items" value={score?.nft_count ?? (holdings || []).length} />
-            <ReceiptStat label="Score" value={score?.score ?? 0} />
-            <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
-          </div>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <WalletScorePanel
+            xUserId={user.x_user_id}
+            xHandle={user.x_handle}
+            xName={user.x_name}
+            xAvatar={user.x_avatar}
+            walletSlot="human"
+            title="Wallet"
+            description="Your main holder wallet. Its NFTs accumulate into the OG score."
+            verifiedWallet={humanWallet?.address}
+          />
+          <WalletScorePanel
+            xUserId={user.x_user_id}
+            xHandle={user.x_handle}
+            xName={user.x_name}
+            xAvatar={user.x_avatar}
+            walletSlot="agent"
+            title="Agent Wallet"
+            description="Virtual Protocol agent wallet. Its NFTs also accumulate into the same OG score."
+            verifiedWallet={agentWallet?.address}
+            allowBrowserConnect={false}
+          />
         </div>
 
-        <div className="mt-5 grid gap-3">
-          {(countedHoldings || []).map((holding, index) => {
-            const metadata = holding.metadata_json as { creator?: unknown; attributes?: unknown[] } | null;
-            const scoreBreakdown = getHoldingScoreBreakdown(
-              {
-                contractAddress: holding.contract_address,
-                tokenId: holding.token_id,
-                metadata: metadata || {}
-              } satisfies NftHolding,
-              index
-            );
-            const traits = getTraitSummary(metadata?.attributes);
-            const creator = getCreatorDisplay(metadata?.creator);
-            const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
+        {/* Badges & Perks — blue-tinted gradient card */}
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-baseblue/15 bg-gradient-to-br from-[#0000FF]/[0.06] via-white to-white p-6 shadow-sm md:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-6">
+            <div>
+              <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges &amp; perks</p>
+              <h2 className="mt-2 text-xl font-semibold text-ink">
+                {ogClaim ? "OG Card claimed." : "OG BLOCK badge field is ready."}
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-black/60">
+                {ogClaim
+                  ? "Your Official OG Badge is minted on Base. More perks unlock over time."
+                  : "Claim your Official OG Badge NFT to fill this field. Collection NFTs stay in Blockchain Legacy below."}
+              </p>
+              {!ogClaim ? (
+                <Link
+                  className="focus-ring mt-4 inline-flex rounded-full bg-[#0000FF] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,255,0.25)] transition hover:bg-[#141CB5]"
+                  href="/og-card"
+                >
+                  Claim OG Card
+                </Link>
+              ) : null}
+            </div>
+            <div className="rounded-2xl border border-baseblue/15 bg-white px-6 py-4 text-center shadow-sm">
+              <p className="text-3xl font-semibold text-ink">{badgeCount}</p>
+              <p className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
+            </div>
+          </div>
 
-            return (
-              <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-lg border border-dashed border-black/15 bg-[#fbfcff] p-4 md:grid-cols-[1fr_auto]">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
-                      Item {index + 1}
+          {ogClaim ? (
+            <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
+              <Image
+                className="rounded-lg object-cover"
+                src="/api/og-card/image"
+                alt="OG Card"
+                width={72}
+                height={72}
+                unoptimized
+              />
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-ink">
+                  OG Card{ogClaim.token_id ? ` #${ogClaim.token_id}` : ""}
+                </p>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                  {ogClaim.tier ? (
+                    <span className="rounded-full bg-baseblue/10 px-2.5 py-1 font-bold uppercase tracking-[0.08em] text-baseblue">
+                      {ogClaim.tier}
                     </span>
-                    {creator.label !== "Unknown creator" ? (
-                      creator.address ? (
-                        <Link
-                          className="font-semibold text-ink hover:text-baseblue"
-                          href={`https://basescan.org/address/${creator.address}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Creator: {creator.label}
-                        </Link>
-                      ) : (
-                        <h3 className="font-semibold text-ink">Creator: {creator.label}</h3>
-                      )
-                    ) : null}
-                  </div>
-                  <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
-                    <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />
-                    <ReceiptLine label="Token ID" value={holding.token_id} />
-                    <ReceiptLine label="Traits" value={traits || "No trait metadata"} />
-                  </dl>
+                  ) : null}
+                  <span className="font-mono text-black/50">{shortAddress(ogClaim.wallet_address)}</span>
+                </div>
+              </div>
+              {ogClaim.token_id && ogClaim.chain_id ? (
+                <div className="flex flex-wrap gap-2">
                   <Link
-                    className="mt-4 inline-flex rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 hover:border-baseblue hover:text-baseblue"
-                    href={explorerUrl}
+                    className="rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 transition hover:border-baseblue hover:text-baseblue"
+                    href={getOgCardExplorerUrl(ogClaim.chain_id, ogCardConfig?.contractAddress ?? null, ogClaim.token_id)}
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Show onchain
+                    BaseScan
                   </Link>
                 </div>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
 
-                <div className="min-w-52 rounded-lg border border-black/10 bg-white p-3">
-                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Score impact</p>
-                  <p className="mt-2 text-3xl font-semibold text-black">+{scoreBreakdown.total}</p>
-                  <div className="mt-3 space-y-1">
-                    {scoreBreakdown.parts.map((part) => (
-                      <div key={part.label} className="flex justify-between gap-3 text-xs text-black/62">
-                        <span>{part.label}</span>
-                        <span className="font-semibold text-black">+{part.points}</span>
-                      </div>
-                    ))}
+        {/* Blockchain Legacy — white receipt card */}
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm md:p-8">
+          <div className="h-[3px] w-24 rounded-full bg-gradient-to-r from-[#0000FF] to-transparent" />
+          <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-ink">Blockchain Legacy</h2>
+              <p className="mt-1 text-sm text-black/55">
+                Verified collection receipts — only verified contracts appear here.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 overflow-hidden rounded-xl border border-black/10 text-center text-xs shadow-sm">
+              <ReceiptStat label="Items" value={score?.nft_count ?? (holdings || []).length} />
+              <ReceiptStat label="Score" value={score?.score ?? 0} />
+              <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-3">
+            {(countedHoldings || []).map((holding, index) => {
+              const metadata = holding.metadata_json as { creator?: unknown; attributes?: unknown[] } | null;
+              const scoreBreakdown = getHoldingScoreBreakdown(
+                {
+                  contractAddress: holding.contract_address,
+                  tokenId: holding.token_id,
+                  metadata: metadata || {}
+                } satisfies NftHolding,
+                index
+              );
+              const traits = getTraitSummary(metadata?.attributes);
+              const creator = getCreatorDisplay(metadata?.creator);
+              const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
+
+              return (
+                <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-2xl border border-black/[0.08] bg-gradient-to-b from-[#fbfcff] to-white p-4 md:grid-cols-[1fr_auto]">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-md bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
+                        Item {index + 1}
+                      </span>
+                      {creator.label !== "Unknown creator" ? (
+                        creator.address ? (
+                          <Link
+                            className="font-semibold text-ink hover:text-baseblue"
+                            href={`https://basescan.org/address/${creator.address}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Creator: {creator.label}
+                          </Link>
+                        ) : (
+                          <h3 className="font-semibold text-ink">Creator: {creator.label}</h3>
+                        )
+                      ) : null}
+                    </div>
+                    <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                      <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />
+                      <ReceiptLine label="Token ID" value={holding.token_id} />
+                      <ReceiptLine label="Traits" value={traits || "No trait metadata"} />
+                    </dl>
+                    <Link
+                      className="mt-4 inline-flex rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 transition hover:border-baseblue hover:text-baseblue"
+                      href={explorerUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      Show onchain
+                    </Link>
+                  </div>
+
+                  <div className="min-w-52 rounded-2xl border border-black/10 bg-white p-4 shadow-sm">
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Score impact</p>
+                    <p className="mt-2 text-3xl font-semibold text-black">+{scoreBreakdown.total}</p>
+                    <div className="mt-3 space-y-1">
+                      {scoreBreakdown.parts.map((part) => (
+                        <div key={part.label} className="flex justify-between gap-3 text-xs text-black/60">
+                          <span>{part.label}</span>
+                          <span className="font-semibold text-black">+{part.points}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+
+            {(countedHoldings || []).length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-black/15 bg-[#fbfcff] px-4 py-10 text-center text-sm text-black/50">
+                No verified collection receipts yet — verify a wallet holding NFTs from verified contracts.
+              </div>
+            ) : null}
+          </div>
+        </section>
+
+        {/* Score History & NFT Activity */}
+        <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm md:p-8">
+          <div className="h-[3px] w-24 rounded-full bg-gradient-to-r from-[#0000FF] to-transparent" />
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-ink">Score History &amp; NFT Activity</h2>
+              <p className="mt-1 text-sm text-black/55">
+                Track of points earned and NFT balance changes over time.
+              </p>
+            </div>
+            <Link
+              href="/leaderboard"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-baseblue hover:underline"
+            >
+              <span>View Public Leaderboard</span>
+              <span>-&gt;</span>
+            </Link>
+          </div>
+
+          <details className="group mt-5">
+            <summary className="focus-ring flex cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-black/15 px-5 py-2.5 text-sm font-semibold text-black/70 transition hover:bg-black/5 [&::-webkit-details-marker]:hidden">
+              <span className="group-open:hidden">
+                Show detail{userHistory.length > 0 ? ` (${userHistory.length})` : ""}
+              </span>
+              <span className="hidden group-open:inline">Hide detail</span>
+              <span className="text-xs transition group-open:rotate-180" aria-hidden="true">▼</span>
+            </summary>
+
+            <div className="mt-5 divide-y divide-black/[0.08]">
+              {userHistory.map((item) => (
+                <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span
+                        className={`rounded px-2 py-0.5 text-[0.68rem] font-bold uppercase ${
+                          item.eventType === "nft_added"
+                            ? "bg-emerald-500/10 text-emerald-700"
+                            : item.eventType === "initial_score"
+                            ? "bg-baseblue/10 text-baseblue"
+                            : item.eventType === "wallet_disconnected"
+                            ? "bg-rose-500/10 text-rose-700"
+                            : "bg-black/[0.06] text-black/70"
+                        }`}
+                      >
+                        {item.eventType.replace("_", " ")}
+                      </span>
+                      <span className="text-xs text-black/40">{formatUtcDate(item.createdAt)}</span>
+                    </div>
+                    <p className="mt-1 text-sm font-medium text-black/85">{item.reason}</p>
+                    <p className="mt-0.5 text-xs text-black/50">
+                      Previous: {item.oldScore} pts -&gt; New: <span className="font-bold text-ink">{item.newScore} pts</span>
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {item.pointsDelta > 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700">
+                        <span>▲</span> +{item.pointsDelta} pts
+                      </span>
+                    ) : item.pointsDelta < 0 ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/25 bg-rose-500/10 px-3 py-1 text-xs font-bold text-rose-700">
+                        <span>▼</span> {item.pointsDelta} pts
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs text-black/60">
+                        Score refreshed
+                      </span>
+                    )}
+
+                    {item.nftDelta > 0 ? (
+                      <span className="rounded-full bg-black/[0.05] px-2 py-1 text-xs font-bold text-black/70">
+                        +{item.nftDelta} NFT
+                      </span>
+                    ) : null}
                   </div>
                 </div>
-              </article>
-            );
-          })}
+              ))}
 
-          {(countedHoldings || []).length === 0 ? (
-            <div className="rounded-lg border border-dashed border-black/15 bg-[#fbfcff] px-4 py-8 text-center text-sm text-black/55">
-              No collection receipt yet.
-            </div>
-          ) : null}
-        </div>
-      </section>
-
-      {/* Score History & NFT Activity */}
-      <section className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 pb-4">
-          <div>
-            <h2 className="font-semibold text-ink">Score History & NFT Activity</h2>
-            <p className="mt-1 text-sm text-black/60">
-              Track of points earned and NFT balance changes over time.
-            </p>
-          </div>
-          <Link
-            href="/leaderboard"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-baseblue hover:underline"
-          >
-            <span>View Public Leaderboard</span>
-            <span>-&gt;</span>
-          </Link>
-        </div>
-
-        <details className="group mt-4">
-          <summary className="focus-ring flex cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-black/15 px-5 py-2.5 text-sm font-semibold text-black/70 transition hover:bg-black/5 [&::-webkit-details-marker]:hidden">
-            <span className="group-open:hidden">
-              Show detail{userHistory.length > 0 ? ` (${userHistory.length})` : ""}
-            </span>
-            <span className="hidden group-open:inline">Hide detail</span>
-            <span className="text-xs transition group-open:rotate-180" aria-hidden="true">▼</span>
-          </summary>
-
-          <div className="mt-4 divide-y divide-black/10">
-          {userHistory.map((item) => (
-            <div key={item.id} className="flex flex-wrap items-center justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span
-                    className={`rounded px-2 py-0.5 text-[0.68rem] font-bold uppercase ${
-                      item.eventType === "nft_added"
-                        ? "bg-emerald-500/10 text-emerald-700"
-                        : item.eventType === "initial_score"
-                        ? "bg-baseblue/10 text-baseblue"
-                        : item.eventType === "wallet_disconnected"
-                        ? "bg-rose-500/10 text-rose-700"
-                        : "bg-black/[0.06] text-black/70"
-                    }`}
-                  >
-                    {item.eventType.replace("_", " ")}
-                  </span>
-                  <span className="text-xs text-black/40">{formatUtcDate(item.createdAt)}</span>
+              {userHistory.length === 0 ? (
+                <div className="py-6 text-center text-sm text-black/50">
+                  No score history recorded yet. Connect a wallet to start tracking points and NFT additions.
                 </div>
-                <p className="mt-1 text-sm font-medium text-black/85">{item.reason}</p>
-                <p className="mt-0.5 text-xs text-black/50">
-                  Previous: {item.oldScore} pts -&gt; New: <span className="font-bold text-ink">{item.newScore} pts</span>
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {item.pointsDelta > 0 ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700">
-                    <span>▲</span> +{item.pointsDelta} pts
-                  </span>
-                ) : item.pointsDelta < 0 ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-rose-500/25 bg-rose-500/10 px-3 py-1 text-xs font-bold text-rose-700">
-                    <span>▼</span> {item.pointsDelta} pts
-                  </span>
-                ) : (
-                  <span className="rounded-full bg-black/5 px-2.5 py-1 text-xs text-black/60">
-                    Score refreshed
-                  </span>
-                )}
-
-                {item.nftDelta > 0 ? (
-                  <span className="rounded-full bg-black/[0.05] px-2 py-1 text-xs font-bold text-black/70">
-                    +{item.nftDelta} NFT
-                  </span>
-                ) : null}
-              </div>
+              ) : null}
             </div>
-          ))}
+          </details>
+        </section>
 
-          {userHistory.length === 0 ? (
-            <div className="py-6 text-center text-sm text-black/50">
-              No score history recorded yet. Connect a wallet to start tracking points and NFT additions.
-            </div>
-          ) : null}
-          </div>
-        </details>
-      </section>
-
+      </div>
     </main>
   );
 }
@@ -399,10 +435,19 @@ function formatUtcDate(value: string) {
   }).format(new Date(value));
 }
 
+function HeroStat({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="min-w-28 rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-5 py-4 text-center shadow-sm">
+      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-ink">{value}</p>
+    </div>
+  );
+}
+
 function ReceiptStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="border-r border-black/10 bg-black/[0.03] px-4 py-3 last:border-r-0">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/50">{label}</p>
+    <div className="border-r border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-4 py-3 last:border-r-0">
+      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/45">{label}</p>
       <p className="mt-1 font-semibold text-ink">{value}</p>
     </div>
   );
@@ -460,13 +505,4 @@ function getCreatorDisplay(creator: unknown): { label: string; address?: string 
     if (address) return { label: shortAddress(address) || address, address };
   }
   return { label: "Unknown creator" };
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-lg border border-black/10 bg-white p-5 shadow-sm">
-      <p className="text-sm text-black/55">{label}</p>
-      <p className="mt-2 text-3xl font-semibold text-ink">{value}</p>
-    </div>
-  );
 }

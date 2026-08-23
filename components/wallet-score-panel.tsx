@@ -137,7 +137,9 @@ export function WalletScorePanel({
   }
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
+      <div className="h-[3px] w-full bg-gradient-to-r from-[#0000FF] via-[#4D7CFF] to-transparent" />
+      <div className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -156,7 +158,7 @@ export function WalletScorePanel({
         </div>
       </div>
 
-      <div className="mt-5 rounded-xl border border-black/10 bg-[#fbfcff] p-4">
+      <div className="mt-5 rounded-xl border border-black/10 bg-gradient-to-b from-[#fbfcff] to-white p-4">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/40">
           {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent setup"}
         </p>
@@ -289,6 +291,7 @@ export function WalletScorePanel({
         xAvatar={xAvatar}
         prefetchedResult={prefetchedResult}
       />
+      </div>
     </div>
   );
 }
