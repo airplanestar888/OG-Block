@@ -65,6 +65,29 @@ export default async function DashboardPage() {
   const badgeCount = ogClaim ? 1 : 0;
   const ogCardConfig = ogClaim ? await getOgCardConfig() : null;
 
+  // --- Blockchain Legacy: only NFTs whose contract counts toward the score ---
+  // Spam / unverified contracts are shown on the public profile, not here.
+  // This keeps Items / NFTs / Rank in sync (e.g. airplanestar_ 1 not 7).
+  let contractMap: Map<string, { is_spam: boolean | null; is_verified: boolean | null }> | null = null;
+  if (holdings && holdings.length > 0) {
+    const addrs = [...new Set(holdings.map((h) => (h.contract_address as string).toLowerCase()))];
+    const { data: contracts } = await supabase
+      .from("nft_contracts")
+      .select("contract_address,is_spam,is_verified")
+      .in("contract_address", addrs);
+    contractMap = new Map(
+      (contracts || []).map((c) => [(c.contract_address as string).toLowerCase(), c as { is_spam: boolean | null; is_verified: boolean | null }])
+    );
+  }
+  // Legacy: strictly verified contracts only (spam and pending stay on the
+  // public profile's breakdown, not here — keeps Items in sync with rank).
+  function isVerifiedForLegacy(c: { is_verified: boolean | null } | undefined): boolean {
+    return c?.is_verified === true;
+  }
+  const countedHoldings = contractMap
+    ? (holdings || []).filter((h) => isVerifiedForLegacy(contractMap!.get((h.contract_address as string).toLowerCase())))
+    : [];
+
   return (
     <main className="mx-auto max-w-6xl space-y-6 px-4 py-8">
       <section className="flex flex-wrap items-center justify-between gap-4">
@@ -183,14 +206,14 @@ export default async function DashboardPage() {
             </p>
           </div>
           <div className="grid grid-cols-3 overflow-hidden rounded-lg border border-black/10 text-center text-xs">
-            <ReceiptStat label="Items" value={(holdings || []).length} />
+            <ReceiptStat label="Items" value={score?.nft_count ?? (holdings || []).length} />
             <ReceiptStat label="Score" value={score?.score ?? 0} />
             <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
           </div>
         </div>
 
         <div className="mt-5 grid gap-3">
-          {(holdings || []).map((holding, index) => {
+          {(countedHoldings || []).map((holding, index) => {
             const metadata = holding.metadata_json as { creator?: unknown; attributes?: unknown[] } | null;
             const scoreBreakdown = getHoldingScoreBreakdown(
               {
@@ -257,7 +280,7 @@ export default async function DashboardPage() {
             );
           })}
 
-          {(holdings || []).length === 0 ? (
+          {(countedHoldings || []).length === 0 ? (
             <div className="rounded-lg border border-dashed border-black/15 bg-[#fbfcff] px-4 py-8 text-center text-sm text-black/55">
               No collection receipt yet.
             </div>

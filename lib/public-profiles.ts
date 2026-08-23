@@ -125,7 +125,28 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
   const agentIdentity = await getAgentIdentity(agentWallet?.address);
 
+  // --- Contract transparency for the public card ---
+  // Verified counts toward score; spam/unverified shown for transparency (not in Blockchain Legacy).
+  let contractBreakdown: { total: number; verified: number; unverified: number; spam: number } | null = null;
+  if (holdings && holdings.length > 0) {
+    const addrs = [...new Set((holdings as Array<{ contract_address?: unknown }>).map((h: any) => String(h.contract_address || "").toLowerCase()).filter(Boolean))];
+    if (addrs.length > 0) {
+      const { data: contracts } = await supabase.from("nft_contracts").select("contract_address,is_spam,is_verified").in("contract_address", addrs);
+      const byAddr = new Map((contracts || []).map((c: any) => [String(c.contract_address).toLowerCase(), c]));
+      let verified = 0, spam = 0;
+      for (const a of addrs) {
+        const c: any = byAddr.get(a);
+        if (c?.is_spam === true) spam += 1;
+        else if (c?.is_verified === true) verified += 1;
+      }
+      const total = addrs.length;
+      contractBreakdown = { total, verified, spam, unverified: total - verified - spam };
+    }
+  }
+
   return {
+    // @ts-ignore - contractBreakdown added for transparency block on public card
+    contractBreakdown,
     xHandle: user.x_handle,
     xName: user.x_name,
     xAvatar: user.x_avatar,
