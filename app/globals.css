@@ -174,7 +174,7 @@ img, video {
   .hero-grid {
     grid-template-columns: 360px 1fr;
     gap: 3rem;
-    align-items: start;
+    align-items: stretch;
   }
 }
 

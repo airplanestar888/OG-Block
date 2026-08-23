@@ -45,8 +45,8 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* CTAs */}
-            <div className="reveal reveal-d2 flex flex-wrap gap-2.5 sm:gap-3">
+            {/* CTAs — pushed to the hero bottom on desktop, level with the Live capsule */}
+            <div className="reveal reveal-d2 flex flex-wrap gap-2.5 sm:gap-3 lg:mt-auto">
               <Link
                 href={session ? "/og-card" : "/login"}
                 className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
