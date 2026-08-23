@@ -141,20 +141,18 @@ export function WalletScorePanel({
       <div className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="font-semibold text-ink">{title}</h2>
-            {verifiedWallet ? (
-              <span className="rounded-full bg-baseblue/10 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-baseblue">
-                Verified
-              </span>
-            ) : (
-              <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-black/45">
-                Not connected
-              </span>
-            )}
-          </div>
+          <h2 className="font-semibold text-ink">{title}</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-black/60">{description}</p>
         </div>
+        {verifiedWallet ? (
+          <span className="rounded-full bg-baseblue/10 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-baseblue">
+            Verified
+          </span>
+        ) : (
+          <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-black/45">
+            Not connected
+          </span>
+        )}
       </div>
 
       <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.02] p-4">
