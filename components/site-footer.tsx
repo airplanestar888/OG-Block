@@ -93,7 +93,7 @@ function FooterWave() {
       // left bound; alpha fades toward that bound so density reads as
       // many (right) → few (left).
       const leftBound = w * 0.25;
-      const fadeSpan = w * 0.35;
+      const fadeSpan = w * 0.2;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
@@ -107,7 +107,7 @@ function FooterWave() {
         if (p.x < leftBound) {
           Object.assign(p, makeParticle(true));
         }
-        const posAlpha = Math.min(1, Math.max(0.08, (p.x - leftBound) / fadeSpan));
+        const posAlpha = Math.min(1, Math.max(0.15, (p.x - leftBound) / fadeSpan));
         ctx.globalAlpha = p.alpha * posAlpha;
         ctx.fillStyle = p.color;
         ctx.fillRect(p.x, p.y, p.size, p.size);
@@ -136,7 +136,7 @@ export function SiteFooter() {
         <FooterWave />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to right, rgb(0,0,255) 25%, transparent 80%)" }}
+          style={{ background: "linear-gradient(to right, rgb(0,0,255) 5%, transparent 22%)" }}
         />
       </div>
 
