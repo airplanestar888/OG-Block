@@ -432,7 +432,7 @@ function formatUtcDate(value: string) {
 
 function HeroStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white/78 px-4 py-4 text-center backdrop-blur">
+    <div className="bg-white px-4 py-4 text-center">
       <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/40">{label}</p>
       <p className="mt-1 text-lg font-semibold text-black/88">{value}</p>
     </div>
@@ -441,7 +441,7 @@ function HeroStat({ label, value }: { label: string; value: string | number }) {
 
 function ReceiptStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white/78 px-4 py-3 backdrop-blur">
+    <div className="bg-white px-4 py-3">
       <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
       <p className="mt-1 font-semibold text-black/88">{value}</p>
     </div>
