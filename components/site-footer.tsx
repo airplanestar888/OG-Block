@@ -44,8 +44,14 @@ function FooterWave() {
     function makeParticle(atRightEdge: boolean): Particle {
       const size = 4 + Math.floor(Math.random() * 8);
       const baseY = Math.random() * h;
+      // Density falloff: particles spawn across 75% of the width from the
+      // right edge, weighted dense near the right and sparse toward the left
+      // (x² sampling biases picks toward the right side of the range).
+      const range = w * 0.75;
+      const bias = Math.pow(Math.random(), 2);
+      const x = w - range + (1 - bias) * range;
       return {
-        x: atRightEdge ? w + Math.random() * 40 : Math.random() * w,
+        x: atRightEdge ? w + Math.random() * 40 : x,
         y: baseY,
         baseY,
         size,
@@ -83,6 +89,12 @@ function FooterWave() {
       prev = now;
       t += dt;
 
+      // Particles live in the right 75% of the bar, recycling at the zone's
+      // left bound; alpha fades toward that bound so density reads as
+      // many (right) → few (left).
+      const leftBound = w * 0.25;
+      const fadeSpan = w * 0.35;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
       ctx.scale(dpr, dpr);
@@ -91,11 +103,12 @@ function FooterWave() {
         p.x -= p.speed * dt;
         // wave bob
         p.y = p.baseY + Math.sin(t * p.freq + p.phase) * p.amp;
-        // recycle off the left edge back to the right
-        if (p.x < -8) {
+        // recycle at the zone's left edge back to the right
+        if (p.x < leftBound) {
           Object.assign(p, makeParticle(true));
         }
-        ctx.globalAlpha = p.alpha;
+        const posAlpha = Math.min(1, Math.max(0.08, (p.x - leftBound) / fadeSpan));
+        ctx.globalAlpha = p.alpha * posAlpha;
         ctx.fillStyle = p.color;
         ctx.fillRect(p.x, p.y, p.size, p.size);
       }
@@ -119,11 +132,11 @@ export function SiteFooter() {
       className="relative overflow-hidden border-y border-white/20 bg-[#0000FF]"
     >
       {/* animation layer (right side), faded into solid blue toward the left */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-2/3">
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-3/4">
         <FooterWave />
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to right, rgb(0,0,255) 22%, transparent 75%)" }}
+          style={{ background: "linear-gradient(to right, rgb(0,0,255) 25%, transparent 80%)" }}
         />
       </div>
 
