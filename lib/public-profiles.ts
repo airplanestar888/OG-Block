@@ -125,11 +125,12 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
   const agentIdentity = await getAgentIdentity(agentWallet?.address);
 
-  // --- Contract transparency for the public card (durable wallet tracking) ---
-  // Scoring unchanged: only contracts where isCounted()==true affect score.
-  // Here we just surface how many distinct contracts are verified / spam /
-  // unverified so a viewer can judge OG-ness (e.g. roziqin wallet: total 63,
-  // verified 6, spam 53). No re-scoring, no mutation.
+  // --- Contract transparency — wallet → NFT → registry → check → scoring → wallet ---
+  // Scoring tidak berubah: hanya verified (BaseScan) yang dihitung. Di sini
+  // kita cuma transparansi: total kontrak berbeda di wallet, berapa yang
+  // verified (counted), berapa spam, berapa unverified/pending.
+  // Alur durable: wallet masuk → NFT didaftarkan → registry cek kontrak →
+  // scoring hitung yang verified → simpan ke wallet (score/nft_count).
   let contractBreakdown: { total: number; verified: number; unverified: number; spam: number; counted: number } | null = null;
   if (holdings && (holdings as Array<{ contract_address?: unknown }>).length > 0) {
     const typedHoldings = holdings as Array<{ contract_address?: unknown }>;
@@ -137,16 +138,16 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
     if (addrs.length > 0) {
       const { data: contracts } = await supabase.from("nft_contracts").select("contract_address,is_spam,is_verified").in("contract_address", addrs);
       const byAddr = new Map((contracts || []).map((c) => [String((c as { contract_address: string }).contract_address).toLowerCase(), c as unknown as { is_spam: boolean | null; is_verified: boolean | null }]));
-      let verified = 0, spam = 0, counted = 0;
+      let verified = 0, spam = 0;
       for (const a of addrs) {
         const c = byAddr.get(a) as { is_spam: boolean | null; is_verified: boolean | null } | undefined;
-        if (c?.is_spam === true) spam += 1;
+        // verified overrides spam — kontrak verified selalu counted walau is_spam true
         if (c?.is_verified === true) verified += 1;
-        // counted mirrors scoring's isCounted(): verified always counted, spam never, pending treated as unverified
-        if (c?.is_verified === true) counted += 1;
+        else if (c?.is_spam === true) spam += 1;
       }
       const total = addrs.length;
-      contractBreakdown = { total, verified, spam, unverified: total - verified - spam, counted };
+      const unverified = total - verified - spam;
+      contractBreakdown = { total, verified, spam, unverified, counted: verified };
     }
   }
 
