@@ -161,8 +161,8 @@ export default async function DashboardPage() {
 
         {/* Badges & Perks — roadmap-style flat card */}
         <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <div>
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges &amp; perks</p>
               <h2 className="mt-2 text-xl font-semibold text-ink">
                 {ogClaim ? "OG Card claimed." : "OG BLOCK badge field is ready."}
@@ -172,18 +172,20 @@ export default async function DashboardPage() {
                   ? "Your Official OG Badge is minted on Base. More perks unlock over time."
                   : "Claim your Official OG Badge NFT to fill this field. Collection NFTs stay in Blockchain Legacy below."}
               </p>
+            </div>
+            <div className="flex w-full flex-col items-stretch gap-4 md:w-auto md:items-center">
+              <div className="rounded-xl border border-baseblue/20 bg-baseblue/10 px-6 py-4 text-center">
+                <p className="text-3xl font-semibold text-ink">{badgeCount}</p>
+                <p className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
+              </div>
               {!ogClaim ? (
                 <Link
-                  className="focus-ring mt-4 inline-flex rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5]"
+                  className="focus-ring inline-flex w-full items-center justify-center rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5] md:w-auto"
                   href="/og-card"
                 >
                   Claim OG Card
                 </Link>
               ) : null}
-            </div>
-            <div className="rounded-xl border border-baseblue/20 bg-baseblue/10 px-6 py-4 text-center">
-              <p className="text-3xl font-semibold text-ink">{badgeCount}</p>
-              <p className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
             </div>
           </div>
 
