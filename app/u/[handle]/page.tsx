@@ -156,26 +156,26 @@ export default async function PublicProfilePage(
             <p className="mt-1 text-xs text-black/50">
               {profile.contractBreakdown.verified} of {profile.contractBreakdown.total} NFTs verified · {profile.nftCount} counted toward score
             </p>
-            <div className="mt-4 grid grid-cols-3 gap-2.5 text-center md:grid-cols-4">
+            <div className="mt-4 grid grid-cols-2 gap-2.5 text-center">
               <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/40">Total</p>
                 <p className="mt-1 text-xl font-semibold text-ink">{profile.contractBreakdown.total}</p>
                 <p className="text-[0.65rem] text-black/40">NFTs</p>
               </div>
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
-                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-emerald-700">Verified</p>
-                <p className="mt-1 text-xl font-semibold text-emerald-700">{profile.contractBreakdown.verified}</p>
-                <p className="text-[0.65rem] text-emerald-700/70">counted</p>
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/40">Verified</p>
+                <p className="mt-1 text-xl font-semibold text-ink">{profile.contractBreakdown.verified}</p>
+                <p className="text-[0.65rem] text-black/40">counted</p>
               </div>
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
-                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-amber-700">Unverified</p>
-                <p className="mt-1 text-xl font-semibold text-amber-700">{profile.contractBreakdown.unverified}</p>
-                <p className="text-[0.65rem] text-amber-700/70">not counted</p>
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/40">Unverified</p>
+                <p className="mt-1 text-xl font-semibold text-ink">{profile.contractBreakdown.unverified}</p>
+                <p className="text-[0.65rem] text-black/40">not counted</p>
               </div>
-              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
-                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-rose-700">Spam</p>
-                <p className="mt-1 text-xl font-semibold text-rose-700">{profile.contractBreakdown.spam}</p>
-                <p className="text-[0.65rem] text-rose-700/70">excluded</p>
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/40">Spam</p>
+                <p className="mt-1 text-xl font-semibold text-ink">{profile.contractBreakdown.spam}</p>
+                <p className="text-[0.65rem] text-black/40">excluded</p>
               </div>
             </div>
             <p className="mt-3 text-center text-[0.68rem] leading-4 text-black/40">
