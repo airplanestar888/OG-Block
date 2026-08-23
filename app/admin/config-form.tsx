@@ -44,10 +44,23 @@ export function AdminConfigForm({
     setRefreshMsg("");
     try {
       const res = await fetch("/api/admin/refresh-all", { method: "POST" });
-      const data = await res.json();
+      const text = await res.text();
+      let data: { error?: string; refreshed?: number; total?: number; failed?: number; remaining?: number } = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        // A proxy timeout returns an HTML error page instead of JSON
+        throw new Error(
+          res.ok
+            ? "Server returned an invalid response. Try again."
+            : `Server error (${res.status}) — likely timed out. Try again; each run continues where the last one stopped.`
+        );
+      }
       if (!res.ok) throw new Error(data.error || "Refresh failed");
       setRefreshMsg(
-        `Refreshed ${data.refreshed}/${data.total} profiles${data.failed ? ` · ${data.failed} failed` : ""}. Leaderboard updated.`
+        `Refreshed ${data.refreshed}/${data.total} profiles${data.failed ? ` · ${data.failed} failed` : ""}${
+          data.remaining ? ` · ${data.remaining} remaining — run again to continue` : ". Leaderboard updated."
+        }`
       );
     } catch (e) {
       setRefreshMsg(e instanceof Error ? e.message : "Refresh failed");

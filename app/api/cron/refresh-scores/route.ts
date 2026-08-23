@@ -47,6 +47,15 @@ export async function GET(request: NextRequest) {
 
   if (refreshed.length > 0) {
     await recalculateRanks();
+  } else {
+    // Backstop: if every refresh failed (e.g. NFT provider outage), users who
+    // registered since the last successful run still have rank = null while
+    // their score is already stored. Re-rank whenever null ranks exist.
+    const { count } = await supabase
+      .from("scores")
+      .select("id", { count: "exact", head: true })
+      .is("rank", null);
+    if (count && count > 0) await recalculateRanks();
   }
 
   // NOTE: X profile refresh is intentionally disabled to avoid consuming X API
