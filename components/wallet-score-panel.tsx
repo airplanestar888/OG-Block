@@ -139,17 +139,17 @@ export function WalletScorePanel({
   return (
     <div className="rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
       <div className="p-5">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+      <div className="flex items-start gap-4">
+        <div className="min-w-0 flex-1">
           <h2 className="font-semibold text-ink">{title}</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-black/60">{description}</p>
         </div>
         {verifiedWallet ? (
-          <span className="rounded-full bg-baseblue/10 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-baseblue">
+          <span className="shrink-0 rounded-full bg-baseblue/10 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-baseblue">
             Verified
           </span>
         ) : (
-          <span className="rounded-full bg-black/[0.05] px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-black/45">
+          <span className="shrink-0 rounded-full bg-black/[0.05] px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-black/45">
             Not connected
           </span>
         )}
