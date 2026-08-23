@@ -154,7 +154,7 @@ export default async function PublicProfilePage(
           <div className="rounded-[1.5rem] border border-black/10 bg-white p-5 shadow-sm md:p-6">
             <h3 className="text-sm font-semibold text-ink">NFT overview</h3>
             <p className="mt-1 text-xs text-black/50">
-              {profile.nftCount} verified NFTs counted toward score
+              {profile.contractBreakdown.verified} of {profile.contractBreakdown.total} NFTs verified · {profile.nftCount} counted toward score
             </p>
             <div className="mt-4 grid grid-cols-3 gap-2.5 text-center md:grid-cols-4">
               <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">

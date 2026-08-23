@@ -71,10 +71,14 @@ function calculateFromHoldings(
   const allHoldings = holdings;
   // When the contract registry is available, drop NFTs from contracts that
   // don't count (verified overrides spam — a verified contract always counts).
+  // Durable system: wallet → NFT → registry → check contract → scoring → wallet
+  // If a contract is not in the registry, it has not been evaluated — do NOT
+  // count it. Counting unknowns inflated scores (xvader 223) when registry was
+  // seeded before backfill. Missing entries will be counted on next wallet scan.
   const valid = registry
     ? holdings.filter((h) => {
         const c = registry.get(h.contractAddress.toLowerCase());
-        if (!c) return true; // not in registry (e.g. fallback path) → keep
+        if (!c) return false;
         return isCounted(c);
       })
     : holdings;
