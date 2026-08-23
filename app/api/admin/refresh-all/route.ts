@@ -29,8 +29,9 @@ export async function POST() {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!isAdminUser(user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    // Heavy operation — cap to a couple of runs per minute per admin.
-    if (!rateLimit(`admin-refresh-all:${user.id}`, 2, 60_000)) {
+    // Each run is short and resumable, so allow a generous cadence — the admin
+    // may need several runs back to back to chew through the full roster.
+    if (!rateLimit(`admin-refresh-all:${user.id}`, 10, 60_000)) {
       return NextResponse.json({ error: "Too many refreshes. Try again shortly." }, { status: 429 });
     }
 

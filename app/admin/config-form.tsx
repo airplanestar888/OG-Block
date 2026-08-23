@@ -41,27 +41,49 @@ export function AdminConfigForm({
   async function refreshAllScores() {
     if (refreshing) return;
     setRefreshing(true);
-    setRefreshMsg("");
+    setRefreshMsg("Starting refresh…");
+
+    const MAX_RUNS = 12;
+    let totalRefreshed = 0;
+    let totalFailed = 0;
+    let grandTotal: number | null = null;
+
     try {
-      const res = await fetch("/api/admin/refresh-all", { method: "POST" });
-      const text = await res.text();
-      let data: { error?: string; refreshed?: number; total?: number; failed?: number; remaining?: number } = {};
-      try {
-        data = JSON.parse(text);
-      } catch {
-        // A proxy timeout returns an HTML error page instead of JSON
-        throw new Error(
-          res.ok
-            ? "Server returned an invalid response. Try again."
-            : `Server error (${res.status}) — likely timed out. Try again; each run continues where the last one stopped.`
+      for (let run = 1; run <= MAX_RUNS; run += 1) {
+        const res = await fetch("/api/admin/refresh-all", { method: "POST" });
+        const text = await res.text();
+        let data: { error?: string; refreshed?: number; total?: number; failed?: number; remaining?: number } = {};
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // A proxy timeout returns an HTML error page instead of JSON
+          throw new Error(
+            res.ok
+              ? "Server returned an invalid response. Try again."
+              : `Server error (${res.status}) — likely timed out. Try again; each run continues where the last one stopped.`
+          );
+        }
+        if (!res.ok) throw new Error(data.error || "Refresh failed");
+
+        totalRefreshed += data.refreshed ?? 0;
+        totalFailed += data.failed ?? 0;
+        grandTotal = data.total ?? grandTotal;
+        const remaining = data.remaining ?? 0;
+
+        setRefreshMsg(
+          `Run ${run}: refreshed ${data.refreshed}/${data.total}${data.failed ? ` · ${data.failed} failed` : ""}${
+            remaining ? ` · ${remaining} remaining, continuing…` : ""
+          }`
         );
+
+        if (remaining <= 0) {
+          setRefreshMsg(
+            `Done — refreshed ${totalRefreshed}/${grandTotal ?? "?"} profiles` +
+              `${totalFailed ? ` · ${totalFailed} failed` : ""}. Leaderboard updated.`
+          );
+          break;
+        }
       }
-      if (!res.ok) throw new Error(data.error || "Refresh failed");
-      setRefreshMsg(
-        `Refreshed ${data.refreshed}/${data.total} profiles${data.failed ? ` · ${data.failed} failed` : ""}${
-          data.remaining ? ` · ${data.remaining} remaining — run again to continue` : ". Leaderboard updated."
-        }`
-      );
     } catch (e) {
       setRefreshMsg(e instanceof Error ? e.message : "Refresh failed");
     } finally {

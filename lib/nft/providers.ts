@@ -112,6 +112,7 @@ type ContractCreator = {
 };
 
 const verifiedContractCache = new Map<string, boolean>();
+const contractCreatorCache = new Map<string, ContractCreator | null>();
 
 /// Run async tasks over items with bounded concurrency — BaseScan rate-limits
 /// aggressive bursts, so contract lookups go through this instead of
@@ -466,12 +467,16 @@ async function getContractCreatorMap(contractAddresses: Array<string | undefined
   const uniqueContracts = [...new Set(contractAddresses.filter(Boolean).map((address) => address!.toLowerCase()))];
   const creatorMap = new Map<string, ContractCreator>();
 
-  await Promise.all(
-    uniqueContracts.map(async (contractAddress) => {
-      const creator = await getContractCreatorFromBasescan(contractAddress);
-      if (creator) creatorMap.set(contractAddress, creator);
-    })
-  );
+  await mapWithConcurrency(uniqueContracts, 4, async (contractAddress) => {
+    if (contractCreatorCache.has(contractAddress)) {
+      const cached = contractCreatorCache.get(contractAddress);
+      if (cached) creatorMap.set(contractAddress, cached);
+      return;
+    }
+    const creator = await getContractCreatorFromBasescan(contractAddress);
+    contractCreatorCache.set(contractAddress, creator);
+    if (creator) creatorMap.set(contractAddress, creator);
+  });
 
   return creatorMap;
 }
@@ -546,7 +551,7 @@ async function getContractCreatorFromBasescan(contractAddress: string): Promise<
       headers: {
         "User-Agent": "Mozilla/5.0 OG-Block score refresh"
       },
-      signal: AbortSignal.timeout(8000)
+      signal: AbortSignal.timeout(4000)
     });
     if (!response.ok) return null;
 
