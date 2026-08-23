@@ -137,8 +137,8 @@ export function WalletScorePanel({
   }
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
-      <div className="p-5">
+    <div className="h-full rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
+      <div className="flex h-full flex-col p-5">
       <div className="flex items-start gap-4">
         <div className="min-w-0 flex-1">
           <h2 className="font-semibold text-ink">{title}</h2>
@@ -157,7 +157,7 @@ export function WalletScorePanel({
 
       <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.02] p-4">
         <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/40">
-          {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent setup"}
+          {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent connect"}
         </p>
         {verifiedWallet ? (
           <p className="mt-2 font-mono text-sm font-semibold text-ink">{shortAddress(verifiedWallet)}</p>
@@ -167,9 +167,9 @@ export function WalletScorePanel({
           </p>
         ) : (
           <p className="mt-2 text-sm leading-6 text-black/65">
-            Register your agent by handing it a one-time code — it signs with its own wallet and links into this slot. No browser wallet needed.
+            Connect an agent with a one-time code — it links itself in. No browser wallet needed.
             <Link className="ml-1 font-semibold text-baseblue hover:underline" href="/agent-guide">
-              View agent guide
+              Agent guide
             </Link>
           </p>
         )}
@@ -200,7 +200,7 @@ export function WalletScorePanel({
         </div>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         {!allowBrowserConnect && !verifiedWallet ? <RegisterAgentButton /> : null}
 
         {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (

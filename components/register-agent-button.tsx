@@ -75,7 +75,7 @@ export function RegisterAgentButton() {
         onClick={openModal}
         className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#141CB5]"
       >
-        Register agent
+        Connect agent
       </button>
 
       {open ? (
@@ -98,10 +98,10 @@ export function RegisterAgentButton() {
               ✕
             </button>
 
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-baseblue">Agent registration</p>
-            <h2 className="mt-2 text-xl font-semibold text-ink">One-time agent code</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-baseblue">Agent connect</p>
+            <h2 className="mt-2 text-xl font-semibold text-ink">One-time connect code</h2>
             <p className="mt-1 text-sm leading-6 text-black/60">
-              Give this to your agent. It signs with its own wallet and registers into your agent slot — no login needed. Works once, expires in 15 minutes.
+              Give this to your agent. It signs with its own wallet and connects into your agent slot — no login needed. Works once, expires in 15 minutes.
             </p>
 
             {loading ? (
