@@ -75,14 +75,30 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           </h1>
         </div>
 
-        <div className="rounded-[1.5rem] border border-black/10 bg-white/78 p-5 shadow-sm backdrop-blur">
-          <p className="text-sm leading-7 text-black/60">
-            Every verified profile, ranked live. This is where OG status is earned, not claimed.
-          </p>
-          <div className="mt-5 grid grid-cols-3 overflow-hidden rounded-2xl border border-black/10 text-center">
-            <HeroStat label="Profiles" value={leaderboard.length} />
-            <HeroStat label="Top score" value={formatCompactNumber(topScore)} />
-            <HeroStat label="NFTs" value={formatCompactNumber(totalNfts)} />
+        <div className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
+          <div className="h-[3px] w-full bg-gradient-to-r from-[#0000FF] via-[#4D7CFF] to-transparent" />
+          <div className="p-6">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Live standings</p>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-emerald-700">
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </span>
+                Live
+              </span>
+            </div>
+            <p className="mt-3 text-base font-semibold leading-snug text-ink">
+              OG status is earned, not claimed.
+            </p>
+            <p className="mt-1.5 text-sm leading-6 text-black/55">
+              Every verified profile, ranked live from on-chain Base holdings.
+            </p>
+            <div className="mt-5 grid grid-cols-3 gap-2.5">
+              <HeroStat label="Profiles" value={leaderboard.length} />
+              <HeroStat label="Top score" value={formatCompactNumber(topScore)} />
+              <HeroStat label="NFTs" value={formatCompactNumber(totalNfts)} />
+            </div>
           </div>
         </div>
       </div>
@@ -317,9 +333,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
 function HeroStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="border-r border-black/10 bg-white/70 px-4 py-3 last:border-r-0">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/55">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-black/88">{value}</p>
+    <div className="rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-2 py-3.5 text-center shadow-sm">
+      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
     </div>
   );
 }
