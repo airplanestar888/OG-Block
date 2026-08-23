@@ -53,13 +53,25 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
   const runRefresh = useCallback(async (signal: AbortSignal) => {
     try {
       const response = await fetch("/api/score/refresh", { method: "POST", signal });
-      const payload = await response.json();
+      const text = await response.text();
+      let payload: { error?: string; score?: number; rank?: number | null; nftCount?: number; isOg?: boolean; tier?: string | null } = {};
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        // A proxy/function timeout returns an HTML error page instead of JSON
+        throw new Error(
+          response.ok
+            ? "Server returned an invalid response. Please retry."
+            : `Server error (${response.status}) — the scan took too long. Please retry.`
+        );
+      }
       if (!response.ok) throw new Error(payload.error || "Score refresh failed");
+      if (typeof payload.score !== "number") throw new Error("Score refresh returned an incomplete result");
       setProgressStep(PROGRESS_STEPS.length - 1);
       setResult({
         score: payload.score,
         rank: payload.rank ?? null,
-        nftCount: payload.nftCount,
+        nftCount: payload.nftCount ?? 0,
         isOg: Boolean(payload.isOg),
         tier: payload.tier ?? null
       });

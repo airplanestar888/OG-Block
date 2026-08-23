@@ -113,6 +113,27 @@ type ContractCreator = {
 
 const verifiedContractCache = new Map<string, boolean>();
 
+/// Run async tasks over items with bounded concurrency — BaseScan rate-limits
+/// aggressive bursts, so contract lookups go through this instead of
+/// sequential awaits (slow) or unbounded Promise.all (rate-limited).
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  task: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await task(items[index]);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
+
 function isBlockedNft(contractAddress: string | undefined, creator: ContractCreator | undefined, blocklist: NftBlocklist): boolean {
   if (!contractAddress) return false;
 
@@ -260,12 +281,15 @@ class AlchemyNftProvider implements NftProvider {
       return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
     }
 
-    const contractAddresses = ownedNfts.map((nft) => nft.contract?.address);
-    const [verifiedContracts, contractCreators, blocklist] = await Promise.all([
-      getVerifiedContractMap(contractAddresses),
-      getContractCreatorMap(contractAddresses),
-      getNftBlocklist()
-    ]);
+  const contractAddresses = ownedNfts.map((nft) => nft.contract?.address);
+  // Cap the auxiliary lookups so a wallet holding NFTs from many different
+  // contracts can't run the function past its time limit. Verified-contract
+  // results are cached per warm instance, so later runs are near-instant.
+  const [verifiedContracts, contractCreators, blocklist] = await Promise.all([
+    withTimeout(getVerifiedContractMap(contractAddresses), 15_000, new Map<string, boolean>()),
+    withTimeout(getContractCreatorMap(contractAddresses), 10_000, new Map<string, ContractCreator>()),
+    getNftBlocklist()
+  ]);
 
     return ownedNfts
       .filter((nft) => {
@@ -423,15 +447,15 @@ async function getVerifiedContractMap(contractAddresses: Array<string | undefine
 
   if (!env.NFT_REQUIRE_VERIFIED_CONTRACT) return verifiedMap;
 
-  for (const contractAddress of uniqueContracts) {
+  const results = await mapWithConcurrency(uniqueContracts, 4, async (contractAddress) => {
     const cached = verifiedContractCache.get(contractAddress);
-    if (cached !== undefined) {
-      verifiedMap.set(contractAddress, cached);
-      continue;
-    }
-
+    if (cached !== undefined) return { contractAddress, verified: cached };
     const verified = await isContractSourceVerifiedOnBasescan(contractAddress);
     verifiedContractCache.set(contractAddress, verified);
+    return { contractAddress, verified };
+  });
+
+  for (const { contractAddress, verified } of results) {
     verifiedMap.set(contractAddress, verified);
   }
 
@@ -450,6 +474,21 @@ async function getContractCreatorMap(contractAddresses: Array<string | undefined
   );
 
   return creatorMap;
+}
+
+/// Wrap a promise with a deadline — on timeout it resolves to the fallback so
+/// a slow metadata/lookup call can't blow the whole score request past the
+/// function's maxDuration (which returns an HTML error page, not JSON).
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 async function isContractSourceVerifiedOnBasescan(contractAddress: string) {

@@ -9,50 +9,58 @@ import { rateLimit } from "@/lib/rate-limit";
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
-  const user = await getOrCreateCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const user = await getOrCreateCurrentUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const key = `${user.id}:${request.headers.get("x-forwarded-for") || "local"}`;
-  if (!rateLimit(key, 3, 60_000)) {
-    return NextResponse.json({ error: "Too many refreshes. Try again shortly." }, { status: 429 });
-  }
+    const key = `${user.id}:${request.headers.get("x-forwarded-for") || "local"}`;
+    if (!rateLimit(key, 3, 60_000)) {
+      return NextResponse.json({ error: "Too many refreshes. Try again shortly." }, { status: 429 });
+    }
 
-  const supabase = getSupabaseAdmin();
-  const { data: wallets, error } = await supabase
-    .from("wallets")
-    .select("address,wallet_slot")
-    .eq("user_id", user.id)
-    .in("wallet_slot", ["human", "agent"]);
-
-  if (error) throw error;
-
-  const walletAddresses = (wallets || []).map((wallet) => wallet.address).filter(Boolean);
-  if (walletAddresses.length === 0) {
-    return NextResponse.json({ error: "Connect a human or agent wallet first" }, { status: 400 });
-  }
-
-  const result = await calculateScoreForWallets(user.id, walletAddresses, { retryOnEmpty: true });
-  await persistScore(user.id, result);
-
-  const [{ data: updated }, { data: ogClaim }] = await Promise.all([
-    supabase
-      .from("scores")
-      .select("rank")
+    const supabase = getSupabaseAdmin();
+    const { data: wallets, error } = await supabase
+      .from("wallets")
+      .select("address,wallet_slot")
       .eq("user_id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("og_card_claims")
-      .select("tier")
-      .eq("user_id", user.id)
-      .limit(1)
-      .maybeSingle()
-  ]);
+      .in("wallet_slot", ["human", "agent"]);
 
-  return NextResponse.json({
-    score: result.score,
-    isOg: result.isOg,
-    nftCount: result.nftCount,
-    rank: updated?.rank ?? null,
-    tier: ogClaim?.tier ?? null
-  });
+    if (error) throw error;
+
+    const walletAddresses = (wallets || []).map((wallet) => wallet.address).filter(Boolean);
+    if (walletAddresses.length === 0) {
+      return NextResponse.json({ error: "Connect a human or agent wallet first" }, { status: 400 });
+    }
+
+    const result = await calculateScoreForWallets(user.id, walletAddresses, { retryOnEmpty: true });
+    await persistScore(user.id, result);
+
+    const [{ data: updated }, { data: ogClaim }] = await Promise.all([
+      supabase
+        .from("scores")
+        .select("rank")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("og_card_claims")
+        .select("tier")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle()
+    ]);
+
+    return NextResponse.json({
+      score: result.score,
+      isOg: result.isOg,
+      nftCount: result.nftCount,
+      rank: updated?.rank ?? null,
+      tier: ogClaim?.tier ?? null
+    });
+  } catch (err) {
+    console.error("score refresh failed:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Score refresh failed" },
+      { status: 500 }
+    );
+  }
 }
