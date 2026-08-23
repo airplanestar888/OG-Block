@@ -97,7 +97,7 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
       .maybeSingle(),
     supabase
       .from("nft_holdings")
-      .select("token_id,metadata_json")
+      .select("contract_address,token_id,metadata_json")
       .eq("user_id", user.id),
     supabase
       .from("og_card_claims")
@@ -125,27 +125,32 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
   const agentIdentity = await getAgentIdentity(agentWallet?.address);
 
-  // --- Contract transparency for the public card ---
-  // Verified counts toward score; spam/unverified shown for transparency (not in Blockchain Legacy).
-  let contractBreakdown: { total: number; verified: number; unverified: number; spam: number } | null = null;
-  if (holdings && holdings.length > 0) {
-    const addrs = [...new Set((holdings as Array<{ contract_address?: unknown }>).map((h: any) => String(h.contract_address || "").toLowerCase()).filter(Boolean))];
+  // --- Contract transparency for the public card (durable wallet tracking) ---
+  // Scoring unchanged: only contracts where isCounted()==true affect score.
+  // Here we just surface how many distinct contracts are verified / spam /
+  // unverified so a viewer can judge OG-ness (e.g. roziqin wallet: total 63,
+  // verified 6, spam 53). No re-scoring, no mutation.
+  let contractBreakdown: { total: number; verified: number; unverified: number; spam: number; counted: number } | null = null;
+  if (holdings && (holdings as Array<{ contract_address?: unknown }>).length > 0) {
+    const typedHoldings = holdings as Array<{ contract_address?: unknown }>;
+    const addrs = [...new Set(typedHoldings.map((h) => String((h as { contract_address?: unknown }).contract_address || "").toLowerCase()).filter(Boolean))];
     if (addrs.length > 0) {
       const { data: contracts } = await supabase.from("nft_contracts").select("contract_address,is_spam,is_verified").in("contract_address", addrs);
-      const byAddr = new Map((contracts || []).map((c: any) => [String(c.contract_address).toLowerCase(), c]));
-      let verified = 0, spam = 0;
+      const byAddr = new Map((contracts || []).map((c) => [String((c as { contract_address: string }).contract_address).toLowerCase(), c as unknown as { is_spam: boolean | null; is_verified: boolean | null }]));
+      let verified = 0, spam = 0, counted = 0;
       for (const a of addrs) {
-        const c: any = byAddr.get(a);
+        const c = byAddr.get(a) as { is_spam: boolean | null; is_verified: boolean | null } | undefined;
         if (c?.is_spam === true) spam += 1;
-        else if (c?.is_verified === true) verified += 1;
+        if (c?.is_verified === true) verified += 1;
+        // counted mirrors scoring's isCounted(): verified always counted, spam never, pending treated as unverified
+        if (c?.is_verified === true) counted += 1;
       }
       const total = addrs.length;
-      contractBreakdown = { total, verified, spam, unverified: total - verified - spam };
+      contractBreakdown = { total, verified, spam, unverified: total - verified - spam, counted };
     }
   }
 
   return {
-    // @ts-ignore - contractBreakdown added for transparency block on public card
     contractBreakdown,
     xHandle: user.x_handle,
     xName: user.x_name,

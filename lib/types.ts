@@ -20,6 +20,14 @@ export type PublicScoreProfile = {
   hasAgentIdentity: boolean;
   agentIdentityTokenId: string | null;
   lastCalculatedAt: string | null;
+  /** Transparent contract breakdown for display (verified counts toward score). */
+  contractBreakdown?: {
+    total: number;
+    verified: number;
+    unverified: number;
+    spam: number;
+    counted: number;
+  } | null;
 };
 
 export type PublicLeaderboardProfile = {
