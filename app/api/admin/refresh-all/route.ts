@@ -18,6 +18,11 @@ type WalletRow = { user_id: string; address: string; wallet_slot: "human" | "age
 // one stopped.
 const TIME_BUDGET_MS = 75_000;
 
+// Refresh a few users concurrently. calculateScoreForWallets already
+// parallelizes its per-contract lookups, so 3 at a time roughly triples
+// throughput per run without tripping Alchemy/BaseScan rate limits.
+const CONCURRENCY = 3;
+
 export async function POST() {
   try {
     const user = await getOrCreateCurrentUser();
@@ -43,24 +48,31 @@ export async function POST() {
       groups.set(w.user_id, list);
     }
 
+    const entries = [...groups.entries()];
     const startedAt = Date.now();
-    let refreshed = 0;
-    let remaining = 0;
     const failed: string[] = [];
-    for (const [userId, addrs] of groups) {
-      if (Date.now() - startedAt > TIME_BUDGET_MS) {
-        remaining = groups.size - refreshed - failed.length;
-        break;
+    let refreshed = 0;
+    let nextIndex = 0;
+
+    const workers = Array.from({ length: Math.min(CONCURRENCY, entries.length) }, async () => {
+      while (nextIndex < entries.length && Date.now() - startedAt <= TIME_BUDGET_MS) {
+        const index = nextIndex;
+        nextIndex += 1;
+        const [userId, addrs] = entries[index];
+        try {
+          const result = await calculateScoreForWallets(userId, addrs);
+          await persistScore(userId, result, { recalculateRank: false });
+          refreshed += 1;
+        } catch (err) {
+          failed.push(userId);
+          console.error(`admin refresh-all failed for ${userId}:`, err instanceof Error ? err.message : err);
+        }
       }
-      try {
-        const result = await calculateScoreForWallets(userId, addrs);
-        await persistScore(userId, result, { recalculateRank: false });
-        refreshed += 1;
-      } catch (err) {
-        failed.push(userId);
-        console.error(`admin refresh-all failed for ${userId}:`, err instanceof Error ? err.message : err);
-      }
-    }
+    });
+    await Promise.all(workers);
+
+    const processed = refreshed + failed.length;
+    const remaining = groups.size - processed;
 
     // Always recalculate, even on a partial run — this is the only pass that
     // assigns ranks to users who registered since the last full refresh.
