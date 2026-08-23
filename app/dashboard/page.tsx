@@ -120,7 +120,7 @@ export default async function DashboardPage() {
                 <p className="mt-2 text-6xl font-bold leading-none tracking-tight text-ink md:text-7xl">
                   {(score?.score ?? 0).toLocaleString()}
                 </p>
-                <p className="mt-3 text-xs text-black/45">
+                <p className="mt-3 text-xs text-black/65">
                   {score?.last_calculated_at
                     ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}`
                     : "Verify your wallet to generate your combined score."}
