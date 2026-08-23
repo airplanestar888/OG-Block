@@ -115,7 +115,9 @@ function FooterWave() {
 
 export function SiteFooter() {
   return (
-    <footer className="relative overflow-hidden" style={{ backgroundColor: "rgb(0, 0, 255)" }}>
+    <footer
+      className="relative overflow-hidden border-t border-white/15 bg-[#0000FF]/90 backdrop-blur-md"
+    >
       {/* animation layer (right side), faded into solid blue toward the left */}
       <div className="pointer-events-none absolute inset-y-0 right-0 w-2/3">
         <FooterWave />
@@ -125,8 +127,8 @@ export function SiteFooter() {
         />
       </div>
 
-      {/* content (left aligned) */}
-      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-4 px-5 py-10 text-left">
+      {/* content (left aligned) — height trimmed 20%: py-10 → py-8 */}
+      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-4 px-5 py-8 text-left">
         <nav className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <a
             className="text-white/85 transition hover:text-white"
