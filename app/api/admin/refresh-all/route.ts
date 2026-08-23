@@ -10,14 +10,13 @@ export const maxDuration = 300;
 
 type WalletRow = { user_id: string; address: string; wallet_slot: "human" | "agent" };
 
-// Maximum wall-clock time we spend refreshing users. Vercel (and other
-// proxies) kill long-running requests with an HTML "An error occurred" page
-// once maxDuration is exceeded — the client then fails with "not valid JSON"
-// and, worse, recalculateRanks() never runs (fresh signups keep rank = null
-// while their points are already stored). Stay under the limit so the
-// function always returns JSON and always recalculates ranks at the end.
-const MAX_DURATION_MS = 300_000;
-const TIME_BUDGET_MS = MAX_DURATION_MS - 45_000;
+// Maximum wall-clock time we spend refreshing users. Keep this well under the
+// *tightest* proxy in front of the function (Vercel's edge proxy can 504 a
+// request in ~100s even when maxDuration is 300), so the loop always exits
+// in time to recalculate ranks and return JSON. Admin re-runs the button to
+// continue through the remaining profiles — each run resumes where the last
+// one stopped.
+const TIME_BUDGET_MS = 75_000;
 
 export async function POST() {
   try {
