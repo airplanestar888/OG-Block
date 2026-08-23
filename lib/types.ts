@@ -78,5 +78,12 @@ export type ScoreResult = {
   isOg: boolean;
   nftCount: number;
   holdings: NftHolding[];
+  /** Transparency counts for the score card popup. */
+  contractBreakdown?: {
+    total: number;
+    spam: number;
+    verified: number;
+    unverified: number;
+  };
 };
 

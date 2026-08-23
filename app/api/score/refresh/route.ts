@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
       isOg: result.isOg,
       nftCount: result.nftCount,
       rank: updated?.rank ?? null,
-      tier: ogClaim?.tier ?? null
+      tier: ogClaim?.tier ?? null,
+      contractBreakdown: result.contractBreakdown ?? null
     });
   } catch (err) {
     console.error("score refresh failed:", err);

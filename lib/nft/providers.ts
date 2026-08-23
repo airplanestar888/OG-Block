@@ -231,24 +231,26 @@ async function fetchChainNftsFromAlchemy(
     url.searchParams.set("withMetadata", "true");
     url.searchParams.set("pageSize", "100");
     if (pageKey) url.searchParams.set("pageKey", pageKey);
-    if (env.NFT_EXCLUDE_SPAM && !env.NFT_REQUIRE_VERIFIED_CONTRACT) {
-      url.searchParams.append("excludeFilters[]", "SPAM");
+    // NOTE: no excludeFilters[]=SPAM here — Alchemy's free plan rejects that
+    // parameter with a non-JSON error body, which previously made the fetch
+    // look like "zero NFTs" and silently zeroed out real holders' scores.
+    // Spam is filtered locally from spamInfo on the response instead.
+
+    const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+    if (!response.ok) {
+      // A rejected request (rate limit, plan restriction, outage) must surface
+      // as an error — never as an empty page, or a healthy wallet gets scored 0.
+      const body = await response.text().catch(() => "");
+      throw new Error(`Alchemy getNFTsForOwner failed (${response.status}): ${body.slice(0, 200)}`);
     }
 
-    try {
-      const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
-      if (!response.ok) break;
-
-      const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[]; pageKey?: string };
-      for (const nft of payload.ownedNfts || []) {
-        (nft as Record<string, unknown>)._chain = chainName;
-        ownedNfts.push(nft);
-      }
-      pageKey = payload.pageKey;
-      if (!pageKey) break;
-    } catch {
-      break;
+    const payload = (await response.json()) as { ownedNfts?: AlchemyOwnedNft[]; pageKey?: string };
+    for (const nft of payload.ownedNfts || []) {
+      (nft as Record<string, unknown>)._chain = chainName;
+      ownedNfts.push(nft);
     }
+    pageKey = payload.pageKey;
+    if (!pageKey) break;
   }
 
   return ownedNfts;
@@ -271,10 +273,19 @@ class AlchemyNftProvider implements NftProvider {
       )
     );
 
+    const chainErrors: string[] = [];
     for (const result of results) {
       if (result.status === "fulfilled") {
         ownedNfts.push(...result.value);
+      } else {
+        chainErrors.push(result.reason instanceof Error ? result.reason.message : String(result.reason));
       }
+    }
+
+    // If EVERY chain call failed, the provider is down/misconfigured — surface
+    // it instead of falling through to "no NFTs", which would zero the score.
+    if (ownedNfts.length === 0 && chainErrors.length === results.length && chainErrors.length > 0) {
+      throw new Error(`Alchemy NFT fetch failed on all chains: ${chainErrors[0]}`);
     }
 
     // If no NFTs returned from multi-chain getNFTsForOwner, fallback to transfer history
@@ -282,36 +293,19 @@ class AlchemyNftProvider implements NftProvider {
       return getHoldingsFromAlchemyTransfers(address, contractAddress, env.NFT_PROVIDER_API_KEY);
     }
 
-  const contractAddresses = ownedNfts.map((nft) => nft.contract?.address);
-  // Cap the auxiliary lookups so a wallet holding NFTs from many different
-  // contracts can't run the function past its time limit. Verified-contract
-  // results are cached per warm instance, so later runs are near-instant.
-  const [verifiedContracts, contractCreators, blocklist] = await Promise.all([
-    withTimeout(getVerifiedContractMap(contractAddresses), 15_000, new Map<string, boolean>()),
-    withTimeout(getContractCreatorMap(contractAddresses), 10_000, new Map<string, ContractCreator>()),
-    getNftBlocklist()
-  ]);
-
-    return ownedNfts
-      .filter((nft) => {
-        const creator = nft.contract?.address
-          ? contractCreators.get(nft.contract.address.toLowerCase())
-          : undefined;
-        return !isBlockedNft(nft.contract?.address, creator, blocklist) && isGenuineAlchemyNft(nft, verifiedContracts);
-      })
-      .map((nft) => ({
-        contractAddress: nft.contract?.address || contractAddress,
-        tokenId: nft.tokenId || "0",
-        metadata: withContractCreatorMetadata(
-          {
-            ...(nft.raw?.metadata || {}),
-            name: nft.raw?.metadata?.name || nft.name,
-            chain: (nft as Record<string, unknown>)._chain || "Base"
-          },
-          nft.contract?.address || contractAddress,
-          contractCreators
-        )
-      }));
+    // RAW holdings only. Spam/verified filtering now lives in the contract
+    // registry (nft_contracts), which evaluates each contract ONCE and reuses
+    // the result across all wallets — so we no longer do per-wallet BaseScan /
+    // blocklist lookups here. This keeps the per-wallet scan fast and cheap.
+    return ownedNfts.map((nft) => ({
+      contractAddress: nft.contract?.address || contractAddress,
+      tokenId: nft.tokenId || "0",
+      metadata: {
+        ...(nft.raw?.metadata || {}),
+        name: nft.raw?.metadata?.name || nft.name,
+        chain: (nft as Record<string, unknown>)._chain || "Base"
+      }
+    }));
   }
 }
 

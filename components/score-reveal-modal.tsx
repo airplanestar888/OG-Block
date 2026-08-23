@@ -21,6 +21,12 @@ type RevealResult = {
   nftCount: number;
   isOg: boolean;
   tier: string | null;
+  contractBreakdown?: {
+    total: number;
+    spam: number;
+    verified: number;
+    unverified: number;
+  } | null;
 };
 
 const PROGRESS_STEPS = [
@@ -54,7 +60,7 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
     try {
       const response = await fetch("/api/score/refresh", { method: "POST", signal });
       const text = await response.text();
-      let payload: { error?: string; score?: number; rank?: number | null; nftCount?: number; isOg?: boolean; tier?: string | null } = {};
+      let payload: { error?: string; score?: number; rank?: number | null; nftCount?: number; isOg?: boolean; tier?: string | null; contractBreakdown?: RevealResult["contractBreakdown"] } = {};
       try {
         payload = JSON.parse(text);
       } catch {
@@ -65,7 +71,13 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
             : `Server error (${response.status}) — the scan took too long. Please retry.`
         );
       }
-      if (!response.ok) throw new Error(payload.error || "Score refresh failed");
+      if (!response.ok) {
+        // Surface a friendly rate-limit message so the user knows to retry later.
+        if (response.status === 429) {
+          throw new Error(payload.error || "Too many refreshes. Please wait a minute and try again, or contact an admin if it keeps happening.");
+        }
+        throw new Error(payload.error || "Score refresh failed");
+      }
       if (typeof payload.score !== "number") throw new Error("Score refresh returned an incomplete result");
       setProgressStep(PROGRESS_STEPS.length - 1);
       setResult({
@@ -73,7 +85,8 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
         rank: payload.rank ?? null,
         nftCount: payload.nftCount ?? 0,
         isOg: Boolean(payload.isOg),
-        tier: payload.tier ?? null
+        tier: payload.tier ?? null,
+        contractBreakdown: payload.contractBreakdown ?? null
       });
       setPhase("reveal");
     } catch (err) {
@@ -334,6 +347,36 @@ export function ScoreRevealModal({ open, onClose, xHandle, xName, xAvatar, prefe
                     </p>
                   </div>
                 </div>
+
+                {/* Contract transparency — spam / unverified are excluded from score */}
+                {result?.contractBreakdown ? (
+                  <div className="grid grid-cols-3 gap-2.5">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-center">
+                      <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-white/40">
+                        Verified
+                      </p>
+                      <p className="mt-1 text-base font-semibold text-emerald-300">
+                        {result.contractBreakdown.verified}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-center">
+                      <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-white/40">
+                        Unverified
+                      </p>
+                      <p className="mt-1 text-base font-semibold text-amber-300">
+                        {result.contractBreakdown.unverified}
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-center">
+                      <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-white/40">
+                        Spam
+                      </p>
+                      <p className="mt-1 text-base font-semibold text-rose-300">
+                        {result.contractBreakdown.spam}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               {/* Footer */}

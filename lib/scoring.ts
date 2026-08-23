@@ -1,6 +1,8 @@
 import { scoreRules } from "@/lib/config/score-rules";
 import { getNftProvider } from "@/lib/nft/providers";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { registerWalletContracts, contractCounts, type ContractRecord } from "@/lib/nft/contracts";
+import { env } from "@/lib/env";
 import type { NftHolding, ScoreResult } from "@/lib/types";
 
 function hasRareTrait(holding: NftHolding) {
@@ -62,12 +64,28 @@ async function fetchWalletHoldings(
   );
 }
 
-function calculateFromHoldings(holdings: NftHolding[], isOg: boolean): ScoreResult {
-  const nftCount = holdings.length;
+function calculateFromHoldings(
+  holdings: NftHolding[],
+  isOg: boolean,
+  registry?: Map<string, ContractRecord>
+): ScoreResult {
+  // When the contract registry is available, drop NFTs from spam contracts
+  // (and unverified ones when required) before scoring.
+  const valid = registry
+    ? holdings.filter((h) => {
+        const c = registry.get(h.contractAddress.toLowerCase());
+        if (!c) return true; // not in registry (e.g. fallback path) → keep
+        if (c.is_spam === true) return false;
+        if (env.NFT_REQUIRE_VERIFIED_CONTRACT && c.status === "ok" && c.is_verified !== true) return false;
+        return true;
+      })
+    : holdings;
+
+  const nftCount = valid.length;
   let score = nftCount > 0 ? scoreRules.points.holdsProjectNft : 0;
   score += Math.max(0, nftCount - 1) * scoreRules.points.eachAdditionalNft;
 
-  for (const holding of holdings) {
+  for (const holding of valid) {
     if (hasRareTrait(holding)) score += scoreRules.points.rareTrait;
     const tokenId = Number(holding.tokenId);
     if (Number.isFinite(tokenId) && tokenId < scoreRules.earlyTokenThreshold) {
@@ -79,7 +97,7 @@ function calculateFromHoldings(holdings: NftHolding[], isOg: boolean): ScoreResu
     score,
     isOg,
     nftCount,
-    holdings
+    holdings: valid
   };
 }
 
@@ -96,9 +114,25 @@ export async function calculateScoreForWallets(
   const provider = getNftProvider();
   const normalizedWallets = [...new Set(walletAddresses.map((address) => address.toLowerCase()))];
   const holdingsByKey = new Map<string, NftHolding>();
+  const allContracts: ContractRecord[] = [];
+  const seenContract = new Set<string>();
 
-  // Fetch every wallet. If ANY wallet fails after retries, we throw — never
-  // persist a partial score that silently drops a wallet's NFTs.
+  // Phase 1 — register each wallet's contracts into the registry (one cheap
+  // Alchemy getContractsForOwner call per wallet). Contracts are evaluated once
+  // globally and reused across wallets, so repeat scans cost almost nothing.
+  for (const walletAddress of normalizedWallets) {
+    const contracts = await registerWalletContracts(walletAddress);
+    for (const c of contracts) {
+      if (!seenContract.has(c.contract_address)) {
+        seenContract.add(c.contract_address);
+        allContracts.push(c);
+      }
+    }
+  }
+
+  // Phase 2 — fetch full holdings only for scoring metadata (rare traits, early
+  // token IDs). If ANY wallet fails after retries, we throw — never persist a
+  // partial score that silently drops a wallet's NFTs.
   for (const walletAddress of normalizedWallets) {
     const holdings = await fetchWalletHoldings(provider, walletAddress, {
       retryOnEmpty: options.retryOnEmpty ?? false
@@ -116,7 +150,13 @@ export async function calculateScoreForWallets(
 
   if (allowlistError) throw allowlistError;
 
-  return calculateFromHoldings([...holdingsByKey.values()], Boolean(allowlist?.length));
+  const result = calculateFromHoldings(
+    [...holdingsByKey.values()],
+    Boolean(allowlist?.length),
+    seenContract.size > 0 ? new Map(allContracts.map((c) => [c.contract_address, c])) : undefined
+  );
+  result.contractBreakdown = contractCounts(allContracts);
+  return result;
 }
 
 export async function persistScore(

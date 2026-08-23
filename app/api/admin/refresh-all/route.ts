@@ -3,89 +3,57 @@ import { getOrCreateCurrentUser } from "@/lib/users";
 import { isAdminUser } from "@/lib/admin";
 import { rateLimit } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { calculateScoreForWallets, persistScore, recalculateRanks } from "@/lib/scoring";
+import { recalculateRanks } from "@/lib/scoring";
+import { reevaluateFailedContracts } from "@/lib/nft/contracts";
+import { scoreRules } from "@/lib/config/score-rules";
+import { env } from "@/lib/env";
 
-// Refreshing every user hits the NFT provider several times each; give it room.
-export const maxDuration = 300;
+// Re-scoring contracts and rebuilding ranks is cheap (no per-wallet NFT scan),
+// so a modest function budget is plenty.
+export const maxDuration = 60;
 
-type WalletRow = { user_id: string; address: string; wallet_slot: "human" | "agent" };
-
-// Maximum wall-clock time we spend refreshing users. Keep this well under the
-// *tightest* proxy in front of the function (Vercel's edge proxy can 504 a
-// request in ~100s even when maxDuration is 300), so the loop always exits
-// in time to recalculate ranks and return JSON. Admin re-runs the button to
-// continue through the remaining profiles — each run resumes where the last
-// one stopped.
-const TIME_BUDGET_MS = 75_000;
-
-// Refresh a few users concurrently. calculateScoreForWallets already
-// parallelizes its per-contract lookups, so 3 at a time roughly triples
-// throughput per run without tripping Alchemy/BaseScan rate limits.
-const CONCURRENCY = 3;
-
+/**
+ * Admin "refresh all" — REDESIGNED.
+ *
+ * Points are captured when a wallet is verified or its owner refreshes from the
+ * dashboard (that path registers + scores the wallet's contracts). This admin
+ * pass therefore does NOT re-scan wallets. It only:
+ *   1. Re-evaluates contracts whose last evaluation FAILED (e.g. a transient
+ *      BaseScan error), so legitimate NFTs aren't stuck at 0.
+ *   2. Recalculates every profile's score from the contract registry.
+ *   3. Rebuilds leaderboard ranks.
+ */
 export async function POST() {
   try {
     const user = await getOrCreateCurrentUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!isAdminUser(user)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    // Each run is short and resumable, so allow a generous cadence — the admin
-    // may need several runs back to back to chew through the full roster.
     if (!rateLimit(`admin-refresh-all:${user.id}`, 10, 60_000)) {
       return NextResponse.json({ error: "Too many refreshes. Try again shortly." }, { status: 429 });
     }
 
     const supabase = getSupabaseAdmin();
-    const { data: wallets, error } = await supabase
-      .from("wallets")
-      .select("user_id,address,wallet_slot")
-      .in("wallet_slot", ["human", "agent"]);
-    if (error) throw error;
 
-    const groups = new Map<string, string[]>();
-    for (const w of (wallets || []) as WalletRow[]) {
-      const list = groups.get(w.user_id) || [];
-      list.push(w.address);
-      groups.set(w.user_id, list);
+    // 1. Retry contracts that failed evaluation.
+    const reevaluated = await reevaluateFailedContracts(50);
+
+    // 2. Recalculate each user's score from the registry.
+    const { data: users } = await supabase.from("scores").select("user_id");
+    let rescored = 0;
+    for (const row of users || []) {
+      try {
+        await rescoreUserFromRegistry(row.user_id);
+        rescored += 1;
+      } catch (err) {
+        console.error(`rescore failed for ${row.user_id}:`, err instanceof Error ? err.message : err);
+      }
     }
 
-    const entries = [...groups.entries()];
-    const startedAt = Date.now();
-    const failed: string[] = [];
-    let refreshed = 0;
-    let nextIndex = 0;
+    // 3. Rebuild ranks.
+    await recalculateRanks();
 
-    const workers = Array.from({ length: Math.min(CONCURRENCY, entries.length) }, async () => {
-      while (nextIndex < entries.length && Date.now() - startedAt <= TIME_BUDGET_MS) {
-        const index = nextIndex;
-        nextIndex += 1;
-        const [userId, addrs] = entries[index];
-        try {
-          const result = await calculateScoreForWallets(userId, addrs);
-          await persistScore(userId, result, { recalculateRank: false });
-          refreshed += 1;
-        } catch (err) {
-          failed.push(userId);
-          console.error(`admin refresh-all failed for ${userId}:`, err instanceof Error ? err.message : err);
-        }
-      }
-    });
-    await Promise.all(workers);
-
-    const processed = refreshed + failed.length;
-    const remaining = groups.size - processed;
-
-    // Always recalculate, even on a partial run — this is the only pass that
-    // assigns ranks to users who registered since the last full refresh.
-    if (refreshed > 0) await recalculateRanks();
-
-    return NextResponse.json({
-      ok: true,
-      total: groups.size,
-      refreshed,
-      failed: failed.length,
-      remaining
-    });
+    return NextResponse.json({ ok: true, reevaluated, rescored, total: (users || []).length });
   } catch (err) {
     console.error("admin refresh-all failed:", err);
     return NextResponse.json(
@@ -93,4 +61,71 @@ export async function POST() {
       { status: 500 }
     );
   }
+}
+
+/**
+ * Recompute one user's score purely from stored holdings + contract registry.
+ * No external NFT calls — this is what makes the admin pass fast and safe.
+ */
+async function rescoreUserFromRegistry(userId: string) {
+  const supabase = getSupabaseAdmin();
+
+  const { data: holdings } = await supabase
+    .from("nft_holdings")
+    .select("contract_address,token_id,metadata_json")
+    .eq("user_id", userId);
+
+  if (!holdings || holdings.length === 0) return;
+
+  const addresses = [...new Set(holdings.map((h) => (h.contract_address as string).toLowerCase()))];
+  const { data: contracts } = await supabase
+    .from("nft_contracts")
+    .select("contract_address,is_spam,is_verified")
+    .in("contract_address", addresses);
+
+  const byAddress = new Map((contracts || []).map((c) => [c.contract_address as string, c]));
+
+  // Keep only NFTs whose contract is non-spam AND (if required) verified.
+  const valid = holdings.filter((h) => {
+    const c = byAddress.get((h.contract_address as string).toLowerCase());
+    if (!c) return false; // not yet evaluated → don't count yet
+    if (c.is_spam === true) return false; // spam → 0
+    if (env.NFT_REQUIRE_VERIFIED_CONTRACT && c.is_verified !== true) return false; // unverified → 0
+    return true;
+  });
+
+  // Score from the valid holdings (mirror calculateFromHoldings).
+  let score = valid.length > 0 ? scoreRules.points.holdsProjectNft : 0;
+  score += Math.max(0, valid.length - 1) * scoreRules.points.eachAdditionalNft;
+  for (const h of valid) {
+    const attrs = (h.metadata_json as { attributes?: unknown })?.attributes;
+    if (Array.isArray(attrs)) {
+      const rare = attrs.some((a) => {
+        const t = a as { trait_type?: unknown; value?: unknown };
+        return scoreRules.rareTraits.some((r) => r.trait_type === t.trait_type && r.value === t.value);
+      });
+      if (rare) score += scoreRules.points.rareTrait;
+    }
+    const tokenId = Number(h.token_id);
+    if (Number.isFinite(tokenId) && tokenId < scoreRules.earlyTokenThreshold) {
+      score += scoreRules.points.earlyTokenId;
+    }
+  }
+
+  const { data: current } = await supabase
+    .from("scores")
+    .select("is_og")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  await supabase.from("scores").upsert(
+    {
+      user_id: userId,
+      score,
+      nft_count: valid.length,
+      is_og: current?.is_og ?? false,
+      last_calculated_at: new Date().toISOString()
+    },
+    { onConflict: "user_id" }
+  );
 }
