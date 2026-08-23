@@ -33,7 +33,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[rgba(10,11,13,0.08)] bg-white/90 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-[rgba(10,11,13,0.08)] bg-white/85 backdrop-blur-sm">
       <div
         className="page-container flex items-center justify-between"
         style={{ paddingTop: "0.875rem", paddingBottom: "0.875rem" }}
