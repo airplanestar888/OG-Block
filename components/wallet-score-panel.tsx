@@ -138,7 +138,7 @@ export function WalletScorePanel({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-black/10 bg-white shadow-sm">
-      <div className="h-[3px] w-full bg-gradient-to-r from-[#0000FF] via-[#4D7CFF] to-transparent" />
+      <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
       <div className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>

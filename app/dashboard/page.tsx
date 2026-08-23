@@ -114,7 +114,7 @@ export default async function DashboardPage() {
 
         {/* Culture score hero — premium white card with Base gradient strip */}
         <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.07)]">
-          <div className="h-[3px] w-full bg-gradient-to-r from-[#0000FF] via-[#4D7CFF] to-transparent" />
+          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
           <div className="relative p-6 md:p-8">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_-10%,rgba(0,0,255,0.10),transparent_50%)]" />
             <div className="relative flex flex-wrap items-end justify-between gap-6">
@@ -231,7 +231,7 @@ export default async function DashboardPage() {
 
         {/* Blockchain Legacy — white receipt card */}
         <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm md:p-8">
-          <div className="h-[3px] w-24 rounded-full bg-gradient-to-r from-[#0000FF] to-transparent" />
+          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
           <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">Blockchain Legacy</h2>
@@ -324,7 +324,7 @@ export default async function DashboardPage() {
 
         {/* Score History & NFT Activity */}
         <section className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white p-6 shadow-sm md:p-8">
-          <div className="h-[3px] w-24 rounded-full bg-gradient-to-r from-[#0000FF] to-transparent" />
+          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">Score History &amp; NFT Activity</h2>
