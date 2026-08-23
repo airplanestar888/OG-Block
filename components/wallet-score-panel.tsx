@@ -155,24 +155,101 @@ export function WalletScorePanel({
         )}
       </div>
 
-      <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.02] p-4">
-        <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/40">
-          {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent connect"}
-        </p>
-        {verifiedWallet ? (
-          <p className="mt-2 font-mono text-sm font-semibold text-ink">{shortAddress(verifiedWallet)}</p>
-        ) : allowBrowserConnect ? (
-          <p className="mt-2 text-sm leading-6 text-black/65">
-            {browserWalletAddress ? `Connected browser wallet: ${shortAddress(browserWalletAddress)}. Sign once to verify it as your wallet.` : "Connect a Base-capable EVM wallet, then sign once to verify it."}
+      <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center">
+        <div className="min-w-0 flex-1 rounded-xl border border-black/10 bg-black/[0.02] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-black/40">
+            {verifiedWallet ? "Verified wallet" : allowBrowserConnect ? "Wallet setup" : "Agent connect"}
           </p>
-        ) : (
-          <p className="mt-2 text-sm leading-6 text-black/65">
-            Connect an agent with a one-time code — it links itself in. No browser wallet needed.
-            <Link className="ml-1 font-semibold text-baseblue hover:underline" href="/agent-guide">
-              Agent guide
-            </Link>
-          </p>
-        )}
+          {verifiedWallet ? (
+            <p className="mt-2 font-mono text-sm font-semibold text-ink">{shortAddress(verifiedWallet)}</p>
+          ) : allowBrowserConnect ? (
+            <p className="mt-2 text-sm leading-6 text-black/65">
+              {browserWalletAddress ? `Connected browser wallet: ${shortAddress(browserWalletAddress)}. Sign once to verify it as your wallet.` : "Connect a Base-capable EVM wallet, then sign once to verify it."}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm leading-6 text-black/65">
+              Connect an agent with a one-time code — it links itself in. No browser wallet needed.
+              <Link className="ml-1 font-semibold text-baseblue hover:underline" href="/agent-guide">
+                Agent guide
+              </Link>
+            </p>
+          )}
+        </div>
+
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {!allowBrowserConnect && !verifiedWallet ? <RegisterAgentButton /> : null}
+
+          {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
+            <button
+              className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!mounted || busy}
+              onClick={() => openAppKit()}
+              type="button"
+            >
+              Connect wallet
+            </button>
+          ) : null}
+
+          {allowBrowserConnect && !verifiedWallet && browserWalletReady ? (
+            <>
+              {chainId === base.id ? (
+                <button
+                  className="focus-ring rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={busy}
+                  onClick={verifyWallet}
+                  type="button"
+                >
+                  Verify wallet
+                </button>
+              ) : (
+                <button
+                  className="focus-ring rounded-full bg-[#0000FF] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#141CB5] disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={busy}
+                  onClick={async () => {
+                    try {
+                      setStatus("Switching network to Base...");
+                      await switchChainAsync({ chainId: base.id });
+                      setStatus("Switched to Base. You can now verify your wallet.");
+                    } catch (err) {
+                      setStatus(err instanceof Error ? err.message : "Network switch failed");
+                    }
+                  }}
+                  type="button"
+                >
+                  Switch to Base & Verify
+                </button>
+              )}
+              <button
+                className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 hover:bg-black/5"
+                onClick={() => disconnect()}
+                type="button"
+              >
+                Disconnect browser
+              </button>
+            </>
+          ) : null}
+
+          {verifiedWallet ? (
+            <>
+              <button
+                className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/70 hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={busy}
+                onClick={refreshScore}
+                type="button"
+              >
+                Refresh score
+              </button>
+              <button
+                className="focus-ring rounded-full border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={busy}
+                onClick={disconnectVerifiedWallet}
+                type="button"
+              >
+                Disconnect wallet
+              </button>
+            </>
+          ) : null}
+        </div>
       </div>
 
       {allowBrowserConnect && !verifiedWallet && browserWalletReady && chainId !== base.id ? (
@@ -199,81 +276,6 @@ export function WalletScorePanel({
           </button>
         </div>
       ) : null}
-
-      <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
-        {!allowBrowserConnect && !verifiedWallet ? <RegisterAgentButton /> : null}
-
-        {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
-          <button
-            className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!mounted || busy}
-            onClick={() => openAppKit()}
-            type="button"
-          >
-            Connect wallet
-          </button>
-        ) : null}
-
-        {allowBrowserConnect && !verifiedWallet && browserWalletReady ? (
-          <>
-            {chainId === base.id ? (
-              <button
-                className="focus-ring rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={busy}
-                onClick={verifyWallet}
-                type="button"
-              >
-                Verify wallet
-              </button>
-            ) : (
-              <button
-                className="focus-ring rounded-full bg-[#0000FF] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#141CB5] disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={busy}
-                onClick={async () => {
-                  try {
-                    setStatus("Switching network to Base...");
-                    await switchChainAsync({ chainId: base.id });
-                    setStatus("Switched to Base. You can now verify your wallet.");
-                  } catch (err) {
-                    setStatus(err instanceof Error ? err.message : "Network switch failed");
-                  }
-                }}
-                type="button"
-              >
-                Switch to Base & Verify
-              </button>
-            )}
-            <button
-              className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/65 hover:bg-black/5"
-              onClick={() => disconnect()}
-              type="button"
-            >
-              Disconnect browser
-            </button>
-          </>
-        ) : null}
-
-        {verifiedWallet ? (
-          <>
-            <button
-              className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-sm font-semibold text-black/70 hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={busy}
-              onClick={refreshScore}
-              type="button"
-            >
-              Refresh score
-            </button>
-            <button
-              className="focus-ring rounded-full border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={busy}
-              onClick={disconnectVerifiedWallet}
-              type="button"
-            >
-              Disconnect wallet
-            </button>
-          </>
-        ) : null}
-      </div>
 
       {status ? <p className="mt-3 text-sm text-black/65">{status}</p> : null}
 
