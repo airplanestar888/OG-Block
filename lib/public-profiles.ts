@@ -157,9 +157,9 @@ export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProf
       .limit(limit),
     supabase
       .from("score_history")
-      .select("user_id,points_delta,nft_delta,event_type,created_at")
+      .select("user_id,points_delta,nft_delta,event_type,created_at,new_score")
       .order("created_at", { ascending: false })
-      .limit(limit * 3)
+      .limit(limit * 6)
       .then(
         (res) => res,
         () => ({ data: null })
@@ -191,6 +191,7 @@ export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProf
       nft_delta: number;
       event_type: "initial_score" | "nft_added" | "nft_removed" | "score_updated" | "wallet_connected" | "wallet_disconnected";
       created_at: string;
+      new_score?: number;
     }
   >();
 
@@ -202,18 +203,51 @@ export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProf
     }
   }
 
+  // Prefer the most recent NON-initial movement for the badge. This avoids
+  // showing an inflated initial_score (+15.7K) next to a much smaller current
+  // score (1.1K). Only fall back to initial_score when that's all we have
+  // and it roughly matches the current score.
+  type HistoryEntry = {
+    user_id: string;
+    points_delta: number;
+    nft_delta: number;
+    event_type: "initial_score" | "nft_added" | "nft_removed" | "score_updated" | "wallet_connected" | "wallet_disconnected";
+    created_at: string;
+    new_score?: number;
+  };
+  const recentMovementByUser = new Map<string, HistoryEntry>();
+  if (historyRes?.data) {
+    for (const entry of historyRes.data as HistoryEntry[]) {
+      if (entry.event_type === "initial_score") continue;
+      if (!recentMovementByUser.has(entry.user_id)) {
+        recentMovementByUser.set(entry.user_id, entry);
+      }
+    }
+  }
+
   const rows = (data || []) as unknown as LeaderboardRow[];
   return rows.map((row) => {
     const history = row.user_id ? latestHistoryByUser.get(row.user_id) : undefined;
-    // For an admin rescore that rebuilt holdings, the history delta can be
-    // inflated (e.g. +16125 when the score was already ~16000). Hide the
-    // badge when it would just repeat the score itself.
-    let pointsDelta: number | undefined =
-      history !== undefined ? history.points_delta : row.score > 0 ? row.score : undefined;
-    if (pointsDelta !== undefined && Math.abs(pointsDelta) === row.score && history?.event_type === "nft_added") {
-      pointsDelta = undefined;
+    // Badge shows recent MOVEMENT, not an inflated initial_score that dwarfs
+    // the current score (e.g. +15.7K next to 1.1K).
+    const movement = row.user_id ? recentMovementByUser.get(row.user_id) : undefined;
+    const effective = movement ?? history;
+    let pointsDelta: number | undefined;
+    if (effective) {
+      // Hide initial_score deltas that no longer reflect the current score
+      // (stale signup score far larger or smaller than today's).
+      if (effective.event_type === "initial_score" && effective.points_delta !== row.score) {
+        pointsDelta = undefined;
+      } else if (Math.abs(effective.points_delta) === row.score && effective.event_type === "nft_added") {
+        // Rebuild artifact (old_score was 0) — would just repeat the score.
+        pointsDelta = undefined;
+      } else {
+        pointsDelta = effective.points_delta;
+      }
+    } else if (row.score > 0) {
+      pointsDelta = row.score;
     }
-    const nftDelta = history !== undefined ? history.nft_delta : (row.nft_count > 0 ? row.nft_count : undefined);
+    const nftDelta = effective !== undefined ? effective.nft_delta : history !== undefined ? history.nft_delta : (row.nft_count > 0 ? row.nft_count : undefined);
 
     return {
       userId: row.user_id,
