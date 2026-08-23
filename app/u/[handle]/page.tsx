@@ -139,37 +139,6 @@ export default async function PublicProfilePage(
             </div>
           </div>
 
-          {/* Contract transparency — wallet breakdown (durable tracking, no scoring change) */}
-          {profile.contractBreakdown && profile.contractBreakdown.total > 0 ? (
-            <>
-              <div className="mx-6 mb-3 grid grid-cols-4 gap-2 rounded-xl border border-black/10 bg-[#f7f8fb] p-3 text-center md:mx-9">
-                <div>
-                  <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-black/40">Total</p>
-                  <p className="mt-1 text-lg font-semibold text-ink">{profile.contractBreakdown.total}</p>
-                  <p className="text-[0.6rem] text-black/40">contracts</p>
-                </div>
-                <div>
-                  <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-emerald-600">Verified</p>
-                  <p className="mt-1 text-lg font-semibold text-ink">{profile.contractBreakdown.verified}</p>
-                  <p className="text-[0.6rem] text-black/40">counted</p>
-                </div>
-                <div>
-                  <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-amber-600">Unverified</p>
-                  <p className="mt-1 text-lg font-semibold text-ink">{profile.contractBreakdown.unverified}</p>
-                  <p className="text-[0.6rem] text-black/40">not counted</p>
-                </div>
-                <div>
-                  <p className="text-[0.58rem] font-bold uppercase tracking-[0.1em] text-rose-600">Spam</p>
-                  <p className="mt-1 text-lg font-semibold text-ink">{profile.contractBreakdown.spam}</p>
-                  <p className="text-[0.6rem] text-black/40">excluded</p>
-                </div>
-              </div>
-              <p className="mx-6 mb-3 text-center text-[0.68rem] leading-4 text-black/40 md:mx-9">
-                NFTs: {profile.nftCount} counted of {(profile as unknown as { nftHoldingsCount?: number }).nftHoldingsCount ?? profile.nftCount} held — only verified contracts count toward score.
-              </p>
-            </>
-          ) : null}
-
           {/* Footer — solid white */}
           <div className="flex items-center justify-between border-t border-black/10 bg-white px-6 py-3.5 md:px-9">
             <div className="flex items-center gap-2">
@@ -179,6 +148,41 @@ export default async function PublicProfilePage(
             <p className="text-xs text-black/35">Base culture score</p>
           </div>
         </div>
+
+        {/* Wallet transparency — separate from OG card, durable tracking */}
+        {profile.contractBreakdown && profile.contractBreakdown.total > 0 ? (
+          <div className="rounded-[1.5rem] border border-black/10 bg-white p-5 shadow-sm md:p-6">
+            <h3 className="text-sm font-semibold text-ink">Wallet overview</h3>
+            <p className="mt-1 text-xs text-black/50">
+              {profile.nftCount} NFTs counted toward score · {profile.contractBreakdown.total} contracts held
+            </p>
+            <div className="mt-4 grid grid-cols-3 gap-2.5 text-center md:grid-cols-4">
+              <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/40">Total</p>
+                <p className="mt-1 text-xl font-semibold text-ink">{profile.contractBreakdown.total}</p>
+                <p className="text-[0.65rem] text-black/40">contracts</p>
+              </div>
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-emerald-700">Verified</p>
+                <p className="mt-1 text-xl font-semibold text-emerald-700">{profile.contractBreakdown.verified}</p>
+                <p className="text-[0.65rem] text-emerald-700/70">counted</p>
+              </div>
+              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-amber-700">Unverified</p>
+                <p className="mt-1 text-xl font-semibold text-amber-700">{profile.contractBreakdown.unverified}</p>
+                <p className="text-[0.65rem] text-amber-700/70">not counted</p>
+              </div>
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-3">
+                <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-rose-700">Spam</p>
+                <p className="mt-1 text-xl font-semibold text-rose-700">{profile.contractBreakdown.spam}</p>
+                <p className="text-[0.65rem] text-rose-700/70">excluded</p>
+              </div>
+            </div>
+            <p className="mt-3 text-center text-[0.68rem] leading-4 text-black/40">
+              Only verified contracts count toward your culture score — others are shown here for transparency.
+            </p>
+          </div>
+        ) : null}
 
         {/* Actions */}
         <div className="space-y-2 md:mx-auto md:flex md:max-w-[520px] md:space-y-0 md:gap-3">
