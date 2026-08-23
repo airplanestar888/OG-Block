@@ -235,7 +235,7 @@ export default async function DashboardPage() {
                 Verified collection receipts — only verified contracts appear here.
               </p>
             </div>
-            <div className="grid w-full max-w-xs grid-cols-3 gap-px overflow-hidden rounded-xl border border-black/10 bg-black/10 text-center text-xs sm:w-auto">
+            <div className="grid w-full grid-cols-3 gap-px overflow-hidden rounded-xl border border-black/10 bg-black/10 text-center text-xs sm:w-auto sm:max-w-xs">
               <ReceiptStat label="Items" value={score?.nft_count ?? (holdings || []).length} />
               <ReceiptStat label="Score" value={score?.score ?? 0} />
               <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
