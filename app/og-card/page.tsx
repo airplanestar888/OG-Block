@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAccount, useChainId, useConnect, useDisconnect, useSwitchChain, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
+import { useAccount, useChainId, useDisconnect, useSwitchChain, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { decodeEventLog, parseAbiItem } from "viem";
 import { base, baseSepolia } from "wagmi/chains";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAppKit } from "@reown/appkit/react";
 import { shortAddress } from "@/lib/address";
-import { pickAvailableConnector } from "@/lib/wallet";
 import { OgCardAbi } from "@/lib/og-card-abi";
 
 const MINTED_EVENT = parseAbiItem("event Minted(address indexed to, uint256 indexed tokenId)");
@@ -81,9 +81,9 @@ export default function OgCardPage() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChainAsync } = useSwitchChain();
+  const { open: openAppKit } = useAppKit();
 
   const [claim, setClaim] = useState<Claim | null>(null);
   const [loading, setLoading] = useState(true);
@@ -383,14 +383,7 @@ export default function OgCardPage() {
             <p className="text-sm text-black/55">Connect your wallet to claim your OG Badge</p>
             <button
               className="focus-ring rounded-full bg-[#0000FF] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
-              onClick={async () => {
-                const connector = await pickAvailableConnector(connectors);
-                if (connector) {
-                  connect({ connector });
-                } else {
-                  setError("No EVM wallet detected. Please install MetaMask, OKX, Bitget, or Trust Wallet.");
-                }
-              }}
+              onClick={() => openAppKit()}
               type="button"
             >
               Connect Wallet

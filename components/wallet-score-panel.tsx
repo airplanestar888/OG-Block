@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useAccount, useChainId, useConnect, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
+import { useAccount, useChainId, useDisconnect, useSignMessage, useSwitchChain } from "wagmi";
+import { useAppKit } from "@reown/appkit/react";
 import { base } from "wagmi/chains";
 import { shortAddress } from "@/lib/address";
 import type { WalletSlot } from "@/lib/types";
 import { ScoreRevealModal } from "@/components/score-reveal-modal";
-import { ConnectWalletModal } from "@/components/connect-wallet-modal";
 import { RegisterAgentButton } from "@/components/register-agent-button";
 
 type RevealResult = {
@@ -43,15 +43,14 @@ export function WalletScorePanel({
 }: WalletScorePanelProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
-  const { isPending: connectPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChainAsync } = useSwitchChain();
   const { signMessageAsync } = useSignMessage();
+  const { open: openAppKit } = useAppKit();
   const [status, setStatus] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [revealOpen, setRevealOpen] = useState(false);
-  const [connectOpen, setConnectOpen] = useState(false);
   const [prefetchedResult, setPrefetchedResult] = useState<RevealResult | null>(null);
 
   useEffect(() => {
@@ -208,8 +207,8 @@ export function WalletScorePanel({
         {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
           <button
             className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!mounted || connectPending || busy}
-            onClick={() => setConnectOpen(true)}
+            disabled={!mounted || busy}
+            onClick={() => openAppKit()}
             type="button"
           >
             Connect wallet
@@ -278,8 +277,6 @@ export function WalletScorePanel({
       </div>
 
       {status ? <p className="mt-3 text-sm text-black/65">{status}</p> : null}
-
-      <ConnectWalletModal open={connectOpen} onClose={() => setConnectOpen(false)} />
 
       <ScoreRevealModal
         open={revealOpen}

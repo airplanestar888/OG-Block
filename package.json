@@ -20,6 +20,8 @@
   "dependencies": {
     "@auth/core": "^0.37.4",
     "@auth/supabase-adapter": "^1.8.0",
+    "@reown/appkit": "^1.8.23",
+    "@reown/appkit-adapter-wagmi": "^1.8.23",
     "@supabase/supabase-js": "^2.47.10",
     "@tanstack/react-query": "^5.62.8",
     "@vercel/analytics": "^2.0.1",
