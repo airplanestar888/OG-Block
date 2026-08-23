@@ -31,7 +31,7 @@ export function buildAgentInstruction(code: string, handle: string): string {
     `   Agent wallet: <YOUR_AGENT_WALLET_ADDRESS>`,
     `   Timestamp: <CURRENT_ISO_8601>`,
     `   ---`,
-    `2. POST the result to https://www.joinog.xyz/api/agent/link`,
+    `2. POST the result to https://joinog.xyz/api/agent/link`,
     `   Content-Type: application/json`,
     `   {`,
     `     "code": "${code}",`,

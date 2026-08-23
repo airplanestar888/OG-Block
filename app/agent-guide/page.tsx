@@ -13,7 +13,7 @@ const agentSteps = [
   },
   {
     title: "POST to /api/agent/link",
-    copy: "The agent sends the code, its address, chainId 8453, the exact signed message, and the signature to https://www.joinog.xyz/api/agent/link. The response returns { ok, handle, agentWallet, score }."
+    copy: "The agent sends the code, its address, chainId 8453, the exact signed message, and the signature to https://joinog.xyz/api/agent/link. The response returns { ok, handle, agentWallet, score }."
   },
   {
     title: "Slot linked, combined score refreshed",
@@ -124,7 +124,7 @@ REQUIRED_ACTIONS:
      Code: <CODE>
      Agent wallet: <AGENT_ADDRESS>
      Timestamp: <ISO_8601>
-4. Agent POSTs to https://www.joinog.xyz/api/agent/link
+4. Agent POSTs to https://joinog.xyz/api/agent/link
      { "code", "address", "chainId": 8453, "message", "signature" }
 5. Server resolves the code server-side, verifies the signature, links the
    agent wallet slot, and rescoring runs across human + agent wallets

@@ -9,7 +9,7 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { useState } from "react";
 
 const projectId = process.env.NEXT_PUBLIC_WC_PROJECT_ID ?? "";
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.joinog.xyz";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://joinog.xyz";
 
 const networks = [base, baseSepolia] as const;
 
