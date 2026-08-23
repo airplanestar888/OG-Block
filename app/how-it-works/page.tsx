@@ -59,10 +59,12 @@ export default function HowItWorksPage() {
               <p className="mt-1.5 text-sm leading-6 text-black/55">
                 OG BLOCK turns your Base NFT holdings into a public rank — and carries that status onto X, where the culture actually is.
               </p>
-              <div className="mt-5 grid grid-cols-3 gap-2.5">
-                <PanelStat label="Signatures" value="1" />
-                <PanelStat label="Gas" value="0" />
-                <PanelStat label="Custody" value="Yours" />
+              <div className="mt-5 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-black/[0.08] pt-4 text-sm text-black/55">
+                <span><span className="font-semibold text-ink">1</span> signature</span>
+                <span className="text-black/25">·</span>
+                <span><span className="font-semibold text-ink">0</span> gas</span>
+                <span className="text-black/25">·</span>
+                <span><span className="font-semibold text-ink">100%</span> your custody</span>
               </div>
             </div>
           </div>
@@ -88,14 +90,5 @@ export default function HowItWorksPage() {
         </div>
       </section>
     </main>
-  );
-}
-
-function PanelStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-2 py-3.5 text-center shadow-sm">
-      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
-    </div>
   );
 }
