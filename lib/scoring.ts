@@ -1,8 +1,7 @@
 import { scoreRules } from "@/lib/config/score-rules";
 import { getNftProvider } from "@/lib/nft/providers";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { registerWalletContracts, contractCounts, type ContractRecord } from "@/lib/nft/contracts";
-import { env } from "@/lib/env";
+import { registerWalletContracts, contractCounts, isCounted, type ContractRecord } from "@/lib/nft/contracts";
 import type { NftHolding, ScoreResult } from "@/lib/types";
 
 function hasRareTrait(holding: NftHolding) {
@@ -69,15 +68,14 @@ function calculateFromHoldings(
   isOg: boolean,
   registry?: Map<string, ContractRecord>
 ): ScoreResult {
-  // When the contract registry is available, drop NFTs from spam contracts
-  // (and unverified ones when required) before scoring.
+  const allHoldings = holdings;
+  // When the contract registry is available, drop NFTs from contracts that
+  // don't count (verified overrides spam — a verified contract always counts).
   const valid = registry
     ? holdings.filter((h) => {
         const c = registry.get(h.contractAddress.toLowerCase());
         if (!c) return true; // not in registry (e.g. fallback path) → keep
-        if (c.is_spam === true) return false;
-        if (env.NFT_REQUIRE_VERIFIED_CONTRACT && c.status === "ok" && c.is_verified !== true) return false;
-        return true;
+        return isCounted(c);
       })
     : holdings;
 
@@ -97,7 +95,8 @@ function calculateFromHoldings(
     score,
     isOg,
     nftCount,
-    holdings: valid
+    holdings: valid,
+    allHoldings
   };
 }
 
@@ -180,11 +179,12 @@ export async function persistScore(
   const pointsDelta = result.score - oldScore;
   const nftDelta = result.nftCount - oldNftCount;
 
+  const allToStore = result.allHoldings ?? result.holdings;
   await supabase.from("nft_holdings").delete().eq("user_id", userId);
 
-  if (result.holdings.length > 0) {
+  if (allToStore.length > 0) {
     const { error: holdingsError } = await supabase.from("nft_holdings").insert(
-      result.holdings.map((holding) => ({
+      allToStore.map((holding) => ({
         user_id: userId,
         contract_address: holding.contractAddress.toLowerCase(),
         token_id: holding.tokenId,

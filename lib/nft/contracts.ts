@@ -183,15 +183,9 @@ export async function evaluatePendingContracts(limit = 20): Promise<number> {
   let done = 0;
   for (const row of pending || []) {
     const addr = row.contract_address as string;
-    // Spam contracts are decided by Alchemy alone — no BaseScan needed.
-    if (row.is_spam === true) {
-      await supabase
-        .from("nft_contracts")
-        .update({ is_verified: false, status: "ok", evaluated_at: new Date().toISOString(), eval_error: null })
-        .eq("contract_address", addr);
-      done += 1;
-      continue;
-    }
+    // Verified (BaseScan) is the source of truth — a verified contract counts
+    // even if Alchemy flags it spam (Alchemy over-flags legit collections).
+    // So we ALWAYS run the BaseScan check, spam or not.
     try {
       const verified = await isContractVerified(addr);
       await supabase
@@ -225,11 +219,23 @@ export async function reevaluateFailedContracts(limit = 50): Promise<number> {
   return evaluatePendingContracts(limit);
 }
 
+/**
+ * Whether a contract's NFTs count toward the score.
+ * Verified (BaseScan) overrides everything: a verified contract always counts,
+ * even if Alchemy flags it as spam. Unverified + spam → excluded.
+ */
+export function isCounted(c: Pick<ContractRecord, "is_spam" | "is_verified">): boolean {
+  if (c.is_verified === true) return true;       // verified → always counted
+  if (c.is_spam === true) return false;           // unverified spam → excluded
+  // Not verified, not spam: counted only when verified-status isn't required.
+  return !env.NFT_REQUIRE_VERIFIED_CONTRACT;
+}
+
 /** Counts for transparency on the score card. */
 export function contractCounts(contracts: ContractRecord[]) {
   const spam = contracts.filter((c) => c.is_spam === true).length;
-  const nonSpam = contracts.length - spam;
-  const verified = contracts.filter((c) => c.is_spam !== true && c.is_verified === true).length;
-  const unverified = nonSpam - verified;
-  return { total: contracts.length, spam, verified, unverified };
+  const verified = contracts.filter((c) => c.is_verified === true).length;
+  const counted = contracts.filter((c) => isCounted(c)).length;
+  const unverified = contracts.length - verified;
+  return { total: contracts.length, spam, verified, unverified, counted };
 }

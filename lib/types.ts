@@ -78,12 +78,15 @@ export type ScoreResult = {
   isOg: boolean;
   nftCount: number;
   holdings: NftHolding[];
+  /** Holds every NFT fetched from the wallet (before registry filtering). */
+  allHoldings?: NftHolding[];
   /** Transparency counts for the score card popup. */
   contractBreakdown?: {
     total: number;
     spam: number;
     verified: number;
     unverified: number;
+    counted: number;
   };
 };
 
