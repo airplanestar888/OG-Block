@@ -71,7 +71,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               letterSpacing: "0.02em",
             }}
           >
-            Who holds the most. Who ranks the highest.
+            Who holds the most.
+            <br className="hidden lg:inline" />
+            Who ranks the highest.
           </h1>
         </div>
 
