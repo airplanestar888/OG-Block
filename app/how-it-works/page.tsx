@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
             Proof, status, visibility.
           </h1>
 
-          <div className="rounded-2xl border border-black/10 bg-white/78 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
+          <div className="rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
             <div className="p-6">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Why it matters</p>
@@ -67,7 +67,7 @@ export default function HowItWorksPage() {
 
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 md:grid-cols-5">
           {steps.map((step, index) => (
-            <article key={step.title} className="bg-white/74 p-5 backdrop-blur">
+            <article key={step.title} className="bg-white p-5">
               <p className="text-xs font-bold text-baseblue">0{index + 1}</p>
               <h2 className="mt-5 text-lg font-semibold text-black">{step.title}</h2>
               <p className="mt-3 text-sm leading-6 text-black/70">{step.copy}</p>

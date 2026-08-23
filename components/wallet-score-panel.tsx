@@ -137,7 +137,7 @@ export function WalletScorePanel({
   }
 
   return (
-    <div className="rounded-2xl border border-black/10 bg-white/78 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur">
+    <div className="rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
       <div className="p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>

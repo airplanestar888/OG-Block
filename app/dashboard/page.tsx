@@ -113,7 +113,7 @@ export default async function DashboardPage() {
 
         {/* Culture score — roadmap-style flat card with hairline stat grid */}
         <section className="overflow-hidden rounded-2xl border border-black/10 bg-black/10">
-          <div className="bg-[#fbfcff] p-6 md:p-8">
+          <div className="bg-[#f0f1f3] p-6 md:p-8">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Culture score</p>
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Badges & Perks — roadmap-style flat card */}
-        <section className="rounded-2xl border border-black/10 bg-white/78 p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-6">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges &amp; perks</p>
@@ -188,7 +188,7 @@ export default async function DashboardPage() {
           </div>
 
           {ogClaim ? (
-            <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-black/10 bg-white/74 p-4">
+            <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-black/10 bg-white p-4">
               <Image
                 className="rounded-lg object-cover"
                 src="/api/og-card/image"
@@ -227,7 +227,7 @@ export default async function DashboardPage() {
         </section>
 
         {/* Blockchain Legacy — roadmap-style flat receipt card */}
-        <section className="rounded-2xl border border-black/10 bg-white/78 p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">Blockchain Legacy</h2>
@@ -258,7 +258,7 @@ export default async function DashboardPage() {
               const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
 
               return (
-                <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-xl border border-black/10 bg-white/74 p-4 md:grid-cols-[1fr_auto]">
+                <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-xl border border-black/10 bg-white p-4 md:grid-cols-[1fr_auto]">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-md bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
@@ -311,7 +311,7 @@ export default async function DashboardPage() {
             })}
 
             {(countedHoldings || []).length === 0 ? (
-              <div className="rounded-xl border border-black/10 bg-white/74 px-4 py-10 text-center text-sm text-black/50">
+              <div className="rounded-xl border border-black/10 bg-white px-4 py-10 text-center text-sm text-black/50">
                 No verified collection receipts yet — verify a wallet holding NFTs from verified contracts.
               </div>
             ) : null}
@@ -319,7 +319,7 @@ export default async function DashboardPage() {
         </section>
 
         {/* Score History & NFT Activity — roadmap-style flat card */}
-        <section className="rounded-2xl border border-black/10 bg-white/78 p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] backdrop-blur md:p-8">
+        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">Score History &amp; NFT Activity</h2>
