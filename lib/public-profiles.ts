@@ -125,29 +125,32 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   const agentWallet = (wallets || []).find((wallet) => wallet.wallet_slot === "agent");
   const agentIdentity = await getAgentIdentity(agentWallet?.address);
 
-  // --- Contract transparency — wallet → NFT → registry → check → scoring → wallet ---
+  // --- NFT overview — wallet → NFT → registry → check → scoring → wallet ---
   // Scoring tidak berubah: hanya verified (BaseScan) yang dihitung. Di sini
-  // kita cuma transparansi: total kontrak berbeda di wallet, berapa yang
-  // verified (counted), berapa spam, berapa unverified/pending.
+  // transparansi per-NFT (bukan per-contract) agar selaras dengan NFT count:
+  // total NFT held, berapa verified (counted), berapa spam/unverified.
   // Alur durable: wallet masuk → NFT didaftarkan → registry cek kontrak →
   // scoring hitung yang verified → simpan ke wallet (score/nft_count).
   let contractBreakdown: { total: number; verified: number; unverified: number; spam: number; counted: number } | null = null;
+  let totalContractsHeld: number | null = null;
   if (holdings && (holdings as Array<{ contract_address?: unknown }>).length > 0) {
     const typedHoldings = holdings as Array<{ contract_address?: unknown }>;
     const addrs = [...new Set(typedHoldings.map((h) => String((h as { contract_address?: unknown }).contract_address || "").toLowerCase()).filter(Boolean))];
+    totalContractsHeld = addrs.length;
     if (addrs.length > 0) {
       const { data: contracts } = await supabase.from("nft_contracts").select("contract_address,is_spam,is_verified").in("contract_address", addrs);
       const byAddr = new Map((contracts || []).map((c) => [String((c as { contract_address: string }).contract_address).toLowerCase(), c as unknown as { is_spam: boolean | null; is_verified: boolean | null }]));
-      let verified = 0, spam = 0;
-      for (const a of addrs) {
-        const c = byAddr.get(a) as { is_spam: boolean | null; is_verified: boolean | null } | undefined;
-        // verified overrides spam — kontrak verified selalu counted walau is_spam true
-        if (c?.is_verified === true) verified += 1;
-        else if (c?.is_spam === true) spam += 1;
+      // Count per-NFT so numbers match the holdings/score domain (223 NFTs, not 132 contracts).
+      let verifiedNfts = 0, spamNfts = 0;
+      for (const h of typedHoldings) {
+        const addr = String((h as { contract_address?: unknown }).contract_address || "").toLowerCase();
+        const c = byAddr.get(addr) as { is_spam: boolean | null; is_verified: boolean | null } | undefined;
+        if (c?.is_verified === true) verifiedNfts += 1;
+        else if (c?.is_spam === true) spamNfts += 1;
       }
-      const total = addrs.length;
-      const unverified = total - verified - spam;
-      contractBreakdown = { total, verified, spam, unverified, counted: verified };
+      const totalNfts = typedHoldings.length;
+      const unverifiedNfts = totalNfts - verifiedNfts - spamNfts;
+      contractBreakdown = { total: totalNfts, verified: verifiedNfts, spam: spamNfts, unverified: unverifiedNfts, counted: verifiedNfts };
     }
   }
 

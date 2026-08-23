@@ -149,18 +149,18 @@ export default async function PublicProfilePage(
           </div>
         </div>
 
-        {/* Wallet transparency — separate from OG card, durable tracking */}
+        {/* NFT overview — separate from OG card, durable wallet→NFT→registry→scoring */}
         {profile.contractBreakdown && profile.contractBreakdown.total > 0 ? (
           <div className="rounded-[1.5rem] border border-black/10 bg-white p-5 shadow-sm md:p-6">
-            <h3 className="text-sm font-semibold text-ink">Wallet overview</h3>
+            <h3 className="text-sm font-semibold text-ink">NFT overview</h3>
             <p className="mt-1 text-xs text-black/50">
-              {profile.nftCount} NFTs counted toward score · {profile.contractBreakdown.total} contracts held
+              {profile.nftCount} verified NFTs counted toward score
             </p>
             <div className="mt-4 grid grid-cols-3 gap-2.5 text-center md:grid-cols-4">
               <div className="rounded-xl border border-black/10 bg-[#f7f8fb] p-3">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/40">Total</p>
                 <p className="mt-1 text-xl font-semibold text-ink">{profile.contractBreakdown.total}</p>
-                <p className="text-[0.65rem] text-black/40">contracts</p>
+                <p className="text-[0.65rem] text-black/40">NFTs</p>
               </div>
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3">
                 <p className="text-[0.6rem] font-bold uppercase tracking-[0.1em] text-emerald-700">Verified</p>
@@ -179,7 +179,7 @@ export default async function PublicProfilePage(
               </div>
             </div>
             <p className="mt-3 text-center text-[0.68rem] leading-4 text-black/40">
-              Only verified contracts count toward your culture score — others are shown here for transparency.
+              Only verified NFTs count toward your culture score — others shown for transparency.
             </p>
           </div>
         ) : null}
