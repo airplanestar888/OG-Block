@@ -205,7 +205,14 @@ export async function getLeaderboard(limit = 100): Promise<PublicLeaderboardProf
   const rows = (data || []) as unknown as LeaderboardRow[];
   return rows.map((row) => {
     const history = row.user_id ? latestHistoryByUser.get(row.user_id) : undefined;
-    const pointsDelta = history !== undefined ? history.points_delta : (row.score > 0 ? row.score : undefined);
+    // For an admin rescore that rebuilt holdings, the history delta can be
+    // inflated (e.g. +16125 when the score was already ~16000). Hide the
+    // badge when it would just repeat the score itself.
+    let pointsDelta: number | undefined =
+      history !== undefined ? history.points_delta : row.score > 0 ? row.score : undefined;
+    if (pointsDelta !== undefined && Math.abs(pointsDelta) === row.score && history?.event_type === "nft_added") {
+      pointsDelta = undefined;
+    }
     const nftDelta = history !== undefined ? history.nft_delta : (row.nft_count > 0 ? row.nft_count : undefined);
 
     return {
