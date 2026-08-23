@@ -29,7 +29,7 @@ export default function HowItWorksPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
       <section className="relative mx-auto max-w-6xl">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">How it works</p>
-        <div className="mt-2 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-start">
+        <div className="mt-3 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <h1
             className="font-bebas text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
             style={{
@@ -42,9 +42,30 @@ export default function HowItWorksPage() {
             <br />
             visibility.
           </h1>
-          <p className="max-w-xl text-base leading-8 text-black/70">
-            OG BLOCK turns your Base NFT holdings into a public rank. Verify once, score everything, and carry that status onto X — where the culture actually is.
-          </p>
+
+          <div className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
+            <div className="h-[3px] w-full bg-gradient-to-r from-[#0000FF] via-[#4D7CFF] to-transparent" />
+            <div className="p-6">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Why it matters</p>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-baseblue/20 bg-baseblue/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-baseblue">
+                  <span className="grid size-3 place-items-center rounded-full bg-[#0000FF] text-[0.5rem] text-white">✓</span>
+                  On-chain
+                </span>
+              </div>
+              <p className="mt-3 text-base font-semibold leading-snug text-ink">
+                Verify once. Score everything.
+              </p>
+              <p className="mt-1.5 text-sm leading-6 text-black/55">
+                OG BLOCK turns your Base NFT holdings into a public rank — and carries that status onto X, where the culture actually is.
+              </p>
+              <div className="mt-5 grid grid-cols-3 gap-2.5">
+                <PanelStat label="Signatures" value="1" />
+                <PanelStat label="Gas" value="0" />
+                <PanelStat label="Custody" value="Yours" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-black/10 bg-black/10 md:grid-cols-5">
@@ -58,7 +79,7 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="mt-10 flex flex-wrap gap-3">
-          <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80" href="/og-card">
+          <Link className="rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(0,0,255,0.25)] transition duration-200 hover:bg-[#141CB5] active:opacity-80" href="/og-card">
             Get your badge
           </Link>
           <Link className="rounded-full border border-[rgba(10,11,13,0.12)] bg-white/70 px-5 py-3 text-sm font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D]" href="/leaderboard">
@@ -67,5 +88,14 @@ export default function HowItWorksPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function PanelStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-2 py-3.5 text-center shadow-sm">
+      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
+    </div>
   );
 }
