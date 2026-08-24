@@ -5,6 +5,31 @@ import type { NftHolding } from "@/lib/types";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/// Alchemy metadata occasionally contains lone UTF-16 surrogates (broken
+/// emoji encodes) and NUL bytes — neither survives a round-trip through
+/// Postgres (jsonb rejects lone surrogates, no text column can hold \u0000),
+/// failing the whole holdings insert. Scrub both before anything downstream
+/// persists the metadata.
+function scrubLoneSurrogates(value: unknown): unknown {
+  if (typeof value === "string") {
+    return value
+      .replace(/\u0000/g, "")
+      .replace(
+        /[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g,
+        "\uFFFD"
+      );
+  }
+  if (Array.isArray(value)) return value.map(scrubLoneSurrogates);
+  if (value !== null && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(value)) {
+      out[key] = scrubLoneSurrogates(val);
+    }
+    return out;
+  }
+  return value;
+}
+
 const baseChain = {
   id: 8453,
   name: "Base",
@@ -161,12 +186,18 @@ function shouldFilterContract(contractAddress: string) {
 /// Solana uses the same /nft/v3/getNFTsForOwner format as EVM chains.
 /// Note: Solana addresses are base58 (not 0x). EVM wallets won't have Solana
 /// NFTs unless the user provides a Solana wallet address separately.
+/// Robinhood was removed: the Alchemy app key returns 403 for that network,
+/// so every scan silently swallowed a failed chain while its errors hid real ones.
 const SUPPORTED_CHAINS = [
   { id: 8453, name: "Base", host: "base-mainnet.g.alchemy.com", isEvm: true },
   { id: 1, name: "Ethereum", host: "eth-mainnet.g.alchemy.com", isEvm: true },
-  { id: 4663, name: "Robinhood", host: "robinhood-mainnet.g.alchemy.com", isEvm: true },
   { id: 1399811149, name: "Solana", host: "solana-mainnet.g.alchemy.com", isEvm: false }
 ] as const;
+
+/// Hard ceiling on pagination so one pathological wallet can't loop forever.
+/// Hitting it must ERROR, not truncate — a capped fetch silently undercounts
+/// (a whale holding 1200+ NFTs used to be scored from only the first 500).
+const MAX_PAGES_PER_CHAIN = 25;
 
 class MockNftProvider implements NftProvider {
   async getHoldings(address: string, contractAddress: string): Promise<NftHolding[]> {
@@ -222,7 +253,7 @@ async function fetchChainNftsFromAlchemy(
   const ownedNfts: AlchemyOwnedNft[] = [];
   let pageKey: string | undefined;
 
-  for (let page = 0; page < 5; page += 1) {
+  for (let page = 0; page < MAX_PAGES_PER_CHAIN; page += 1) {
     const url = new URL(`https://${chainHost}/nft/v3/${apiKey}/getNFTsForOwner`);
     url.searchParams.set("owner", address);
     if (shouldFilterContract(contractAddress)) {
@@ -251,6 +282,14 @@ async function fetchChainNftsFromAlchemy(
     }
     pageKey = payload.pageKey;
     if (!pageKey) break;
+  }
+
+  if (pageKey) {
+    throw new Error(
+      `Alchemy getNFTsForOwner ${chainName} for ${address} holds more than ${
+        MAX_PAGES_PER_CHAIN * 100
+      } NFTs — refusing to score from a truncated list`
+    );
   }
 
   return ownedNfts;
@@ -282,10 +321,14 @@ class AlchemyNftProvider implements NftProvider {
       }
     }
 
-    // If EVERY chain call failed, the provider is down/misconfigured — surface
-    // it instead of falling through to "no NFTs", which would zero the score.
-    if (ownedNfts.length === 0 && chainErrors.length === results.length && chainErrors.length > 0) {
-      throw new Error(`Alchemy NFT fetch failed on all chains: ${chainErrors[0]}`);
+    // ANY failed chain means the wallet view would be partial — e.g. Ethereum
+    // hiccuping while Base succeeds would silently drop every ETH NFT from the
+    // score and persist the undercount. Surface it instead; the scoring layer
+    // retries (3× with backoff), so transient failures recover there.
+    if (chainErrors.length > 0) {
+      throw new Error(
+        `Alchemy NFT fetch failed on ${chainErrors.length}/${results.length} chains: ${chainErrors[0]}`
+      );
     }
 
     // If no NFTs returned from multi-chain getNFTsForOwner, fallback to transfer history
@@ -300,11 +343,11 @@ class AlchemyNftProvider implements NftProvider {
     return ownedNfts.map((nft) => ({
       contractAddress: nft.contract?.address || contractAddress,
       tokenId: nft.tokenId || "0",
-      metadata: {
+      metadata: scrubLoneSurrogates({
         ...(nft.raw?.metadata || {}),
         name: nft.raw?.metadata?.name || nft.name,
         chain: (nft as Record<string, unknown>)._chain || "Base"
-      }
+      }) as Record<string, unknown>
     }));
   }
 }

@@ -1,7 +1,13 @@
 import { scoreRules } from "@/lib/config/score-rules";
 import { getNftProvider } from "@/lib/nft/providers";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { registerWalletContracts, contractCounts, isCounted, type ContractRecord } from "@/lib/nft/contracts";
+import {
+  getContractRecords,
+  registerWalletContracts,
+  contractCounts,
+  isCounted,
+  type ContractRecord
+} from "@/lib/nft/contracts";
 import type { NftHolding, ScoreResult } from "@/lib/types";
 
 function hasRareTrait(holding: NftHolding) {
@@ -145,6 +151,23 @@ export async function calculateScoreForWallets(
     }
   }
 
+  // getContractsForOwner doesn't list every contract that shows up in holdings,
+  // and an unfiltered contract is excluded from scoring — so resolve verdicts
+  // for any holding contract the registration phase didn't cover.
+  const uncoveredContractAddresses = [...holdingsByKey.values()]
+    .map((holding) => holding.contractAddress.toLowerCase())
+    .filter((address) => !seenContract.has(address));
+  const uncovered = [...new Set(uncoveredContractAddresses)];
+  if (uncovered.length > 0) {
+    const records = await getContractRecords(uncovered);
+    for (const record of records) {
+      if (!seenContract.has(record.contract_address)) {
+        seenContract.add(record.contract_address);
+        allContracts.push(record);
+      }
+    }
+  }
+
   const { data: allowlist, error: allowlistError } = await supabase
     .from("og_allowlist")
     .select("id")
@@ -152,6 +175,15 @@ export async function calculateScoreForWallets(
     .limit(1);
 
   if (allowlistError) throw allowlistError;
+
+  // Guard: scoring without the registry filter counts every spam/unverified
+  // NFT the wallet holds. If a wallet has holdings but the registry read came
+  // back empty, fail loudly instead of persisting an inflated score.
+  if (holdingsByKey.size > 0 && seenContract.size === 0) {
+    throw new Error(
+      `Contract registry returned no rows for ${normalizedWallets.length} wallet(s) holding ${holdingsByKey.size} NFT(s) — refusing to score unfiltered`
+    );
+  }
 
   const result = calculateFromHoldings(
     [...holdingsByKey.values()],

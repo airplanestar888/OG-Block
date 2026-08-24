@@ -46,7 +46,12 @@ type AlchemyContract = {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Fetch every contract a wallet holds (one call per chain, free-plan safe). */
+/** Fetch every contract a wallet holds (paginated, one chain set per wallet). */
+/// Registration ceiling mirroring the holdings guard — hitting it must ERROR,
+/// not truncate: an unregistered contract can never verify, so its NFTs would
+/// silently vanish from every score built on this registry.
+const MAX_CONTRACT_PAGES = 50;
+
 async function fetchContractsForOwner(address: string): Promise<AlchemyContract[]> {
   const apiKey = env.NFT_PROVIDER_API_KEY;
   if (!apiKey) throw new Error("NFT_PROVIDER_API_KEY is required");
@@ -62,25 +67,39 @@ async function fetchContractsForOwner(address: string): Promise<AlchemyContract[
 
   await Promise.all(
     hosts.map(async (host) => {
-      const url = new URL(`https://${host}/nft/v3/${apiKey}/getContractsForOwner`);
-      url.searchParams.set("owner", address);
-      try {
-        const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
-        if (!res.ok) {
-          const body = await res.text().catch(() => "");
-          errors.push(`getContractsForOwner ${host} ${res.status}: ${body.slice(0, 120)}`);
+      let pageKey: string | undefined;
+      for (let page = 0; page < MAX_CONTRACT_PAGES; page += 1) {
+        const url = new URL(`https://${host}/nft/v3/${apiKey}/getContractsForOwner`);
+        url.searchParams.set("owner", address);
+        url.searchParams.set("pageSize", "100");
+        if (pageKey) url.searchParams.set("pageKey", pageKey);
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(12000) });
+          if (!res.ok) {
+            const body = await res.text().catch(() => "");
+            errors.push(`getContractsForOwner ${host} ${res.status}: ${body.slice(0, 120)}`);
+            return;
+          }
+          const body = (await res.json()) as { contracts?: AlchemyContract[]; pageKey?: string };
+          for (const c of body.contracts || []) all.push(c);
+          pageKey = body.pageKey;
+          if (!pageKey) return;
+        } catch (e) {
+          errors.push(e instanceof Error ? e.message : String(e));
           return;
         }
-        const body = (await res.json()) as { contracts?: AlchemyContract[] };
-        for (const c of body.contracts || []) all.push(c);
-      } catch (e) {
-        errors.push(e instanceof Error ? e.message : String(e));
       }
+      errors.push(
+        `getContractsForOwner ${host}: wallet ${address} exceeds ${
+          MAX_CONTRACT_PAGES * 100
+        } contracts — refusing a truncated registry`
+      );
     })
   );
 
-  // If every chain errored, surface it — never report "no contracts".
-  if (all.length === 0 && errors.length > 0) {
+  // A failed chain yields a partial registry, and anything missing from the
+  // registry is excluded from scoring — surface it instead of undercounting.
+  if (errors.length > 0) {
     throw new Error(`Alchemy contract scan failed: ${errors[0]}`);
   }
   return all;
@@ -131,15 +150,65 @@ async function isContractVerified(contractAddress: string): Promise<boolean> {
  * Register the contracts a wallet holds into nft_contracts (idempotent).
  * Returns the registry rows for those contracts (post-evaluation).
  */
-export async function registerWalletContracts(address: string): Promise<ContractRecord[]> {
-  const supabase = getSupabaseAdmin();
+
+/// PostgREST .in() filters fail at fetch level once the URL grows past a few
+/// hundred values ("fetch failed" with data=null) — a whale wallet holds 500+
+/// contracts, so every registry read goes through bounded chunks. Errors are
+/// NEVER swallowed here: an empty-looking registry silently disables scoring
+/// filters and counts spam NFTs.
+const REGISTRY_QUERY_CHUNK = 100;
+
+async function selectRegistryRows<T extends Record<string, unknown>>(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  columns: string,
+  addresses: string[]
+): Promise<T[]> {
+  const rows: T[] = [];
+  for (let index = 0; index < addresses.length; index += REGISTRY_QUERY_CHUNK) {
+    const batch = addresses.slice(index, index + REGISTRY_QUERY_CHUNK);
+    const { data, error } = await supabase
+      .from("nft_contracts")
+      .select(columns)
+      .in("contract_address", batch);
+    if (error) throw error;
+    if (data) rows.push(...(data as unknown as T[]));
+  }
+  return rows;
+}
+
+/// Registry verdicts for arbitrary contract addresses (read-only, chunked).
+/// getContractsForOwner misses contracts that getNFTsForOwner returns, so the
+/// scoring filter must also resolve verdicts for contracts seen in holdings.
+export async function getContractRecords(addresses: string[]): Promise<ContractRecord[]> {
+  if (addresses.length === 0) return [];
+  return selectRegistryRows<ContractRecord>(getSupabaseAdmin(), "*", addresses);
+}
+
+export async function registerWalletContracts(address: string): Promise<ContractRecord[]> {  const supabase = getSupabaseAdmin();
   const contracts = await fetchContractsForOwner(address);
+  const addresses = contracts.map((c) => c.address?.toLowerCase()).filter(Boolean) as string[];
+
+  // Read prior statuses BEFORE upserting so evaluated contracts keep their
+  // verdict. Resetting ok/failed rows to "pending" on every scan forced the
+  // BaseScan check to rerun forever and left a permanent pending backlog.
+  const priorStatus = new Map<string, string>();
+  if (addresses.length > 0) {
+    const known = await selectRegistryRows<{ contract_address: string; status: string }>(
+      supabase,
+      "contract_address,status",
+      addresses
+    );
+    for (const row of known) priorStatus.set(row.contract_address, row.status);
+  }
 
   // Upsert basic identity + spam signal; keep existing evaluation if present.
   for (const c of contracts) {
     const addr = c.address?.toLowerCase();
     if (!addr) continue;
-    await supabase.from("nft_contracts").upsert(
+    const existingStatus = priorStatus.get(addr);
+    const status: ContractStatus =
+      existingStatus === "ok" || existingStatus === "failed" ? existingStatus : "pending";
+    const { error } = await supabase.from("nft_contracts").upsert(
       {
         contract_address: addr,
         name: c.name || c.openSeaMetadata?.collectionName || null,
@@ -149,23 +218,23 @@ export async function registerWalletContracts(address: string): Promise<Contract
         is_spam: c.isSpam ?? null,
         spam_classifications: c.spamClassifications || null,
         // only mark pending if never evaluated; don't clobber an ok/failed row
-        status: "pending",
+        status,
         updated_at: new Date().toISOString()
       },
       { onConflict: "contract_address", ignoreDuplicates: false }
     );
+    if (error) throw error;
   }
 
   // Evaluate any that are still pending (verified check is the expensive part).
   await evaluatePendingContracts(20);
 
-  const addresses = contracts.map((c) => c.address?.toLowerCase()).filter(Boolean) as string[];
   if (addresses.length === 0) return [];
-  const { data } = await supabase
-    .from("nft_contracts")
-    .select("*")
-    .in("contract_address", addresses);
-  return (data || []) as ContractRecord[];
+  return (await selectRegistryRows<ContractRecord>(
+    supabase,
+    "*",
+    addresses
+  )) as ContractRecord[];
 }
 
 /**
