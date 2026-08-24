@@ -77,8 +77,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           </h1>
         </div>
 
-        <div className="overflow-hidden rounded-[1.75rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
-          <div className="h-[3px] w-full bg-gradient-to-r from-black/25 via-black/10 to-transparent" />
+        <div className="rounded-[1.75rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
           <div className="p-6">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Live standings</p>
