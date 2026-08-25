@@ -33,7 +33,7 @@ git commit -m "showcase: add OG BLOCK (agent wallet culture score on Base)"
 git push -u origin showcase/og-block
 gh pr create --repo Virtual-Protocol/acp-cli-demos \
   --title "Showcase: OG BLOCK" \
-  --body "Agent-wallet culture score on Base. Live at joinog.xyz, 529 NFTs tracked on testnet. Uses the wallet primitive + on-chain AgentIdentity."
+  --body "Agent-wallet culture score on Base. Live at joinog.xyz, 2,000+ NFTs tracked on Base mainnet across 16 verified profiles. Uses the wallet primitive + on-chain AgentIdentity."
 ```
 
 ## Notes / optional upgrades before submitting

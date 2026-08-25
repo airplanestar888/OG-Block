@@ -30,7 +30,8 @@ the ACP flow next.
 - Public profile API (JSON): https://www.joinog.xyz/api/profile/airplanestar_
 - Source: https://github.com/airplanestar888/OG-Block
 
-Testnet status: 11 profiles onboarded, 529 NFTs tracked, top score 22.7K.
+Status: live on Base mainnet — 16 profiles onboarded, 2,000+ NFTs tracked,
+top score 61.5K and a combined ecosystem score of 99.2K.
 
 ## Scoring model
 

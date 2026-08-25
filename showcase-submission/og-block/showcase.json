@@ -2,7 +2,7 @@
   "slug": "og-block",
   "title": "OG BLOCK",
   "tagline": "Scores verified on-chain NFT holdings into a public Base culture rank, and tracks agent wallets as first-class holders alongside their operators",
-  "description": "OG BLOCK turns real NFT holdings on Base into a public culture score and leaderboard, instead of ranking people by followers or engagement. A profile has both a human wallet and an agent wallet slot: each is verified independently by signing from its own key, and NFTs from either wallet accumulate into one combined score. Agent wallets are recognized on-chain through an AgentIdentity NFT, so an autonomous agent gets its own cultural reputation that is pulled, verified, and ranked publicly. Live on testnet with 11 profiles onboarded and 529 NFTs tracked.",
+  "description": "OG BLOCK turns real NFT holdings on Base into a public culture score and leaderboard, instead of ranking people by followers or engagement. A profile has both a human wallet and an agent wallet slot: each is verified independently by signing from its own key, and NFTs from either wallet accumulate into one combined score. Agent wallets are recognized on-chain through an AgentIdentity NFT, so an autonomous agent gets its own cultural reputation that is pulled, verified, and ranked publicly. Live on Base mainnet with 16 verified profiles onboarded and 2,000+ NFTs tracked.",
   "status": "live",
   "topic": "agents",
   "topics": ["agents", "base", "wallet", "nft", "reputation", "leaderboard"],
@@ -21,7 +21,7 @@
     "kind": "live app",
     "eyebrow": "base + agent wallet",
     "title": "on-chain culture score",
-    "posterUrl": "https://www.joinog.xyz/opengraph-image"
+    "posterUrl": "https://joinog.xyz/opengraph-image"
   },
   "skills": [],
   "artifacts": [
