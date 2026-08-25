@@ -5,7 +5,6 @@ const STACK = [
   { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
   { name: "Etherscan", src: "/logos/etherscan.svg", h: 24 },
   { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 },
-  { name: "MetaMask", src: "/logos/metamask.svg", h: 24 },
   { name: "WalletConnect", src: "/logos/walletconnect.svg", h: 22 },
   { name: "Virtual Protocol", src: "/logos/virtual-protocol.svg", h: 24 }
 ];
