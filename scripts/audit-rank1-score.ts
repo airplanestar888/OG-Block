@@ -1,7 +1,7 @@
 /**
- * Score Audit — Rank #1 wallet (read-only)
+ * Score Audit — leaderboard wallet by rank (read-only)
  *
- * Recomputes the rank-1 user's score independently and compares it with what
+ * Recomputes a top-N user's score independently and compares it with what
  * the scoring engine persisted, in two layers:
  *
  *   Layer 1 — DB internal consistency: stored nft_holdings + nft_contracts
@@ -13,7 +13,7 @@
  * Never writes to the DB. Registry gaps (contracts missing/pending) are
  * reported as findings because they change what the next scan will produce.
  *
- * Usage: npm run tsx scripts/audit-rank1-score.ts   (or npx tsx ...)
+ * Usage: npx tsx scripts/audit-rank1-score.ts [rank]   (default: 1)
  */
 
 import "dotenv/config";
@@ -153,8 +153,9 @@ async function fetchRegistryRows(
 }
 
 async function main() {
+  const rank = Math.max(1, Number(process.argv[2] || 1) || 1);
   console.log("==========================================================");
-  console.log("  Score Audit — Rank #1 wallet (read-only)");
+  console.log(`  Score Audit — Rank #${rank} wallet (read-only)`);
   console.log("==========================================================");
   console.log(
     `Rules: first NFT +${scoreRules.points.holdsProjectNft}, each additional +${scoreRules.points.eachAdditionalNft}, ` +
@@ -164,18 +165,18 @@ async function main() {
 
   const supabase = getSupabaseAdmin();
 
-  // ---- Identify rank 1 exactly the way the leaderboard orders rows ----
+  // ---- Identify the target exactly the way the leaderboard orders rows ----
   const { data: topRows, error: topError } = await supabase
     .from("scores")
     .select("id,user_id,score,nft_count,rank,is_og,last_calculated_at")
     .order("score", { ascending: false })
     .order("rank", { ascending: true })
-    .limit(5);
+    .limit(rank);
   if (topError) throw topError;
 
   const top = (topRows || []) as ScoreRow[];
-  if (top.length === 0) throw new Error("No scores in DB — nothing to audit.");
-  const rank1 = top[0];
+  if (top.length < rank) throw new Error(`Leaderboard has only ${top.length} row(s) — no rank #${rank}.`);
+  const rank1 = top[rank - 1];
 
   const { data: userRow } = await supabase
     .from("users")
@@ -184,15 +185,16 @@ async function main() {
     .maybeSingle();
   const handle = userRow?.x_handle || rank1.user_id;
 
-  console.log(`\nRank #1: @${handle} (user_id=${rank1.user_id})`);
+  console.log(`\nRank #${rank}: @${handle} (user_id=${rank1.user_id})`);
   console.log(
     `Stored: score=${rank1.score}, nft_count=${rank1.nft_count}, rank=${rank1.rank ?? "null"}, ` +
       `last_calculated_at=${rank1.last_calculated_at}`
   );
-  check(rank1.rank === 1, "rank column is 1 for the top row");
-
-  // Rank ordering integrity: nobody above, no ties ranked lower but ordered first
-  check(top.every((row) => (row.rank ?? Infinity) >= (rank1.rank ?? 0)), "no other row outranks rank 1 in stored ranks");
+  check(rank1.rank === rank, `rank column is ${rank} for this row`);
+  check(
+    top.slice(0, -1).every((row) => (row.rank ?? Infinity) < (rank1.rank ?? 0)),
+    "rows above it hold strictly better stored ranks"
+  );
 
   // ---- Wallets of this user (human + agent), same slots the engine scores ----
   const { data: wallets, error: walletsError } = await supabase
@@ -365,7 +367,7 @@ async function main() {
   console.log("\n==========================================================");
   console.log(`Audit summary: ${passed} passed, ${failed} failed.`);
   if (failed === 0) {
-    console.log(`Rank #1 (@${handle}) score ${rank1.score} is consistent with the scoring engine.`);
+    console.log(`Rank #${rank} (@${handle}) score ${rank1.score} is consistent with the scoring engine.`);
   } else {
     console.log("Discrepancies found — see [FAIL] lines above.");
   }
