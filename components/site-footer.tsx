@@ -83,10 +83,7 @@ function FooterWave() {
 
     let prev = performance.now();
     let t = 0;
-    function tick() {
-      const now = performance.now();
-      const dt = Math.min((now - prev) / 1000, 0.05);
-      prev = now;
+    function step(dt: number) {
       t += dt;
 
       // Particles live in the right 75% of the bar, recycling at the zone's
@@ -113,12 +110,62 @@ function FooterWave() {
         ctx.fillRect(p.x, p.y, p.size, p.size);
       }
       ctx.restore();
+    }
+
+    function tick() {
+      const now = performance.now();
+      const dt = Math.min((now - prev) / 1000, 0.05);
+      prev = now;
+      step(dt);
       rafRef.current = requestAnimationFrame(tick);
     }
-    rafRef.current = requestAnimationFrame(tick);
+
+    // The footer sits below the fold on every page, so the loop only runs
+    // while it's actually near the viewport; reduced-motion users get a
+    // single static frame instead of an endless animation.
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let inView = false;
+    let animating = false;
+
+    function syncAnimation() {
+      const shouldRun = inView && !reducedMotion.matches;
+      if (shouldRun && !animating) {
+        prev = performance.now();
+        animating = true;
+        rafRef.current = requestAnimationFrame(tick);
+      } else if (!shouldRun && animating) {
+        cancelAnimationFrame(rafRef.current);
+        animating = false;
+      }
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        inView = entries.some((entry) => entry.isIntersecting);
+        syncAnimation();
+      },
+      { rootMargin: "120px" }
+    );
+    observer.observe(el);
+
+    const onMotionPreferenceChange = () => {
+      if (reducedMotion.matches) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        step(0);
+      }
+      syncAnimation();
+    };
+
+    // Static texture for reduced motion (before the first intersection fires)
+    if (reducedMotion.matches) step(0);
+
+    reducedMotion.addEventListener("change", onMotionPreferenceChange);
+    syncAnimation();
 
     return () => {
       window.removeEventListener("resize", build);
+      reducedMotion.removeEventListener("change", onMotionPreferenceChange);
+      observer.disconnect();
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
