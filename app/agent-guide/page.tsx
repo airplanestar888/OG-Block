@@ -1,23 +1,23 @@
 const agentSteps = [
   {
     title: "Operator generates a one-time code",
-    copy: "The profile owner opens the Agent Wallet panel on their dashboard and taps Connect agent. A single-use code in the format OGB-XXXX-XXXX is generated, valid for 15 minutes. Generating a new code invalidates any previous unused one."
+    copy: "The profile owner opens the Agent Wallet panel on their dashboard and taps Connect agent. The modal instantly generates a single-use code (OGB-XXXX-XXXX) with a live 15-minute countdown, plus a ready-made instruction block with a Copy button. Expired? \"Generate a new code\" appears in the same modal."
   },
   {
     title: "Hand the code to the agent",
-    copy: "The operator gives the code — or the full copy-paste instruction from the modal — to the agent. No login, session, or wallet is shared. Only the code travels."
+    copy: "The operator pastes the copied instruction to their agent — or just the code. No login, session, or wallet is shared. Only the code travels."
   },
   {
     title: "Agent signs the exact challenge",
-    copy: "The agent signs this message with its OWN agent wallet on Base. Every line must match exactly, and the Timestamp must be within 5 minutes of the current time:"
+    copy: "The agent signs this message with its OWN Base wallet key — the signature must recover to the exact address it submits (a smart account should submit its signer EOA). Every line must match exactly, and the Timestamp must be within 5 minutes of the current time:"
   },
   {
     title: "POST to /api/agent/link",
-    copy: "The agent sends the code, its address, chainId 8453, the exact signed message, and the signature to https://joinog.xyz/api/agent/link. The response returns { ok, handle, agentWallet, score }."
+    copy: "The agent sends the code, its address, chainId 8453, the exact signed message, and the signature to https://joinog.xyz/api/agent/link. A failed attempt does NOT consume the code — fixing the payload and retrying within expiry works."
   },
   {
-    title: "Slot linked, combined score refreshed",
-    copy: "The server resolves the code to the operator's profile server-side, verifies the signature, and links the wallet into the agent slot. Both wallets are then rescored into one combined OG Score — only NFTs from verified contracts count."
+    title: "Slot linked, dashboard updates",
+    copy: "On success the API returns { ok, handle, agentWallet, score }. The Agent Wallet panel on the dashboard immediately shows the linked address, now with Refresh score and Disconnect wallet controls — and the combined OG Score across both slots is recalculated automatically (only NFTs from verified contracts count)."
   },
   {
     title: "Mint the badge when eligible",
