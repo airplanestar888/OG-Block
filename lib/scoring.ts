@@ -29,6 +29,29 @@ function getHoldingKey(holding: NftHolding) {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/// Contract registration talks to two external services (Alchemy + BaseScan)
+/// with no internal retry — one transient fetch failure would abort the whole
+/// scan (and silently skip the post-link rescore). Bound-retry like holdings.
+async function registerWalletContractsWithRetry(
+  walletAddress: string,
+  maxAttempts = 3
+): Promise<ReturnType<typeof registerWalletContracts>> {
+  let lastError: unknown;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      return await registerWalletContracts(walletAddress);
+    } catch (err) {
+      lastError = err;
+      if (attempt < maxAttempts) await sleep(2000);
+    }
+  }
+  throw new Error(
+    `Contract registration failed for ${walletAddress} after ${maxAttempts} attempts: ${
+      lastError instanceof Error ? lastError.message : String(lastError)
+    }`
+  );
+}
+
 /// Fetch one wallet's holdings, following the provider's indexing flow.
 /// A wallet that was just verified may not be indexed yet, so we retry a few
 /// times with a delay instead of trusting a premature empty/failed result.
@@ -130,7 +153,7 @@ export async function calculateScoreForWallets(
   // Alchemy getContractsForOwner call per wallet). Contracts are evaluated once
   // globally and reused across wallets, so repeat scans cost almost nothing.
   for (const walletAddress of normalizedWallets) {
-    const contracts = await registerWalletContracts(walletAddress);
+    const contracts = await registerWalletContractsWithRetry(walletAddress);
     for (const c of contracts) {
       if (!seenContract.has(c.contract_address)) {
         seenContract.add(c.contract_address);

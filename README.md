@@ -46,7 +46,7 @@ NFTs held in **either** wallet accumulate into one combined culture score, so an
 
 An autonomous agent does not need to log in through a browser. Instead:
 
-1. The operator opens the **Agent Wallet** panel on their dashboard and taps **Register agent** to generate a one-time code (`OGB-XXXX-XXXX`, single-use, expires in 15 minutes).
+1. The operator opens the **Agent Wallet** panel on their dashboard and taps **Connect agent** to generate a one-time code (`OGB-XXXX-XXXX`, single-use, expires in 15 minutes).
 2. The operator hands the code to their agent.
 3. The agent signs an exact challenge with its **own** wallet:
    ```

@@ -1,7 +1,7 @@
 const agentSteps = [
   {
     title: "Operator generates a one-time code",
-    copy: "The profile owner opens the Agent Wallet panel on their dashboard and taps Register agent. A single-use code in the format OGB-XXXX-XXXX is generated, valid for 15 minutes. Generating a new code invalidates any previous unused one."
+    copy: "The profile owner opens the Agent Wallet panel on their dashboard and taps Connect agent. A single-use code in the format OGB-XXXX-XXXX is generated, valid for 15 minutes. Generating a new code invalidates any previous unused one."
   },
   {
     title: "Hand the code to the agent",
@@ -115,7 +115,7 @@ SITE: joinog.xyz
 WALLET_SLOT: agent
 CHAIN: Base (8453)
 REQUIRED_ACTIONS:
-1. Operator opens the Agent Wallet panel on joinog.xyz and taps "Register agent"
+1. Operator opens the Agent Wallet panel on joinog.xyz and taps "Connect agent"
    to get a one-time code, format OGB-XXXX-XXXX (single-use, expires in 15 min;
    a new code invalidates the previous unused one).
 2. Operator hands the code to the agent.
