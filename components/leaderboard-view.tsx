@@ -47,7 +47,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
   const featuredProfiles = leaderboard.slice(0, 3);
   const totalNfts = leaderboard.reduce((total, profile) => total + profile.nftCount, 0);
-  const topScore = leaderboard[0]?.score ?? 0;
+  const totalScore = leaderboard.reduce((total, profile) => total + profile.score, 0);
   const latestGeneratedAt = useMemo(() => {
     let latest: string | null = null;
     for (const profile of leaderboard) {
@@ -97,7 +97,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             </p>
             <div className="mt-5 grid grid-cols-3 gap-2.5">
               <HeroStat label="Profiles" value={leaderboard.length} />
-              <HeroStat label="Top score" value={formatCompactNumber(topScore)} />
+              <HeroStat label="Total score" value={formatCompactNumber(totalScore)} />
               <HeroStat label="NFTs" value={formatCompactNumber(totalNfts)} />
             </div>
           </div>
