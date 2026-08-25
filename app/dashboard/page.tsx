@@ -10,6 +10,8 @@ import { getOgCardConfig } from "@/lib/app-config";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
 import { getUserScoreHistory } from "@/lib/public-profiles";
+import { fetchAllUserHoldings } from "@/lib/holdings";
+import { getContractRecords } from "@/lib/nft/contracts";
 import type { NftHolding } from "@/lib/types";
 
 export default async function DashboardPage() {
@@ -40,12 +42,7 @@ export default async function DashboardPage() {
         .eq("user_id", user.id)
         .maybeSingle()
         .then((r) => r.data ?? null),
-      supabase
-        .from("nft_holdings")
-        .select("contract_address,token_id,metadata_json")
-        .eq("user_id", user.id)
-        .order("updated_at", { ascending: false })
-        .then((r) => r.data ?? []),
+      fetchAllUserHoldings(user.id),
       supabase
         .from("og_card_claims")
         .select("wallet_address,token_id,tier,chain_id,claimed_at")
@@ -71,12 +68,9 @@ export default async function DashboardPage() {
   let contractMap: Map<string, { is_spam: boolean | null; is_verified: boolean | null }> | null = null;
   if (holdings && holdings.length > 0) {
     const addrs = [...new Set(holdings.map((h) => (h.contract_address as string).toLowerCase()))];
-    const { data: contracts } = await supabase
-      .from("nft_contracts")
-      .select("contract_address,is_spam,is_verified")
-      .in("contract_address", addrs);
+    const contracts = await getContractRecords(addrs);
     contractMap = new Map(
-      (contracts || []).map((c) => [(c.contract_address as string).toLowerCase(), c as { is_spam: boolean | null; is_verified: boolean | null }])
+      contracts.map((c) => [c.contract_address.toLowerCase(), { is_spam: c.is_spam, is_verified: c.is_verified }])
     );
   }
   // Legacy: strictly verified contracts only (spam and pending stay on the

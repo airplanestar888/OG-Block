@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { fetchAllUserHoldings } from "@/lib/holdings";
 
 export async function GET() {
   const user = await getOrCreateCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const supabase = getSupabaseAdmin();
-  const [{ data: wallets }, { data: score }, { data: holdings }] = await Promise.all([
+  const [{ data: wallets }, { data: score }, holdings] = await Promise.all([
     supabase
       .from("wallets")
       .select("address,chain_id,wallet_slot,verified_at")
@@ -18,11 +19,7 @@ export async function GET() {
       .select("score,rank,is_og,nft_count,last_calculated_at")
       .eq("user_id", user.id)
       .maybeSingle(),
-    supabase
-      .from("nft_holdings")
-      .select("contract_address,token_id,metadata_json,updated_at")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false })
+    fetchAllUserHoldings(user.id, "contract_address,token_id,metadata_json,updated_at")
   ]);
 
   return NextResponse.json({

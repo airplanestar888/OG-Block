@@ -1,5 +1,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { getNftProvider } from "@/lib/nft/providers";
+import { getContractRecords } from "@/lib/nft/contracts";
+import { fetchAllUserHoldings } from "@/lib/holdings";
 import type { PublicLeaderboardProfile, PublicScoreProfile } from "@/lib/types";
 import { shortAddress } from "@/lib/address";
 import { scoreRules } from "@/lib/config/score-rules";
@@ -84,7 +86,7 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
   if (userError) throw userError;
   if (!user) return null;
 
-  const [{ data: wallets, error: walletError }, { data: score, error: scoreError }, { data: holdings, error: holdingsError }, { data: ogClaim, error: ogClaimError }] = await Promise.all([
+  const [{ data: wallets, error: walletError }, { data: score, error: scoreError }, holdings, { data: ogClaim, error: ogClaimError }] = await Promise.all([
     supabase
       .from("wallets")
       .select("address,wallet_slot")
@@ -95,10 +97,7 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
       .select("score,rank,is_og,nft_count,last_calculated_at")
       .eq("user_id", user.id)
       .maybeSingle(),
-    supabase
-      .from("nft_holdings")
-      .select("contract_address,token_id,metadata_json")
-      .eq("user_id", user.id),
+    fetchAllUserHoldings(user.id),
     supabase
       .from("og_card_claims")
       .select("tier")
@@ -109,7 +108,6 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
 
   if (walletError) throw walletError;
   if (scoreError) throw scoreError;
-  if (holdingsError) throw holdingsError;
   if (ogClaimError) throw ogClaimError;
 
   // Verified breakdown from the same on-chain holdings the score is built from.
@@ -138,13 +136,13 @@ export async function getPublicProfileByHandle(handle: string): Promise<PublicSc
     const addrs = [...new Set(typedHoldings.map((h) => String((h as { contract_address?: unknown }).contract_address || "").toLowerCase()).filter(Boolean))];
     totalContractsHeld = addrs.length;
     if (addrs.length > 0) {
-      const { data: contracts } = await supabase.from("nft_contracts").select("contract_address,is_spam,is_verified").in("contract_address", addrs);
-      const byAddr = new Map((contracts || []).map((c) => [String((c as { contract_address: string }).contract_address).toLowerCase(), c as unknown as { is_spam: boolean | null; is_verified: boolean | null }]));
+      const contracts = await getContractRecords(addrs);
+      const byAddr = new Map(contracts.map((c) => [c.contract_address.toLowerCase(), c]));
       // Count per-NFT so numbers match the holdings/score domain (223 NFTs, not 132 contracts).
       let verifiedNfts = 0, spamNfts = 0;
       for (const h of typedHoldings) {
         const addr = String((h as { contract_address?: unknown }).contract_address || "").toLowerCase();
-        const c = byAddr.get(addr) as { is_spam: boolean | null; is_verified: boolean | null } | undefined;
+        const c = byAddr.get(addr);
         if (c?.is_verified === true) verifiedNfts += 1;
         else if (c?.is_spam === true) spamNfts += 1;
       }

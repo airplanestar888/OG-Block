@@ -4,7 +4,8 @@ import { isAdminUser } from "@/lib/admin";
 import { rateLimit } from "@/lib/rate-limit";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { recalculateRanks, calculateScoreForWallets, persistScore } from "@/lib/scoring";
-import { reevaluateFailedContracts, isCounted } from "@/lib/nft/contracts";
+import { reevaluateFailedContracts, isCounted, getContractRecords } from "@/lib/nft/contracts";
+import { fetchAllUserHoldings } from "@/lib/holdings";
 import { scoreRules } from "@/lib/config/score-rules";
 
 export const maxDuration = 300;
@@ -124,20 +125,14 @@ async function fullRescan(supabase: ReturnType<typeof getSupabaseAdmin>) {
 async function rescoreUserFromRegistry(userId: string) {
   const supabase = getSupabaseAdmin();
 
-  const { data: holdings } = await supabase
-    .from("nft_holdings")
-    .select("contract_address,token_id,metadata_json")
-    .eq("user_id", userId);
+  const holdings = await fetchAllUserHoldings(userId);
 
   if (!holdings || holdings.length === 0) return;
 
   const addresses = [...new Set(holdings.map((h) => (h.contract_address as string).toLowerCase()))];
-  const { data: contracts } = await supabase
-    .from("nft_contracts")
-    .select("contract_address,is_spam,is_verified")
-    .in("contract_address", addresses);
+  const contracts = await getContractRecords(addresses);
 
-  const byAddress = new Map((contracts || []).map((c) => [c.contract_address as string, c]));
+  const byAddress = new Map(contracts.map((c) => [c.contract_address.toLowerCase(), c]));
 
   // Keep only NFTs whose contract counts (verified overrides spam).
   const valid = holdings.filter((h) => {
