@@ -58,7 +58,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
               key={href}
               href={href}
               aria-current={pathname === href ? "page" : undefined}
-              className={`focus-ring rounded-lg px-3 py-2 text-[0.82rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] ${
+              className={`focus-ring rounded-lg px-3 py-2 text-[0.875rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] ${
                 pathname === href
                   ? "bg-[rgba(0,0,255,0.08)] text-[#0000FF]"
                   : "text-[#0A0B0D]"
@@ -120,8 +120,8 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
 
 function NavAuthAction({ isLoggedIn, compact = false }: { isLoggedIn: boolean; compact?: boolean }) {
   const sizeClass = compact
-    ? "h-9 px-4 text-[0.8rem]"
-    : "h-11 w-full justify-center text-[0.9rem]";
+    ? "h-9 px-4 text-[0.875rem]"
+    : "h-11 w-full justify-center text-[0.95rem]";
 
   if (isLoggedIn) {
     return (
