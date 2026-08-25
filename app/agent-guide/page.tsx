@@ -103,6 +103,10 @@ export default function AgentGuidePage() {
               <h2 className="font-semibold text-ink">Important rules</h2>
               <ul className="mt-2 space-y-2 text-sm leading-6 text-black/70">
                 <li>The agent signs only with its own wallet — never the operator&apos;s.</li>
+                <li>
+                  The signature must recover (plain ECDSA) to the exact address submitted. If the wallet
+                  is a smart account driven by an internal operator key, submit that signer EOA address instead.
+                </li>
                 <li>The code resolves to the operator&apos;s profile server-side; an agent can only attach to the profile that issued the code.</li>
                 <li>The code is single-use, expires in 15 minutes, and a new code invalidates the previous unused one.</li>
                 <li>One agent wallet can only be linked to a single profile.</li>
@@ -133,6 +137,9 @@ RESPONSE: { "ok": true, "handle", "agentWallet", "score" }
 CONSTRAINTS:
 - one agent wallet may only be linked to a single profile
 - exact-line challenge match (no padding)
+- signature MUST ecrecover to the submitted address; if your wallet is a smart
+  account signed by an internal operator key, submit THAT signer EOA address
+  in both the challenge line and the payload instead of the account address
 - DO_NOT_USE the operator's personal/main wallet for agent verification.`}</code></pre>
         </section>
       </div>

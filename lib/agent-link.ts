@@ -19,29 +19,47 @@ export function generateAgentCode(): string {
 
 /// Build the copy-paste instruction an operator hands to their agent. It is
 /// self-contained: the code, the exact challenge message to sign, and the POST
-/// shape — so any agent/CLI can execute it without a browser.
+/// shape — so any agent/CLI can execute it without a browser. Written for a
+/// COLD-START agent: every assumption the server enforces is spelled out,
+/// because the #1 failure mode is signing with a key that recovers to a
+/// different address than the one submitted.
 export function buildAgentInstruction(code: string, handle: string): string {
   return [
-    `Register yourself as the agent wallet for the OG BLOCK profile @${handle}.`,
+    `TASK: register YOUR wallet as the agent wallet of the OG BLOCK profile @${handle}.`,
+    `Follow only this instruction. Do not substitute addresses or keys.`,
     ``,
-    `1. Sign this exact message with your own agent wallet (Base):`,
-    `   ---`,
-    `   OG BLOCK agent link`,
-    `   Code: ${code}`,
-    `   Agent wallet: <YOUR_AGENT_WALLET_ADDRESS>`,
-    `   Timestamp: <CURRENT_ISO_8601>`,
-    `   ---`,
-    `2. POST the result to https://joinog.xyz/api/agent/link`,
-    `   Content-Type: application/json`,
-    `   {`,
-    `     "code": "${code}",`,
-    `     "address": "<YOUR_AGENT_WALLET_ADDRESS>",`,
-    `     "chainId": 8453,`,
-    `     "message": "<THE_EXACT_MESSAGE_YOU_SIGNED>",`,
-    `     "signature": "<0x_SIGNATURE>"`,
-    `   }`,
+    `STEP 1 — Pick your wallet.`,
+    `Use a Base EOA whose private key you control directly (the key behind`,
+    `personal_sign). The signature MUST cryptographically recover to exactly the`,
+    `address you submit. If your setup is a smart account signed by an internal`,
+    `operator key, submit THAT signer EOA address instead — smart-account`,
+    `signatures that recover elsewhere are rejected.`,
     ``,
-    `Rules: sign with your OWN wallet key only. Code expires in 15 minutes and works once.`
+    `STEP 2 — Sign this exact text with that key (EIP-191 personal_sign, UTF-8).`,
+    `Replace <YOUR_ADDRESS> with your address and use the CURRENT UTC time:`,
+    `---`,
+    `OG BLOCK agent link`,
+    `Code: ${code}`,
+    `Agent wallet: <YOUR_ADDRESS>`,
+    `Timestamp: <ISO_8601_UTC_NOW>`,
+    `---`,
+    ``,
+    `STEP 3 — POST JSON to https://joinog.xyz/api/agent/link`,
+    `{`,
+    `  "code": "${code}",`,
+    `  "address": "<YOUR_ADDRESS>",   // identical string to the "Agent wallet:" line`,
+    `  "chainId": 8453,               // integer, Base mainnet`,
+    `  "message": "<EXACT_SIGNED_TEXT>",`,
+    `  "signature": "<0x_SIGNATURE>"`,
+    `}`,
+    ``,
+    `SUCCESS looks like: {"ok":true,"handle":"${handle}","agentWallet":"<YOUR_ADDRESS>","score":<number>}`,
+    ``,
+    `CONSTRAINTS`,
+    `- The address in the message line and in the payload must be IDENTICAL strings.`,
+    `- The signature must recover to that same address (plain ECDSA ecrecover).`,
+    `- Timestamp: ISO 8601, within ±5 minutes of server time.`,
+    `- Code works once, expires 15 minutes after issue; FAILED attempts do not consume it — fix and retry within expiry.`
   ].join("\n");
 }
 
