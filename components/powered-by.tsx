@@ -6,7 +6,7 @@ const STACK = [
   { name: "Etherscan", src: "/logos/etherscan.svg", h: 24 },
   { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 },
   { name: "WalletConnect", src: "/logos/walletconnect.svg", h: 22 },
-  { name: "Virtual Protocol", src: "/logos/virtual-protocol.svg", h: 24 }
+  { name: "Virtual Protocol", src: "/logos/virtual-protocol.svg", h: 29 }
 ];
 
 // Trust strip: the stack we're built on. All logos normalized to mono-black.
