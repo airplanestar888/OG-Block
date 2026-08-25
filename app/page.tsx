@@ -47,16 +47,10 @@ export default async function HomePage() {
 
             {/* CTAs — pushed to the hero bottom on desktop, level with the Live capsule */}
             <div className="reveal reveal-d2 flex flex-wrap gap-2.5 sm:gap-3 lg:mt-auto">
-              <Link
-                href={session ? "/og-card" : "/login"}
-                className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
-              >
+              <Link href={session ? "/og-card" : "/login"} className="btn-primary">
                 {session ? "Get your badge" : "Sign in"}
               </Link>
-              <Link
-                href="/leaderboard"
-                className="focus-ring inline-flex h-10 items-center justify-center rounded-[12px] border border-[rgba(10,11,13,0.12)] bg-white px-5 text-[0.85rem] font-semibold text-[#0A0B0D]/65 transition duration-200 hover:border-[rgba(10,11,13,0.26)] hover:text-[#0A0B0D] sm:h-11 sm:text-[0.875rem]"
-              >
+              <Link href="/leaderboard" className="btn-secondary">
                 View leaderboard
               </Link>
             </div>

@@ -61,8 +61,9 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <main className="bg-white px-5 py-12">
-      <section className="mx-auto max-w-3xl">
+    <main className="relative overflow-hidden bg-[#f7f8fb] px-5 py-12">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
+      <section className="relative mx-auto max-w-3xl">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#0000FF]">Privacy</p>
         <h1 className="mt-5 text-4xl font-semibold leading-tight text-[#0A0B0D] sm:text-5xl">
           Privacy Policy
@@ -89,16 +90,10 @@ export default function PrivacyPage() {
         </div>
 
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            className="focus-ring inline-flex h-11 items-center justify-center rounded-[10px] bg-[#0000FF] px-5 text-sm font-semibold text-white transition hover:bg-[#141CB5]"
-            href="/"
-          >
+          <Link className="btn-primary" href="/">
             Back home
           </Link>
-          <Link
-            className="focus-ring inline-flex h-11 items-center justify-center rounded-[10px] border border-black/15 bg-white px-5 text-sm font-semibold text-[#0A0B0D]/70 transition hover:border-black/25 hover:bg-black/[0.04] hover:text-[#0A0B0D]"
-            href="/leaderboard"
-          >
+          <Link className="btn-secondary" href="/leaderboard">
             View leaderboard
           </Link>
         </div>

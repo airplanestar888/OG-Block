@@ -218,8 +218,11 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             </thead>
             <tbody className="divide-y divide-black/10">
               {filteredProfiles.map((profile, index) => {
-                const hasGain = (profile.recentPointsDelta ?? 0) > 0;
-                const hasDrop = (profile.recentPointsDelta ?? 0) < 0;
+                // A zero score with a negative delta reads oddly ("why minus
+                // at 0?") — only show movement for profiles that still hold
+                // points.
+                const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
+                const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
 
                 return (
                   <tr
