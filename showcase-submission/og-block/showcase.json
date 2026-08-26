@@ -69,6 +69,16 @@
       "kind": "proof"
     },
     {
+      "label": "Redacted result report",
+      "href": "https://github.com/Virtual-Protocol/acp-cli-demos/blob/main/showcase/og-block/result-redacted.md",
+      "kind": "proof"
+    },
+    {
+      "label": "Demo prompt",
+      "href": "https://github.com/Virtual-Protocol/acp-cli-demos/blob/main/showcase/og-block/prompt.md",
+      "kind": "prompt"
+    },
+    {
       "label": "Source repository",
       "href": "https://github.com/airplanestar888/OG-Block",
       "kind": "docs"
