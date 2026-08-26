@@ -187,7 +187,7 @@ export default async function PublicProfilePage(
         {/* Actions — side by side, equal halves */}
         <div className="mx-auto flex w-full max-w-[520px] items-stretch gap-2.5">
           <ShareProfileButton handle={cleanHandle} score={profile.score} rank={profile.rank} />
-          <Link href="/" className="btn-secondary flex-1">
+          <Link href="/og-card" className="btn-secondary flex-1">
             Get your badge
           </Link>
         </div>
