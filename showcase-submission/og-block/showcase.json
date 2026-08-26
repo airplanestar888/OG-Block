@@ -23,7 +23,15 @@
     "title": "on-chain culture score",
     "posterUrl": "https://joinog.xyz/opengraph-image"
   },
-  "skills": [],
+  "skills": [
+    {
+      "name": "og-block-agent-link",
+      "href": "https://github.com/Virtual-Protocol/acp-cli-demos/tree/main/showcase/og-block/skills/og-block-agent-link",
+      "sourcePath": "showcase/og-block/skills/og-block-agent-link",
+      "summary": "Register any ACP agent's own Base wallet into an OG BLOCK profile's agent slot using a one-time code, then read back the combined culture score and rank. Zero funding required — works with any ACP agent out of the box.",
+      "install": "cp -R showcase/og-block/skills/og-block-agent-link ~/.agents/skills/"
+    }
+  ],
   "artifacts": [
     {
       "label": "Live app — joinog.xyz",
