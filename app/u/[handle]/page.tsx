@@ -184,11 +184,11 @@ export default async function PublicProfilePage(
           </div>
         ) : null}
 
-        {/* Actions */}
-        <div className="space-y-2 md:mx-auto md:flex md:max-w-[520px] md:space-y-0 md:gap-3">
+        {/* Actions — side by side, equal halves */}
+        <div className="mx-auto flex w-full max-w-[520px] items-stretch gap-2.5">
           <ShareProfileButton handle={cleanHandle} score={profile.score} rank={profile.rank} />
-          <Link href="/" className="btn-secondary">
-            Get your own OG BLOCK card
+          <Link href="/" className="btn-secondary flex-1">
+            Get your card
           </Link>
         </div>
       </div>
