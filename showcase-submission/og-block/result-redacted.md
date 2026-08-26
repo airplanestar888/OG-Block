@@ -10,7 +10,10 @@ truncated; no private material is included.
 | Item | Value |
 | --- | --- |
 | Chain | Base mainnet (8453) |
+| Agent | airplane (ACP agent, HYBRID role) |
+| Agent ID | `019f0a02-50d4-7169-b047-a5771369e32a` |
 | Agent wallet (ACP) | `0x3282f5ae930f8be53695de152cf890b9385e8263` |
+| AgentIdentity NFT | #58870 on `0x8004a169fb4a3325136eb29fa0ceb6d2e539a432` |
 | Operator profile | `@airplanestar_` |
 | Endpoint under test | `POST https://joinog.xyz/api/agent/link` |
 

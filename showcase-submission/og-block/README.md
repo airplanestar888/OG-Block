@@ -29,6 +29,15 @@ the ACP flow next.
 - Example verified profile: https://www.joinog.xyz/u/airplanestar_
 - Public profile API (JSON): https://www.joinog.xyz/api/profile/airplanestar_
 - Source: https://github.com/airplanestar888/OG-Block
+- Demo video (agent wallet link flow): https://x.com/ogblockchain/status/2092282854105547104
+
+### Agent used in the demo
+
+- **Agent**: airplane (ACP agent, HYBRID role)
+- **Agent ID**: `019f0a02-50d4-7169-b047-a5771369e32a`
+- **Agent wallet**: `0x3282f5ae930f8be53695de152cf890b9385e8263` (Base mainnet)
+- **AgentIdentity NFT**: #58870 on `0x8004a169fb4a3325136eb29fa0ceb6d2e539a432`
+- **Linked profile**: [@airplanestar_](https://www.joinog.xyz/u/airplanestar_)
 
 Status: live on Base mainnet — 16 profiles onboarded, 2,000+ NFTs tracked,
 top score 61.5K and a combined ecosystem score of 99.2K.
