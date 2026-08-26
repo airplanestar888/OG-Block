@@ -14,13 +14,15 @@
     "repo": "https://github.com/airplanestar888/OG-Block",
     "demo": "https://www.joinog.xyz/leaderboard",
     "share": "https://www.joinog.xyz",
-    "feedback": "https://github.com/airplanestar888/OG-Block/issues/new?title=Feedback%3A%20OG%20BLOCK"
+    "feedback": "https://github.com/airplanestar888/OG-Block/issues/new?title=Feedback%3A%20OG%20BLOCK",
+    "video": "https://x.com/ogblockchain/status/2092282854105547104?s=20"
   },
   "primitives": ["wallet"],
   "visual": {
     "kind": "live app",
     "eyebrow": "base + agent wallet",
     "title": "on-chain culture score",
+    "videoLabel": "Watch the agent wallet demo",
     "posterUrl": "https://joinog.xyz/opengraph-image"
   },
   "skills": [
