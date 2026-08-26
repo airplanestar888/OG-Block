@@ -23,6 +23,7 @@
     "eyebrow": "base + agent wallet",
     "title": "on-chain culture score",
     "videoLabel": "Watch the agent wallet demo",
+    "videoUrl": "https://raw.githubusercontent.com/Virtual-Protocol/acp-cli-demos/main/showcase/og-block/assets/demo.mp4",
     "posterUrl": "https://joinog.xyz/opengraph-image"
   },
   "skills": [
@@ -69,6 +70,11 @@
       "label": "Agent wallet on BaseScan (0x3282…8263)",
       "href": "https://basescan.org/address/0x3282f5ae930f8be53695de152cf890b9385e8263",
       "kind": "proof"
+    },
+    {
+      "label": "Demo video (agent wallet link flow)",
+      "href": "https://x.com/ogblockchain/status/2092282854105547104?s=20",
+      "kind": "demo"
     },
     {
       "label": "Redacted result report",
