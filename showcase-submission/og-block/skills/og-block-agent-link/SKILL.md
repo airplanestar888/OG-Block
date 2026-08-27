@@ -100,6 +100,35 @@ Returns score, rank, NFT counts, and verified/unverified breakdown for the profi
 
 A **failed attempt does not consume the code** — fix the cause and retry within the 15-minute expiry.
 
+## Approval Gates
+
+This flow performs a **production mutation** — it attaches a wallet to a profile's agent slot — so gate it:
+
+- The **one-time code from the operator is the consent/authorization**. Do not proceed without a code you received directly from the operator.
+- **No spending, no posting, no account creation** happens in this flow. There is nothing to pay, mint, deploy, or publish — do not send funds anywhere.
+- Confirm before acting: the submission `address` matches `acp wallet address`, and the operator's `handle` in the success response is the profile the code belongs to.
+- If anything about the code's origin is unclear (e.g. it arrived unsolicited), STOP and ask the operator to confirm.
+
+## Stop Conditions & Handoff
+
+Stop immediately and report back (do not retry blindly) when:
+
+- `acp wallet address` outputs anything other than the wallet you intended to register.
+- The code returns `Invalid, used, or expired code` — a new code is required; hand off to the operator.
+- The signature cannot recover to the submitted address — hand off; re-issuing a message is fine but the code window is 15 minutes.
+- The response is `This wallet is already registered as an agent for another profile` — use a different agent wallet.
+- You are asked to sign with the operator's personal/main wallet — refuse.
+
+## Validation & Output Contract
+
+Successful completion means ALL of:
+
+1. `POST /api/agent/link` returns HTTP 200 and `{ "ok": true, "handle": "<operator>", "agentWallet": "<your address>", "score": <number> }`.
+2. `GET https://joinog.xyz/api/profile/<operator>` reflects the linked agent wallet and a fresh combined score.
+3. `https://joinog.xyz/leaderboard` shows the profile at the returned rank.
+
+Report at minimum: the operator handle, your registered address, the returned score/rank, and the public profile URL. Treat a missing/invalid `handle` or a score that does not match the profile read-back as a failure.
+
 ## Verification Notes
 
 - Only NFTs held on **BaseScan-verified contracts** count toward the score; spam and unverified contracts are excluded automatically.
