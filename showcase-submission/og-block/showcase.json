@@ -1,11 +1,11 @@
 {
   "slug": "og-block",
   "title": "OG BLOCK",
-  "tagline": "Scores verified on-chain NFT holdings into a public Base culture rank, and tracks agent wallets as first-class holders alongside their operators",
+  "tagline": "Ranks a public culture score from on-chain NFT holdings, with first-class support for agent wallets",
   "description": "OG BLOCK turns real NFT holdings on Base into a public culture score and leaderboard, instead of ranking people by followers or engagement. A profile has both a human wallet and an agent wallet slot: each is verified independently by signing from its own key, and NFTs from either wallet accumulate into one combined score. Agent wallets are recognized on-chain through an AgentIdentity NFT, so an autonomous agent gets its own cultural reputation that is pulled, verified, and ranked publicly. Live on Base mainnet with 16 verified profiles onboarded and 2,000+ NFTs tracked.",
   "status": "live",
   "topic": "agents",
-  "topics": ["agents", "base", "wallet", "nft", "reputation", "leaderboard"],
+  "topics": ["agents", "commerce"],
   "builder": {
     "name": "airplanestar",
     "url": "https://x.com/airplanestar_"
@@ -74,7 +74,7 @@
     {
       "label": "Demo video (agent wallet link flow)",
       "href": "https://x.com/ogblockchain/status/2092282854105547104?s=20",
-      "kind": "demo"
+      "kind": "video"
     },
     {
       "label": "Redacted result report",

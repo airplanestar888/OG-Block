@@ -13,17 +13,19 @@ git checkout -b showcase/og-block
 
 ## 2. Add the package
 ```
-mkdir -p showcase/og-block
-# copy showcase.json + README.md from this folder into showcase/og-block/
-cp <this-repo>/showcase-submission/og-block/showcase.json showcase/og-block/
-cp <this-repo>/showcase-submission/og-block/README.md      showcase/og-block/
+mkdir -p showcase
+# copy the whole package (folder name must equal the slug "og-block")
+cp -R <this-repo>/showcase-submission/og-block showcase/og-block
 ```
-Folder name **must** equal the slug `og-block`.
+Folder name **must** equal the slug `og-block`. The validator requires every file
+the manifest references to exist in this repo: `showcase.json`, `README.md`,
+`prompt.md`, `result-redacted.md`, `assets/demo.mp4`, and
+`skills/og-block-agent-link/SKILL.md`.
 
 ## 3. Validate locally (required before PR)
 ```
 node scripts/validate-showcase.mjs      # must print 0 errors
-curl -sI "https://www.joinog.xyz/opengraph-image"   # must be 200 + image/*
+curl -sI -L "https://www.joinog.xyz/opengraph-image"   # must end at 200 + image/*
 ```
 
 ## 4. Open the PR
@@ -47,5 +49,8 @@ gh pr create --repo Virtual-Protocol/acp-cli-demos \
   16:9 hero, commit it to `showcase/og-block/assets/poster.jpg` and point
   `visual.posterUrl` at the `raw.githubusercontent.com/.../main/...` URL (only
   resolves after merge — verify on your branch first).
-- A reusable `SKILL.md` is only needed if you want another agent to repeat the
-  flow; `skills: []` is valid for now.
+- The video is listed under `artifacts` with kind `video` (README "Video
+  Fields" requires it so the card links the watch page from the detail view).
+- A reusable `SKILL.md` ships in `skills/og-block-agent-link/`; the manifest's
+  `skills[].sourcePath` points there, and validation fails if that path is not
+  copied into the repo.
