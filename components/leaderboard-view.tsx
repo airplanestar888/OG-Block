@@ -357,7 +357,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                     </td>
 
                     {/* X / Profile */}
-                    <td className="px-6 py-4 pl-10 text-left">
+                    <td className="px-6 py-4 pl-16 text-left">
                       <div className="flex items-center gap-3 text-left">
                         <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
                         <div className="min-w-0">
