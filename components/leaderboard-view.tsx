@@ -260,18 +260,18 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             })}
           </section>
 
-          {/* Personal standing pill — extra breathing room above the board panel */}
-          <div className="flex justify-center pb-5 pt-6">
-            <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-5 py-2.5 text-sm text-black/60 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_8px_24px_rgba(0,0,255,0.05)]">
-              <span className="inline-block size-2 rounded-full bg-baseblue" aria-hidden="true" />
+          {/* Personal standing pill */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-baseblue px-5 py-2.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,255,0.28)]">
+              <span className="inline-block size-2 rounded-full bg-white" aria-hidden="true" />
               {myProfile?.rank ? (
                 <span>
-                  You&apos;re ranked <span className="font-bold text-ink">#{myProfile.rank}</span> of{" "}
-                  <span className="font-bold text-ink">{leaderboard.length}</span> verified profiles
+                  You&apos;re ranked <span className="font-bold">#{myProfile.rank}</span> of{" "}
+                  <span className="font-bold">{leaderboard.length}</span> verified profiles
                 </span>
               ) : (
                 <span>
-                  <span className="font-bold text-ink">{leaderboard.length}</span> verified profiles,
+                  <span className="font-bold">{leaderboard.length}</span> verified profiles,
                   ranked live from Base
                 </span>
               )}
