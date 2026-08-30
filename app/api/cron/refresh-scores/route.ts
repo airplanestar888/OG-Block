@@ -20,8 +20,14 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 // so a truncated run defers the freshest users, not the same tail every day.
 export const maxDuration = 300;
 const CONCURRENCY = 4;
-const PER_USER_TIMEOUT_MS = 90_000;
 const WORKER_CUTOFF_MS = 90_000;
+// No scan may extend past this point from run start — Vercel kills the
+// invocation around 270s, so leave tail room for recalculateRanks + response.
+// The per-user timeout is whatever remains until this deadline, which gives
+// whale wallets (500+ contracts, ~2-4 min scans, ordered stalest-first) room
+// while capping every scan against the platform kill.
+const USER_DEADLINE_MS = 240_000;
+const MIN_SCAN_BUDGET_MS = 10_000;
 
 export async function GET(request: NextRequest) {
   if (!isAuthorizedCronRequest(request)) {
@@ -69,9 +75,13 @@ export async function GET(request: NextRequest) {
 
   const runOne = async (group: { userId: string; wallets: WalletRow[] }) => {
     try {
+      const budgetMs = startedAt + USER_DEADLINE_MS - Date.now();
+      if (budgetMs < MIN_SCAN_BUDGET_MS) {
+        throw new Error(`Skipped: no time budget left for user ${group.userId}`);
+      }
       const result = await withTimeout(
         calculateScoreForWallets(group.userId, group.wallets.map((wallet) => wallet.address)),
-        PER_USER_TIMEOUT_MS,
+        budgetMs,
         `Scan for user ${group.userId} timed out`
       );
       await persistScore(group.userId, result, { recalculateRank: false });
