@@ -121,41 +121,43 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
           ) : null}
         </div>
 
-        <div>
-          <label
-            className="text-xs font-bold uppercase tracking-[0.14em] text-black/45"
-            htmlFor="try-captcha-answer"
+        <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <button
+            className="focus-ring rounded-full bg-baseblue px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={busy}
+            onClick={handleSubmit}
+            type="button"
           >
-            Quick check: {captcha?.question ?? "loading…"}
-          </label>
-          <div className="mt-2 flex items-center gap-2">
-            <input
-              id="try-captcha-answer"
-              className="focus-ring w-28 rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-ink"
-              inputMode="numeric"
-              onChange={(e) => setCaptchaAnswer(e.target.value)}
-              placeholder="Answer"
-              type="text"
-              value={captchaAnswer}
-            />
-            <button
-              className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-xs font-semibold text-black/65 hover:bg-black/5"
-              onClick={() => void loadChallenge()}
-              type="button"
+            See my score
+          </button>
+
+          <div>
+            <label
+              className="text-xs font-bold uppercase tracking-[0.14em] text-black/45"
+              htmlFor="try-captcha-answer"
             >
-              New question
-            </button>
+              Quick check: {captcha?.question ?? "loading…"}
+            </label>
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                id="try-captcha-answer"
+                className="focus-ring w-24 rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-ink"
+                inputMode="numeric"
+                onChange={(e) => setCaptchaAnswer(e.target.value)}
+                placeholder="Answer"
+                type="text"
+                value={captchaAnswer}
+              />
+              <button
+                className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-xs font-semibold text-black/65 hover:bg-black/5"
+                onClick={() => void loadChallenge()}
+                type="button"
+              >
+                New question
+              </button>
+            </div>
           </div>
         </div>
-
-        <button
-          className="focus-ring w-full rounded-full bg-baseblue px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-          disabled={busy}
-          onClick={handleSubmit}
-          type="button"
-        >
-          See my score
-        </button>
 
         {status ? <p className="text-sm text-red-600">{status}</p> : null}
 
