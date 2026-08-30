@@ -10,11 +10,25 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
   verified_at: string | null;
 };
 
+// A full pass scans every user's wallets against Alchemy + BaseScan and can
+// run past 4 minutes sequentially — Vercel kills the invocation around 270s,
+// which silently dropped entire daily runs (nothing persisted, no response).
+// Declare the ceiling explicitly, scan with a small worker pool + per-user
+// timeout so one slow scan can't eat the run, and stop starting new scans
+// past a cutoff so the invocation ALWAYS finishes with a JSON summary.
+// Refresh the stalest profiles first (never-scored users before scored ones)
+// so a truncated run defers the freshest users, not the same tail every day.
+export const maxDuration = 300;
+const CONCURRENCY = 4;
+const PER_USER_TIMEOUT_MS = 90_000;
+const WORKER_CUTOFF_MS = 90_000;
+
 export async function GET(request: NextRequest) {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const startedAt = Date.now();
   const supabase = getSupabaseAdmin();
   const { data: wallets, error } = await supabase
     .from("wallets")
@@ -24,13 +38,42 @@ export async function GET(request: NextRequest) {
 
   if (error) throw error;
 
-  const walletGroups = getWalletGroupsByUser((wallets || []) as WalletRow[]).slice(0, env.CRON_REFRESH_LIMIT);
+  // Refresh the stalest profiles first (never-scored users before scored
+  // ones), so a truncated run defers the freshest users, not the same tail
+  // every day.
+  const { data: scoreStamps } = await supabase
+    .from("scores")
+    .select("user_id,last_calculated_at");
+  const lastRunByUser = new Map(
+    (scoreStamps || []).map((row) => [row.user_id, row.last_calculated_at as string])
+  );
+
+  const walletGroups = getWalletGroupsByUser((wallets || []) as WalletRow[])
+    .sort((a, b) => {
+      const stampA = lastRunByUser.get(a.userId);
+      const stampB = lastRunByUser.get(b.userId);
+      if (!stampA && !stampB) return 0;
+      if (!stampA) return -1;
+      if (!stampB) return 1;
+      return stampA.localeCompare(stampB);
+    })
+    .slice(0, env.CRON_REFRESH_LIMIT);
+
   const refreshed: Array<{ userId: string; score: number; nftCount: number }> = [];
   const failed: Array<{ userId: string; error: string }> = [];
 
-  for (const group of walletGroups) {
+  // Cursor-based worker pool: cursor only advances between awaits on the
+  // single JS thread, so concurrent workers can't claim the same group.
+  const queue = [...walletGroups];
+  let cursor = 0;
+
+  const runOne = async (group: { userId: string; wallets: WalletRow[] }) => {
     try {
-      const result = await calculateScoreForWallets(group.userId, group.wallets.map((wallet) => wallet.address));
+      const result = await withTimeout(
+        calculateScoreForWallets(group.userId, group.wallets.map((wallet) => wallet.address)),
+        PER_USER_TIMEOUT_MS,
+        `Scan for user ${group.userId} timed out`
+      );
       await persistScore(group.userId, result, { recalculateRank: false });
       refreshed.push({
         userId: group.userId,
@@ -43,7 +86,21 @@ export async function GET(request: NextRequest) {
         error: error instanceof Error ? error.message : "Unknown refresh error"
       });
     }
-  }
+  };
+
+  const worker = async () => {
+    while (cursor < queue.length) {
+      if (Date.now() - startedAt > WORKER_CUTOFF_MS) return;
+      const group = queue[cursor];
+      cursor += 1;
+      await runOne(group);
+    }
+  };
+
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, queue.length) }, () => worker())
+  );
+  const skipped = queue.length - cursor;
 
   if (refreshed.length > 0) {
     await recalculateRanks();
@@ -67,7 +124,25 @@ export async function GET(request: NextRequest) {
     checked: walletGroups.length,
     refreshed: refreshed.length,
     failed: failed.length,
+    skipped,
+    durationMs: Date.now() - startedAt,
     failures: failed.slice(0, 10)
+  });
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(label)), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
   });
 }
 
