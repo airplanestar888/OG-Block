@@ -50,8 +50,8 @@ export default async function HomePage() {
               <Link href={session ? "/og-card" : "/login"} className="btn-primary">
                 {session ? "Get your badge" : "Sign in"}
               </Link>
-              <Link href="/leaderboard" className="btn-secondary">
-                View leaderboard
+              <Link href="/try" className="btn-secondary">
+                Try yours
               </Link>
             </div>
           </aside>
