@@ -72,9 +72,12 @@ export default async function PublicProfilePage(
   const earlyPct = profile.nftCount > 0 ? Math.round((profile.earlyCount / profile.nftCount) * 100) : 0;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
-      {/* plain background — soft blue spotlight only */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,255,0.10),transparent_50%)]" />
+    <main className="relative min-h-screen overflow-hidden px-4 py-12 text-ink">
+      {/* Abyss wallpaper backdrop — navy/blue gradient, fixed so it covers the
+          full scroll height like a wallpaper. */}
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[url('/wallpapers/profile-abyss.jpg')] bg-cover bg-center" />
+      {/* Soft vignette so the white cards keep their edge */}
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(4,5,26,0)_40%,rgba(4,5,26,0.35)_100%)]" />
 
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
         {/* Culture score card — portrait on mobile, landscape on desktop */}
