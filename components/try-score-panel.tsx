@@ -149,11 +149,27 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
                 value={captchaAnswer}
               />
               <button
-                className="focus-ring rounded-full border border-black/15 px-4 py-2.5 text-xs font-semibold text-black/65 hover:bg-black/5"
+                className="focus-ring grid size-11 shrink-0 place-items-center rounded-full bg-ink text-white transition hover:bg-black active:scale-95"
                 onClick={() => void loadChallenge()}
                 type="button"
+                aria-label="New question"
+                title="New question"
               >
-                New question
+                <svg
+                  width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  aria-hidden="true"
+                >
+                  <polyline
+                    points="23 4 23 10 17 10"
+                    stroke="currentColor" strokeWidth="2"
+                    strokeLinecap="round" strokeLinejoin="round"
+                  />
+                  <path
+                    d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"
+                    stroke="currentColor" strokeWidth="2"
+                    strokeLinecap="round" strokeLinejoin="round"
+                  />
+                </svg>
               </button>
             </div>
           </div>
