@@ -142,7 +142,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   return (
     <div className="space-y-8">
       {/* Top Header & Stats */}
-      <div className="grid gap-8 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+      <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:items-start">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Leaderboard</p>
           <h1
@@ -187,7 +187,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       {/* Featured Top 3 Podium */}
       {podiumVisible ? (
         <>
-          <section className="grid items-end gap-5 sm:grid-cols-3 sm:gap-4 lg:gap-6">
+          <section className="grid items-end gap-5 pt-6 sm:grid-cols-3 sm:gap-4 lg:gap-6">
             {podium.map((profile, position) => {
               if (!profile) return null;
               const place = ((position === 1 ? 1 : position === 0 ? 2 : 3) as PodiumPlace);
