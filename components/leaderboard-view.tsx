@@ -2,12 +2,58 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { XAvatar } from "@/components/x-avatar";
 import type { PublicLeaderboardProfile } from "@/lib/types";
 
 type LeaderboardViewProps = {
   leaderboard: PublicLeaderboardProfile[];
+};
+
+type PodiumPlace = 1 | 2 | 3;
+
+const PLACE_STYLES: Record<
+  PodiumPlace,
+  {
+    chip: string;
+    chipRing: string;
+    pedestal: string;
+    panelGlow: string;
+    avatarSize: number;
+    nameSize: string;
+  }
+> = {
+  1: {
+    chip: "bg-gradient-to-b from-[#F7D77A] to-[#E5B54A] text-white",
+    chipRing: "ring-[#D9A93F]/40",
+    pedestal: "from-[#fdfdfb] to-[#f4ecda]",
+    panelGlow: "shadow-[0_18px_44px_rgba(217,169,63,0.16)]",
+    avatarSize: 88,
+    nameSize: "text-xl",
+  },
+  2: {
+    chip: "bg-gradient-to-b from-[#EAEEF3] to-[#C9D1DB] text-white",
+    chipRing: "ring-[#B7BFCB]/50",
+    pedestal: "from-[#fcfdfe] to-[#eceff4]",
+    panelGlow: "shadow-[0_14px_36px_rgba(10,11,13,0.08)]",
+    avatarSize: 68,
+    nameSize: "text-lg",
+  },
+  3: {
+    chip: "bg-gradient-to-b from-[#F0D2B2] to-[#D8A26A] text-white",
+    chipRing: "ring-[#C08A55]/40",
+    pedestal: "from-[#fdfcfa] to-[#f3e7d8]",
+    panelGlow: "shadow-[0_14px_36px_rgba(192,138,85,0.14)]",
+    avatarSize: 68,
+    nameSize: "text-lg",
+  }
+};
+
+const PEDESTAL_HEIGHT: Record<PodiumPlace, string> = {
+  1: "min-h-[212px]",
+  2: "min-h-[132px]",
+  3: "min-h-[112px]"
 };
 
 function formatCompactNumber(value: number): string {
@@ -17,8 +63,7 @@ function formatCompactNumber(value: number): string {
     return `${formatted}M`;
   }
   if (absValue >= 1_000) {
-    const formatted = (value / 1_000).toFixed(1).replace(/\.0$/, "");
-    return `${formatted}K`;
+    return `${(value / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
   }
   return value.toLocaleString();
 }
@@ -31,9 +76,31 @@ function formatUtcDate(value: string) {
   }).format(new Date(value));
 }
 
+function TrophyIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M8 21h8M12 17.5V21M7 4h10v5a5 5 0 0 1-10 0V4Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7 6H4.2a2.8 2.8 0 0 0 3.1 3.6M17 6h2.8a2.8 2.8 0 0 1-3.1 3.6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const { data: session } = useSession();
 
   const filteredProfiles = useMemo(() => {
     return leaderboard.filter((profile) => {
@@ -46,6 +113,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   }, [leaderboard, searchQuery]);
 
   const featuredProfiles = leaderboard.slice(0, 3);
+  const podium = [featuredProfiles[1], featuredProfiles[0], featuredProfiles[2]];
+  const podiumVisible = featuredProfiles.length > 0 && !searchQuery;
+  // The top 3 live in the podium; the table covers everyone else — until a
+  // search is active, then matches (including the top 3) all show here.
+  const tableRows = searchQuery ? filteredProfiles : filteredProfiles.slice(3);
+
   const totalNfts = leaderboard.reduce((total, profile) => total + profile.nftCount, 0);
   const totalScore = leaderboard.reduce((total, profile) => total + profile.score, 0);
   const latestGeneratedAt = useMemo(() => {
@@ -58,6 +131,13 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
     }
     return latest;
   }, [leaderboard]);
+
+  const myHandle = session?.user?.xHandle;
+  const myProfile = myHandle
+    ? leaderboard.find((profile) => profile.xHandle === myHandle)
+    : undefined;
+
+  const openProfile = (handle: string) => handle && router.push(`/u/${handle}`);
 
   return (
     <div className="space-y-8">
@@ -105,64 +185,99 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       </div>
 
       {/* Featured Top 3 Podium */}
-      {featuredProfiles.length > 0 && !searchQuery ? (
-        <section className="grid gap-4 lg:grid-cols-3">
-          {featuredProfiles.map((profile, index) => (
-            <article
-              key={`featured-${profile.xHandle || index}`}
-              onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
-              className={`relative overflow-hidden rounded-[1.5rem] border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
-                profile.xHandle ? "cursor-pointer" : ""
-              } ${
-                index === 0
-                  ? "border-baseblue/25 shadow-[0_10px_28px_rgba(0,0,255,0.08)]"
-                  : "border-black/10"
-              }`}
-            >
-              <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-baseblue" />
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={48} />
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">
-                        Rank #{profile.rank || index + 1}
-                      </p>
-                      {profile.profileRole === "agent" ? (
-                        <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
-                          Agent
-                        </span>
-                      ) : null}
-                    </div>
-                    <h2 className="mt-1 font-semibold text-black/88">
+      {podiumVisible ? (
+        <>
+          <section className="grid items-end gap-5 sm:grid-cols-3 sm:gap-4 lg:gap-6">
+            {podium.map((profile, position) => {
+              if (!profile) return null;
+              const place = ((position === 1 ? 1 : position === 0 ? 2 : 3) as PodiumPlace);
+              const styles = PLACE_STYLES[place];
+              const orderClass =
+                place === 1 ? "order-1 sm:order-2" : place === 2 ? "order-2 sm:order-1" : "order-3";
+
+              return (
+                <article
+                  key={`podium-${profile.xHandle || place}`}
+                  onClick={() => openProfile(profile.xHandle)}
+                  className={`group flex flex-col items-center text-center ${orderClass} ${
+                    profile.xHandle ? "cursor-pointer" : ""
+                  }`}
+                >
+                  <span className="rounded-full bg-white p-0.5 shadow-[0_10px_24px_rgba(10,11,13,0.14)] ring-2 ring-white">
+                    <XAvatar
+                      src={profile.xAvatar}
+                      handle={profile.xHandle}
+                      size={styles.avatarSize}
+                    />
+                  </span>
+                  <div className="mt-3 flex items-center gap-1.5">
+                    <h2 className={`font-semibold tracking-tight text-black/90 ${styles.nameSize}`}>
                       {profile.xHandle ? (
                         <Link
                           href={`/u/${profile.xHandle}`}
                           onClick={(e) => e.stopPropagation()}
                           className="transition hover:text-baseblue hover:underline"
                         >
-                          @{profile.xHandle}
+                          {profile.xName || `@${profile.xHandle}`}
                         </Link>
                       ) : (
                         `@${profile.xHandle}`
                       )}
                     </h2>
+                    {profile.profileRole === "agent" ? (
+                      <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-black/55">
+                        Agent
+                      </span>
+                    ) : null}
                   </div>
-                </div>
+                  <p className="text-xs text-black/45">
+                    {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
+                  </p>
 
-                <span className="rounded-full bg-baseblue/10 px-3 py-1 text-xs font-bold text-baseblue">
-                  {formatCompactNumber(profile.score)} pts
+                  {/* Pedestal */}
+                  <div
+                    className={`relative mt-9 flex w-full flex-col items-center rounded-t-[1.4rem] border border-b-0 border-black/[0.07] bg-gradient-to-b px-5 pt-9 pb-6 ${PEDESTAL_HEIGHT[place]} ${styles.pedestal} ${styles.panelGlow} transition-all duration-200 group-hover:-translate-y-0.5`}
+                  >
+                    <span
+                      className={`absolute -top-5 grid size-10 place-items-center rounded-xl ring-4 ring-white ${styles.chip} ${styles.chipRing}`}
+                    >
+                      <TrophyIcon />
+                    </span>
+                    <p className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-black/40">
+                      Culture score
+                    </p>
+                    <p className="mt-1 text-3xl font-bold leading-none tracking-tight text-ink">
+                      {formatCompactNumber(profile.score)}
+                    </p>
+                    <div className="mt-3 flex items-center gap-4 text-xs font-semibold text-black/55">
+                      <span>{profile.nftCount.toLocaleString()} NFT</span>
+                      <span className="h-3 w-px bg-black/10" aria-hidden="true" />
+                      <span>{profile.badgeCount.toLocaleString()} badge</span>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </section>
+
+          {/* Personal standing pill */}
+          <div className="flex justify-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-5 py-2.5 text-sm text-black/60 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_8px_24px_rgba(0,0,255,0.05)]">
+              <span className="inline-block size-2 rounded-full bg-baseblue" aria-hidden="true" />
+              {myProfile?.rank ? (
+                <span>
+                  You&apos;re ranked <span className="font-bold text-ink">#{myProfile.rank}</span> of{" "}
+                  <span className="font-bold text-ink">{leaderboard.length}</span> verified profiles
                 </span>
-              </div>
-
-              <div className="mt-5 grid grid-cols-3 gap-2">
-                <MiniStat label="NFT" value={profile.nftCount.toLocaleString()} />
-                <MiniStat label="Badge" value={profile.badgeCount.toLocaleString()} />
-                <MiniStat label="Score" value={formatCompactNumber(profile.score)} />
-              </div>
-            </article>
-          ))}
-        </section>
+              ) : (
+                <span>
+                  <span className="font-bold text-ink">{leaderboard.length}</span> verified profiles,
+                  ranked live from Base
+                </span>
+              )}
+            </div>
+          </div>
+        </>
       ) : null}
 
       {/* Main Culture Board */}
@@ -171,7 +286,11 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
           <div>
             <h2 className="font-semibold text-black/88">Culture board</h2>
-            <p className="mt-1 text-sm text-black/65">Live rankings across all verified OG BLOCK profiles.</p>
+            <p className="mt-1 text-sm text-black/65">
+              {podiumVisible
+                ? "Full rankings across all verified OG BLOCK profiles — top 3 featured above."
+                : "Live rankings across all verified OG BLOCK profiles."}
+            </p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -217,7 +336,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-black/10">
-              {filteredProfiles.map((profile, index) => {
+              {tableRows.map((profile, index) => {
                 // A zero score with a negative delta reads oddly ("why minus
                 // at 0?") — only show movement for profiles that still hold
                 // points.
@@ -262,7 +381,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                               </span>
                             ) : null}
                           </div>
-                          <p className="text-xs text-black/40">Wallet verified</p>
+                          <p className="text-xs text-black/40">
+                            {profile.xName || "Wallet verified"}
+                          </p>
                         </div>
                       </div>
                     </td>
@@ -310,10 +431,14 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 );
               })}
 
-              {filteredProfiles.length === 0 ? (
+              {tableRows.length === 0 ? (
                 <tr>
                   <td className="px-6 py-12 text-center text-black/55" colSpan={5}>
-                    {searchQuery ? `No profiles matching "${searchQuery}"` : "No scored profiles yet."}
+                    {searchQuery
+                      ? `No profiles matching "${searchQuery}"`
+                      : leaderboard.length > 0
+                        ? "The top 3 are featured above."
+                        : "No scored profiles yet."}
                   </td>
                 </tr>
               ) : null}
@@ -343,13 +468,3 @@ function HeroStat({ label, value }: { label: string; value: string | number }) {
     </div>
   );
 }
-
-function MiniStat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="rounded-xl border border-black/10 bg-[#fbfcff] p-3 text-center">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/55">{label}</p>
-      <p className="mt-1 font-semibold text-black/88">{value}</p>
-    </div>
-  );
-}
-
