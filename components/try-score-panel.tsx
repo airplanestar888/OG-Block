@@ -136,7 +136,8 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
               className="whitespace-nowrap text-sm font-semibold text-ink"
               htmlFor="try-captcha-answer"
             >
-              {captcha?.question ?? "loading…"}
+              <span className="text-black/50">Security check:</span>{" "}
+              {(captcha?.question ?? "loading…").replace(/-/g, "−")}
             </label>
             <div className="flex items-center gap-2">
               <input
