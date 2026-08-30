@@ -329,7 +329,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             <thead className="bg-black/[0.03] text-black/55">
               <tr>
                 <th className="w-[10%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Rank</th>
-                <th className="w-[38%] px-6 py-4 pl-10 text-left text-xs font-bold uppercase tracking-[0.12em]">X</th>
+                <th className="w-[38%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">X</th>
                 <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">NFT</th>
                 <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Badge</th>
                 <th className="w-[22%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Score</th>
