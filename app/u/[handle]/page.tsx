@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getPublicProfileByHandle } from "@/lib/public-profiles";
 import { ShareProfileButton } from "@/components/share-profile-button";
 import { ProfileCardAvatar } from "@/components/profile-card-avatar";
+import { AbyssWallpaper } from "@/components/abyss-wallpaper";
 
 function formatCompactNumber(value: number): string {
   const absValue = Math.abs(value);
@@ -73,11 +74,8 @@ export default async function PublicProfilePage(
 
   return (
     <main className="relative min-h-screen overflow-hidden px-4 py-12 text-ink">
-      {/* Abyss wallpaper backdrop — navy/blue gradient, fixed so it covers the
-          full scroll height like a wallpaper. */}
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[url('/wallpapers/profile-abyss.jpg')] bg-cover bg-center" />
-      {/* Soft vignette so the white cards keep their edge */}
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_50%_20%,rgba(4,5,26,0)_40%,rgba(4,5,26,0.35)_100%)]" />
+      {/* Live abyss wallpaper — animated gradient + film grain, WebGL */}
+      <AbyssWallpaper />
 
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
         {/* Culture score card — portrait on mobile, landscape on desktop */}
