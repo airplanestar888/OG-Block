@@ -85,7 +85,7 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
         Try yours
       </p>
       <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink">
-        Check any wallet&apos;s score. No sign-in.
+        Check any wallet&apos;s score. No sign-in required.
       </h1>
       <p className="mt-3 text-sm leading-6 text-black/70">
         Paste a Base wallet address and see the culture score it would earn from its NFT
