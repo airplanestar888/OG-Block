@@ -260,8 +260,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             })}
           </section>
 
-          {/* Personal standing pill */}
-          <div className="flex justify-center">
+          {/* Personal standing pill — extra breathing room above the board panel */}
+          <div className="flex justify-center pb-5 pt-6">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-5 py-2.5 text-sm text-black/60 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_8px_24px_rgba(0,0,255,0.05)]">
               <span className="inline-block size-2 rounded-full bg-baseblue" aria-hidden="true" />
               {myProfile?.rank ? (
