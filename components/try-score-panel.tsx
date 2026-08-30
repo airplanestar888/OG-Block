@@ -121,7 +121,7 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
           ) : null}
         </div>
 
-        <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
           <button
             className="focus-ring rounded-full bg-baseblue px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
             disabled={busy}
@@ -131,14 +131,14 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
             See my score
           </button>
 
-          <div>
+          <div className="flex items-center justify-between gap-3">
             <label
-              className="text-xs font-bold uppercase tracking-[0.14em] text-black/45"
+              className="whitespace-nowrap text-sm font-semibold text-ink"
               htmlFor="try-captcha-answer"
             >
-              Quick check: {captcha?.question ?? "loading…"}
+              {captcha?.question ?? "loading…"}
             </label>
-            <div className="mt-2 flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <input
                 id="try-captcha-answer"
                 className="focus-ring w-24 rounded-xl border border-black/15 bg-white px-4 py-3 text-sm text-ink"
