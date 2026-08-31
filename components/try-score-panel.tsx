@@ -101,15 +101,25 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
           >
             Wallet address
           </label>
-          <input
-            id="try-wallet-address"
-            className="focus-ring mt-2 w-full rounded-xl border border-black/15 bg-white px-4 py-3 font-mono text-sm text-ink placeholder:text-black/30"
-            onChange={(e) => setWalletInput(e.target.value)}
-            placeholder="0x…"
-            spellCheck={false}
-            type="text"
-            value={walletInput}
-          />
+          <div className="mt-2 flex items-center gap-2 rounded-full border border-black/15 bg-white p-1.5 pl-5 shadow-sm transition focus-within:border-baseblue focus-within:ring-1 focus-within:ring-baseblue">
+            <input
+              id="try-wallet-address"
+              className="min-w-0 flex-1 bg-transparent font-mono text-sm text-ink placeholder:text-black/30 focus:outline-none"
+              onChange={(e) => setWalletInput(e.target.value)}
+              placeholder="0x… paste wallet address"
+              spellCheck={false}
+              type="text"
+              value={walletInput}
+            />
+            <button
+              className="focus-ring shrink-0 rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={busy}
+              onClick={handleSubmit}
+              type="button"
+            >
+              See my score
+            </button>
+          </div>
           {isConnected && connectedAddress ? (
             <button
               className="focus-ring mt-2 text-xs font-semibold text-baseblue hover:underline"
@@ -121,24 +131,14 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
           ) : null}
         </div>
 
-        <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            className="focus-ring rounded-full bg-baseblue px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={busy}
-            onClick={handleSubmit}
-            type="button"
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <label
+            className="whitespace-nowrap text-sm font-semibold text-ink"
+            htmlFor="try-captcha-answer"
           >
-            See my score
-          </button>
-
-          <div className="flex items-center justify-between gap-3">
-            <label
-              className="whitespace-nowrap text-sm font-semibold text-ink"
-              htmlFor="try-captcha-answer"
-            >
-              <span className="text-black/50">Security check:</span>{" "}
-              {(captcha?.question ?? "loading…").replace(/-/g, "−")}
-            </label>
+            <span className="text-black/50">Security check:</span>{" "}
+            {(captcha?.question ?? "loading…").replace(/-/g, "−")}
+          </label>
             <div className="flex items-center gap-2">
               <input
                 id="try-captcha-answer"
@@ -173,7 +173,6 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
                 </svg>
               </button>
             </div>
-          </div>
         </div>
 
         {status ? <p className="text-sm text-red-600">{status}</p> : null}
