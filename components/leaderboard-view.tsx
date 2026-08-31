@@ -157,7 +157,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           </h1>
         </div>
 
-        <div className="rounded-[1.75rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
+        <div className="rounded-[1.5rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
           <div className="p-6">
             <div className="flex items-center justify-between gap-3">
               <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Live standings</p>
@@ -323,8 +323,65 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           <span className="text-sm text-baseblue" aria-hidden="true">-&gt;</span>
         </div>
 
-        {/* Rankings Table with balanced column widths & alignment */}
-        <div className="overflow-x-auto overscroll-x-contain">
+        {/* Mobile ranking cards — compact rows instead of a swipe table */}
+        <ol className="divide-y divide-black/[0.07] sm:hidden">
+          {tableRows.map((profile, index) => {
+            const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
+            const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
+            return (
+              <li
+                key={`m-${profile.xHandle || index}`}
+                onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
+                className={`flex items-center gap-3 px-4 py-3.5 transition hover:bg-baseblue/[0.05] ${
+                  profile.xHandle ? "cursor-pointer" : ""
+                }`}
+              >
+                <span className="inline-flex min-w-11 items-center justify-center rounded-full bg-black/[0.04] px-2.5 py-1 text-xs font-bold text-black/70">
+                  {profile.rank ? `#${profile.rank}` : "-"}
+                </span>
+                <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="truncate text-sm font-semibold text-black/85">@{profile.xHandle}</p>
+                    {profile.profileRole === "agent" ? (
+                      <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.62rem] font-bold uppercase text-black/60">
+                        Agent
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="text-xs text-black/40">{profile.nftCount.toLocaleString()} NFT</p>
+                </div>
+                <div className="flex flex-col items-end gap-0.5">
+                  <span className="rounded-full bg-baseblue px-2.5 py-0.5 text-xs font-bold text-white">
+                    {formatCompactNumber(profile.score)}
+                  </span>
+                  {hasGain && profile.recentPointsDelta ? (
+                    <span className="text-[0.65rem] font-bold text-emerald-600">
+                      ▲ {formatCompactNumber(profile.recentPointsDelta)}
+                    </span>
+                  ) : null}
+                  {hasDrop && profile.recentPointsDelta ? (
+                    <span className="text-[0.65rem] font-bold text-rose-600">
+                      ▼ {formatCompactNumber(profile.recentPointsDelta)}
+                    </span>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
+          {tableRows.length === 0 ? (
+            <li className="px-4 py-10 text-center text-sm text-black/55">
+              {searchQuery
+                ? `No profiles matching "${searchQuery}"`
+                : leaderboard.length > 0
+                  ? "The top 3 are featured above."
+                  : "No scored profiles yet."}
+            </li>
+          ) : null}
+        </ol>
+
+        {/* Rankings Table with balanced column widths & alignment (desktop) */}
+        <div className="hidden overflow-x-auto overscroll-x-contain sm:block">
           <table className="w-full min-w-[720px] table-fixed text-left text-sm">
             <thead className="bg-black/[0.03] text-black/55">
               <tr>
@@ -382,7 +439,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                             ) : null}
                           </div>
                           <p className="text-xs text-black/40">
-                            {profile.xName || "Wallet verified"}
+                            {profile.nftCount.toLocaleString()} NFT on Base
                           </p>
                         </div>
                       </div>

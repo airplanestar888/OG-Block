@@ -80,7 +80,7 @@ export function TryScorePanel({ isLoggedIn }: TryScorePanelProps) {
   };
 
   return (
-    <section className="w-full rounded-lg border border-black/10 bg-white p-6 shadow-sm sm:p-8">
+    <section className="w-full rounded-[1.5rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8">
       <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
         Try yours
       </p>

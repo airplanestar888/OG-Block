@@ -133,7 +133,7 @@ export function TryScoreModal({ open, onClose, isLoggedIn, runScan }: TryScoreMo
       aria-modal="true"
     >
       <div
-        className="relative flex max-h-[92vh] w-full max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-2xl sm:rounded-[1.75rem]"
+        className="relative flex max-h-[92vh] w-full max-w-[400px] flex-col overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
