@@ -10,10 +10,10 @@ import { useEffect, useRef, useState } from "react";
 /// unavailable or motion is reduced.
 
 const GRID_COLORS: string[] = [
-  "#04051A", "#081757", "#1E5BFD", "#050824",
-  "#143EB6", "#D3EDF7", "#071654", "#1D59F8",
-  "#060E3A", "#1237A7", "#96E4FB", "#071551",
-  "#2D95FF", "#060D35", "#103198", "#5ADCFE"
+  "#0A1240", "#0F2277", "#1E3BFF", "#0C1747",
+  "#1636C4", "#E8F1FF", "#101E6E", "#1D59F8",
+  "#0A1648", "#1A38B8", "#9CC2FF", "#0C1A52",
+  "#2D6BFF", "#0A1140", "#11259E", "#5B8CFF"
 ];
 
 const VERTEX_SHADER = `
@@ -125,20 +125,20 @@ void main() {
 
   // Bright liquid blooms over the base — small, separate elliptical lights
   // so the abyss stays deep navy around them.
-  glow(uv, vec2(0.333, 0.333), vec3(0.80, 0.90, 0.96), 0.24, 0.34, t, col);
-  glow(uv, vec2(0.667, 0.667), vec3(0.55, 0.86, 0.95), 0.22, 0.27, t, col);
-  glow(uv, vec2(1.0, 1.0), vec3(0.35, 0.82, 0.96), 0.21, 0.23, t, col);
+  glow(uv, vec2(0.333, 0.333), vec3(0.82, 0.90, 1.0), 0.24, 0.32, t, col);
+  glow(uv, vec2(0.667, 0.667), vec3(0.45, 0.68, 1.0), 0.22, 0.26, t, col);
+  glow(uv, vec2(1.0, 1.0), vec3(0.25, 0.52, 1.0), 0.21, 0.24, t, col);
 
-  // Film fade lifts blacks toward the abyss base color.
-  col = mix(col, vec3(0.016, 0.020, 0.102), 0.10);
+  // Film fade lifts blacks toward the brand-blue base.
+  col = mix(col, vec3(0.03, 0.06, 0.24), 0.08);
 
   // Vignette.
   vec2 vc = vUv - 0.5;
-  col *= 1.0 - dot(vc, vc) * 0.55;
+  col *= 1.0 - dot(vc, vc) * 0.5;
 
   // Animated film grain, per device pixel.
   float g = hash(gl_FragCoord.xy + vec2(mod(t, 10.0) * 137.0));
-  col += (g - 0.5) * 0.085;
+  col += (g - 0.5) * 0.075;
 
   gl_FragColor = vec4(col, 1.0);
 }
