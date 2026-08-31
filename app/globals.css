@@ -204,6 +204,8 @@ img, video {
 }
 
 /* ─── NFT image max-height per breakpoint ─────────── */
+/* Sized so the whole hero (headline + image + score strip + powered-by)
+   fits inside the first viewport without being cut off. */
 .nft-image-wrap {
   width: 100%;
   overflow: hidden;
@@ -212,11 +214,11 @@ img, video {
   /* Mobile: natural aspect ratio */
   max-height: 240px;
 }
-@media (min-width: 480px)  { .nft-image-wrap { max-height: 300px; } }
-@media (min-width: 768px)  { .nft-image-wrap { max-height: 380px; } }
-@media (min-width: 1024px) { .nft-image-wrap { max-height: 420px; } }
-@media (min-width: 1280px) { .nft-image-wrap { max-height: 462px; } }
-@media (min-width: 1536px) { .nft-image-wrap { max-height: 520px; } }
+@media (min-width: 480px)  { .nft-image-wrap { max-height: 280px; } }
+@media (min-width: 768px)  { .nft-image-wrap { max-height: 320px; } }
+@media (min-width: 1024px) { .nft-image-wrap { max-height: 360px; } }
+@media (min-width: 1280px) { .nft-image-wrap { max-height: 380px; } }
+@media (min-width: 1536px) { .nft-image-wrap { max-height: 420px; } }
 
 /* ─── Score strip responsive ─────────────────────── */
 /* On very small screens hide the label & live text */

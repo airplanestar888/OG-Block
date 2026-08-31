@@ -1,12 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { getLeaderboard } from "@/lib/public-profiles";
 import { PixelField } from "@/components/pixel-field";
 import { PoweredBy } from "@/components/powered-by";
 
-
 export default async function HomePage() {
   const session = await auth();
+  const leaderboard = await getLeaderboard();
+  const profiles = leaderboard.length;
+  const totalScore = leaderboard.reduce((total, profile) => total + profile.score, 0);
+  const totalNfts = leaderboard.reduce((total, profile) => total + profile.nftCount, 0);
+
+  function formatCompactNumber(value: number): string {
+    const absValue = Math.abs(value);
+    if (absValue >= 1_000_000) {
+      return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+    }
+    if (absValue >= 1_000) {
+      return `${(value / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+    }
+    return value.toLocaleString();
+  }
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
@@ -47,12 +62,18 @@ export default async function HomePage() {
 
             {/* CTAs — pushed to the hero bottom on desktop, level with the Live capsule */}
             <div className="reveal reveal-d2 flex flex-wrap gap-2.5 sm:gap-3 lg:mt-auto">
-              <Link href={session ? "/og-card" : "/login"} className="btn-primary">
-                {session ? "Get your badge" : "Sign in"}
+              <Link href="/try" className="btn-primary">
+                Try yours — no sign-in
               </Link>
-              <Link href="/try" className="btn-secondary">
-                Try yours
-              </Link>
+              {session ? (
+                <Link href="/og-card" className="btn-secondary">
+                  Get your badge
+                </Link>
+              ) : (
+                <Link href="/leaderboard" className="btn-secondary">
+                  View leaderboard
+                </Link>
+              )}
             </div>
           </aside>
 
@@ -78,15 +99,15 @@ export default async function HomePage() {
               <div className="score-label-col flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-3 py-2.5 sm:px-4 sm:py-3">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0000FF]" />
                 <span className="whitespace-nowrap text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/60 sm:text-[0.6rem]">
-                  NFT Score
+                  On Base
                 </span>
               </div>
 
-              {/* Metrics */}
+              {/* Metrics — live numbers from the leaderboard */}
               <div className="flex flex-1 divide-x divide-[rgba(10,11,13,0.07)]">
-                <ScoreMetric label="Score"  value="250" />
-                <ScoreMetric label="Rank"   value="#12" />
-                <ScoreMetric label="Status" value="OG"  />
+                <ScoreMetric label="Profiles" value={profiles.toLocaleString()} />
+                <ScoreMetric label="Total score" value={formatCompactNumber(totalScore)} />
+                <ScoreMetric label="NFTs" value={formatCompactNumber(totalNfts)} />
               </div>
 
               {/* Live — hidden xs */}
