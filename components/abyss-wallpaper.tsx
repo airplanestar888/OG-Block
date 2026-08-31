@@ -104,29 +104,30 @@ void main() {
   float wsum = 0.0;
   // Additive-light model: the deep navies only tint the base (tiny weight),
   // while the three bright sources bloom as large liquid ellipses over it.
-  blob(uv, vec2(0.0, 0.0), uC0, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.333, 0.0), uC1, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.667, 0.0), uC2, 0.40, 1.2, t, acc, wsum);
-  blob(uv, vec2(1.0, 0.0), uC3, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.0, 0.333), uC4, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.333, 0.333), uC5, 0.55, 1.5, t, acc, wsum);
-  blob(uv, vec2(0.667, 0.333), uC6, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(1.0, 0.333), uC7, 0.40, 1.2, t, acc, wsum);
-  blob(uv, vec2(0.0, 0.667), uC8, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.333, 0.667), uC9, 0.40, 1.2, t, acc, wsum);
-  blob(uv, vec2(0.667, 0.667), uC10, 0.50, 1.4, t, acc, wsum);
-  blob(uv, vec2(1.0, 0.667), uC11, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.0, 1.0), uC12, 0.40, 1.2, t, acc, wsum);
-  blob(uv, vec2(0.333, 1.0), uC13, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(0.667, 1.0), uC14, 0.35, 0.3, t, acc, wsum);
-  blob(uv, vec2(1.0, 1.0), uC15, 0.50, 1.3, t, acc, wsum);
+  blob(uv, vec2(0.0, 0.0), uC0, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.333, 0.0), uC1, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.667, 0.0), uC2, 0.28, 0.55, t, acc, wsum);
+  blob(uv, vec2(1.0, 0.0), uC3, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.0, 0.333), uC4, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.333, 0.333), uC5, 0.28, 0.70, t, acc, wsum);
+  blob(uv, vec2(0.667, 0.333), uC6, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(1.0, 0.333), uC7, 0.28, 0.55, t, acc, wsum);
+  blob(uv, vec2(0.0, 0.667), uC8, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.333, 0.667), uC9, 0.28, 0.55, t, acc, wsum);
+  blob(uv, vec2(0.667, 0.667), uC10, 0.26, 0.60, t, acc, wsum);
+  blob(uv, vec2(1.0, 0.667), uC11, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.0, 1.0), uC12, 0.28, 0.55, t, acc, wsum);
+  blob(uv, vec2(0.333, 1.0), uC13, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(0.667, 1.0), uC14, 0.30, 0.25, t, acc, wsum);
+  blob(uv, vec2(1.0, 1.0), uC15, 0.24, 0.50, t, acc, wsum);
 
   vec3 col = acc / max(wsum, 0.0001);
 
-  // Bright liquid blooms over the base — the elliptical lights.
-  glow(uv, vec2(0.333, 0.333), vec3(0.80, 0.90, 0.96), 0.42, 0.60, t, col);
-  glow(uv, vec2(0.667, 0.667), vec3(0.55, 0.86, 0.95), 0.40, 0.50, t, col);
-  glow(uv, vec2(1.0, 1.0), vec3(0.35, 0.82, 0.96), 0.38, 0.45, t, col);
+  // Bright liquid blooms over the base — small, separate elliptical lights
+  // so the abyss stays deep navy around them.
+  glow(uv, vec2(0.333, 0.333), vec3(0.80, 0.90, 0.96), 0.24, 0.34, t, col);
+  glow(uv, vec2(0.667, 0.667), vec3(0.55, 0.86, 0.95), 0.22, 0.27, t, col);
+  glow(uv, vec2(1.0, 1.0), vec3(0.35, 0.82, 0.96), 0.21, 0.23, t, col);
 
   // Film fade lifts blacks toward the abyss base color.
   col = mix(col, vec3(0.016, 0.020, 0.102), 0.10);
