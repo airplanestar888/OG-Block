@@ -469,7 +469,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                             title={`Score increased by +${profile.recentPointsDelta.toLocaleString()} points`}
                           >
                             <span className="text-[0.68rem]">▲</span>
-                            <span>+{formatCompactNumber(profile.recentPointsDelta)} pts</span>
+                            <span>+{formatCompactNumber(profile.recentPointsDelta)}</span>
                           </span>
                         ) : null}
 
@@ -479,7 +479,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                             title={`Score decreased by ${profile.recentPointsDelta.toLocaleString()} points`}
                           >
                             <span className="text-[0.68rem]">▼</span>
-                            <span>{formatCompactNumber(profile.recentPointsDelta)} pts</span>
+                            <span>{formatCompactNumber(profile.recentPointsDelta)}</span>
                           </span>
                         ) : null}
                       </div>
