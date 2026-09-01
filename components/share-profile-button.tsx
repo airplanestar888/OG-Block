@@ -33,7 +33,7 @@ export function ShareProfileButton({ handle, score, rank }: ShareProfileButtonPr
 
   return (
     <button
-      className="focus-ring inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#000000] px-5 text-[0.85rem] font-semibold text-white transition hover:opacity-90 active:scale-[0.98] sm:h-11 sm:text-[0.875rem]"
+      className="focus-ring inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#0000FF] px-5 text-[0.85rem] font-semibold text-white transition duration-200 hover:bg-[#141CB5] active:opacity-80 sm:h-11 sm:text-[0.875rem]"
       onClick={handleShare}
       type="button"
     >
