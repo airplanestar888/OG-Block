@@ -13,6 +13,7 @@ import { getUserScoreHistory } from "@/lib/public-profiles";
 import { fetchAllUserHoldings } from "@/lib/holdings";
 import { getContractRecords } from "@/lib/nft/contracts";
 import type { NftHolding } from "@/lib/types";
+import { DashboardPortfolioFilter, type DashboardHolding } from "@/components/dashboard-portfolio-filter";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -81,6 +82,38 @@ export default async function DashboardPage() {
   const countedHoldings = contractMap
     ? (holdings || []).filter((h) => isVerifiedForLegacy(contractMap!.get((h.contract_address as string).toLowerCase())))
     : [];
+
+  const dashboardHoldings: DashboardHolding[] = (countedHoldings || []).map((holding, index) => {
+    const metadata = holding.metadata_json as { creator?: unknown; attributes?: unknown[]; chain?: string } | null;
+    const scoreBreakdown = getHoldingScoreBreakdown(
+      {
+        contractAddress: holding.contract_address,
+        tokenId: holding.token_id,
+        metadata: metadata || {}
+      } satisfies NftHolding,
+      index
+    );
+    const traits = getTraitSummary(metadata?.attributes);
+    const creator = getCreatorDisplay(metadata?.creator);
+    const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
+    const rawChain = metadata?.chain;
+    const chain: "Base" | "Ethereum" | "Robinhood" | "Solana" =
+      rawChain === "Ethereum" || rawChain === "Robinhood" || rawChain === "Solana"
+        ? rawChain
+        : "Base";
+
+    return {
+      contractAddress: holding.contract_address,
+      tokenId: holding.token_id,
+      chain,
+      creatorLabel: creator.label,
+      creatorAddress: creator.address,
+      traits: traits || "Standard",
+      scoreTotal: scoreBreakdown.total,
+      scoreParts: scoreBreakdown.parts,
+      explorerUrl
+    };
+  });
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-5 py-12 text-ink">
@@ -176,7 +209,7 @@ export default async function DashboardPage() {
                 className="focus-ring inline-flex self-start rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5] md:col-start-1 md:row-start-2 md:justify-self-start"
                 href="/og-card"
               >
-                Claim OG Card
+                Claim Badge/NFT
               </Link>
             ) : null}
           </div>
@@ -236,79 +269,8 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="mt-5 grid gap-3">
-            {(countedHoldings || []).map((holding, index) => {
-              const metadata = holding.metadata_json as { creator?: unknown; attributes?: unknown[] } | null;
-              const scoreBreakdown = getHoldingScoreBreakdown(
-                {
-                  contractAddress: holding.contract_address,
-                  tokenId: holding.token_id,
-                  metadata: metadata || {}
-                } satisfies NftHolding,
-                index
-              );
-              const traits = getTraitSummary(metadata?.attributes);
-              const creator = getCreatorDisplay(metadata?.creator);
-              const explorerUrl = getBaseExplorerNftUrl(holding.contract_address, holding.token_id);
-
-              return (
-                <article key={`${holding.contract_address}-${holding.token_id}`} className="grid gap-4 rounded-xl border border-black/10 bg-white p-4 md:grid-cols-[1fr_auto]">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-md bg-black px-2 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white">
-                        Item {index + 1}
-                      </span>
-                      {creator.label !== "Unknown creator" ? (
-                        creator.address ? (
-                          <Link
-                            className="font-semibold text-ink hover:text-baseblue"
-                            href={`https://basescan.org/address/${creator.address}`}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Creator: {creator.label}
-                          </Link>
-                        ) : (
-                          <h3 className="font-semibold text-ink">Creator: {creator.label}</h3>
-                        )
-                      ) : null}
-                    </div>
-                    <dl className="mt-4 grid gap-3 text-sm md:grid-cols-3">
-                      <ReceiptLine label="Collection contract" value={shortAddress(holding.contract_address) || "-"} mono />
-                      <ReceiptLine label="Token ID" value={holding.token_id} />
-                      <ReceiptLine label="Traits" value={traits || "No trait metadata"} />
-                    </dl>
-                    <Link
-                      className="mt-4 inline-flex rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 transition hover:border-baseblue hover:text-baseblue"
-                      href={explorerUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Show onchain
-                    </Link>
-                  </div>
-
-                  <div className="min-w-52 rounded-xl border border-black/10 bg-[#fbfcff] p-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-baseblue">Score impact</p>
-                    <p className="mt-2 text-3xl font-semibold text-black">+{scoreBreakdown.total}</p>
-                    <div className="mt-3 space-y-1">
-                      {scoreBreakdown.parts.map((part) => (
-                        <div key={part.label} className="flex justify-between gap-3 text-xs text-black/60">
-                          <span>{part.label}</span>
-                          <span className="font-semibold text-black">+{part.points}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-
-            {(countedHoldings || []).length === 0 ? (
-              <div className="rounded-xl border border-black/10 bg-white px-4 py-10 text-center text-sm text-black/50">
-                No verified collection receipts yet — verify a wallet holding NFTs from verified contracts.
-              </div>
-            ) : null}
+          <div className="mt-6">
+            <DashboardPortfolioFilter holdings={dashboardHoldings} />
           </div>
         </section>
 

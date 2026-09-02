@@ -40,6 +40,16 @@ export default async function HomePage() {
           {/* ── LEFT — copy ── */}
           <aside className="flex flex-col gap-6 sm:gap-7">
 
+            {/* CTA Pill Banner */}
+            <Link
+              href="/og-card"
+              className="focus-ring group inline-flex items-center gap-2 self-start rounded-full border border-[#0000FF]/25 bg-[#0000FF]/[0.06] px-3.5 py-1.5 text-xs font-semibold text-[#0000FF] transition hover:bg-[#0000FF]/12 active:scale-95"
+            >
+              <span className="flex size-2 rounded-full bg-[#0000FF] animate-pulse" />
+              <span>✨ Official OG Badge Minting is Live</span>
+              <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+            </Link>
+
             {/* Headline */}
             <div className="reveal reveal-d1 flex flex-col gap-3">
               <h1
@@ -117,6 +127,30 @@ export default async function HomePage() {
               </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* ── MULTI-CHAIN CULTURE INDEXING STRIP ───────── */}
+        <div className="reveal reveal-d3 mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[rgba(10,11,13,0.08)] bg-white/70 p-3.5 backdrop-blur-sm sm:px-5 sm:py-3">
+          <div className="flex items-center gap-2">
+            <span className="size-2 rounded-full bg-[#00c48c]" />
+            <span className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#0A0B0D]/55 sm:text-xs">
+              Multi-Chain Culture Indexing
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[0.75rem] font-semibold text-[#0A0B0D]/75">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#0000FF]/[0.08] px-2.5 py-1 text-[#0000FF]">
+              <span className="size-1.5 rounded-full bg-[#0000FF]" /> Base
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-2.5 py-1">
+              <span className="size-1.5 rounded-full bg-[#627EEA]" /> Ethereum
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-2.5 py-1">
+              <span className="size-1.5 rounded-full bg-[#00C805]" /> Robinhood
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.05] px-2.5 py-1">
+              <span className="size-1.5 rounded-full bg-[#9945FF]" /> Solana
+            </span>
           </div>
         </div>
       </section>

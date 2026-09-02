@@ -7,6 +7,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 const NAV_LINKS = [
+  { href: "/og-card", label: "Badge/NFT", isMint: true },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/agent-guide", label: "Agents" },
@@ -53,18 +54,23 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
         </Link>
 
         <nav className="nav-links hidden items-center gap-1 sm:flex">
-          {navLinks.map(({ href, label }) => (
+          {navLinks.map(({ href, label, isMint }) => (
             <Link
               key={href}
               href={href}
               aria-current={pathname === href ? "page" : undefined}
-              className={`focus-ring rounded-lg px-3 py-2 text-[0.875rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] ${
+              className={`focus-ring inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[0.875rem] font-semibold transition duration-150 hover:bg-[rgba(10,11,13,0.05)] ${
                 pathname === href
                   ? "bg-[rgba(0,0,255,0.08)] text-[#0000FF]"
                   : "text-[#0A0B0D]"
               }`}
             >
-              {label}
+              <span>{label}</span>
+              {isMint && (
+                <span className="rounded-full bg-[#0000FF]/10 px-1.5 py-0.5 text-[0.62rem] font-extrabold uppercase tracking-wide text-[#0000FF]">
+                  Mint
+                </span>
+              )}
             </Link>
           ))}
           <div className="ml-1">
@@ -94,18 +100,23 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
       {open ? (
         <div className="border-t border-[rgba(10,11,13,0.07)] bg-white sm:hidden">
           <nav className="page-container flex flex-col py-3">
-            {navLinks.map(({ href, label }) => (
+            {navLinks.map(({ href, label, isMint }) => (
               <Link
                 key={href}
                 href={href}
                 aria-current={pathname === href ? "page" : undefined}
-                className={`rounded-lg px-3 py-3.5 text-[0.95rem] font-semibold transition hover:bg-[rgba(10,11,13,0.04)] ${
+                className={`inline-flex items-center justify-between rounded-lg px-3 py-3.5 text-[0.95rem] font-semibold transition hover:bg-[rgba(10,11,13,0.04)] ${
                   pathname === href
                     ? "bg-[rgba(0,0,255,0.08)] text-[#0000FF]"
                     : "text-[#0A0B0D]"
                 }`}
               >
-                {label}
+                <span>{label}</span>
+                {isMint && (
+                  <span className="rounded-full bg-[#0000FF]/10 px-2 py-0.5 text-[0.68rem] font-extrabold uppercase tracking-wide text-[#0000FF]">
+                    Mint
+                  </span>
+                )}
               </Link>
             ))}
             <div className="mt-2 pb-2">

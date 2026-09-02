@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useAppKit } from "@reown/appkit/react";
 import { shortAddress } from "@/lib/address";
 import { OgCardAbi } from "@/lib/og-card-abi";
+import { TiltCard } from "@/components/tilt-card";
 
 const MINTED_EVENT = parseAbiItem("event Minted(address indexed to, uint256 indexed tokenId)");
 
@@ -268,7 +269,9 @@ export default function OgCardPage() {
   const nextNumber = totalSupply !== undefined ? Number(totalSupply) : undefined;
   const previewTier = nextNumber !== undefined ? tierForNumber(nextNumber) : undefined;
   const soldOut = nextNumber !== undefined && nextNumber >= MAX_SUPPLY;
+  const mintedCount = nextNumber !== undefined ? nextNumber : 0;
   const remaining = nextNumber !== undefined ? Math.max(MAX_SUPPLY - nextNumber, 0) : undefined;
+  const percentMinted = Math.min(100, Math.round((mintedCount / MAX_SUPPLY) * 100 * 10) / 10);
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
@@ -282,14 +285,14 @@ export default function OgCardPage() {
           Claim Your OG Card
         </h1>
         <p className="mt-2 text-sm leading-6 text-black/55">
-          First OG Badge Genesis
+          First OG Badge Genesis · Proof of Culture
         </p>
       </div>
 
-      {/* card visual */}
-      <div className="relative overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-6 shadow-sm sm:p-8">
+      {/* 3D Interactive Card Visual */}
+      <TiltCard className="relative overflow-hidden rounded-[1.5rem] border border-black/10 bg-white p-6 shadow-md transition-shadow duration-300 hover:shadow-xl sm:p-8">
         {/* card artwork */}
-        <div className="relative mx-auto mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-white">
+        <div className="relative mx-auto mb-6 aspect-square w-full max-w-sm overflow-hidden rounded-xl bg-white shadow-inner">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={cardImage}
@@ -340,6 +343,22 @@ export default function OgCardPage() {
           </div>
         </div>
 
+        {/* Live Mint Progress Bar */}
+        <div className="relative mt-5 space-y-2 rounded-xl border border-black/10 bg-[#f7f8fb] p-3.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-ink">Total Minted</span>
+            <span className="font-mono font-bold text-baseblue">
+              {mintedCount.toLocaleString()} / {MAX_SUPPLY.toLocaleString()} ({percentMinted}%)
+            </span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-black/10">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-baseblue to-[#3851ff] transition-all duration-700"
+              style={{ width: `${Math.max(percentMinted, 1)}%` }}
+            />
+          </div>
+        </div>
+
         {alreadyClaimed && claim ? (
           <div className="relative mt-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-center">
             <p className="text-sm font-semibold text-green-700">
@@ -368,7 +387,7 @@ export default function OgCardPage() {
             View contract on BaseScan →
           </a>
         </div>
-      </div>
+      </TiltCard>
 
       {/* action area */}
       <div className="space-y-3">
@@ -455,6 +474,72 @@ export default function OgCardPage() {
           <p className="text-center text-sm text-red-600">{error}</p>
         ) : null}
       </div>
+
+      {/* ── VISUAL TIER SHOWCASE ───────────────────────── */}
+      <section className="space-y-3 pt-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-[0.16em] text-black/50">
+            OG Card Tiers &amp; Perks
+          </h3>
+          <span className="text-[0.65rem] font-medium text-black/40">Allocated strictly by mint order</span>
+        </div>
+
+        <div className="grid gap-2.5 sm:grid-cols-3">
+          {/* Genesis */}
+          <div className={`relative overflow-hidden rounded-xl border p-3.5 transition ${
+            previewTier === "Genesis"
+              ? "border-[#E5B54A] bg-[#fdfdfb] shadow-[0_4px_16px_rgba(217,169,63,0.14)] ring-1 ring-[#E5B54A]/30"
+              : "border-black/10 bg-white"
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="rounded-md bg-gradient-to-r from-[#F7D77A] to-[#E5B54A] px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-wider text-black/85">
+                Genesis
+              </span>
+              <span className="font-mono text-[0.7rem] font-bold text-black/40">#0 – #99</span>
+            </div>
+            <p className="mt-2.5 text-xs font-semibold text-ink">Founding OG Status</p>
+            <p className="mt-0.5 text-[0.7rem] leading-relaxed text-black/55">
+              Top culture multiplier, Genesis badge on X profile, exclusive governance access.
+            </p>
+          </div>
+
+          {/* Early */}
+          <div className={`relative overflow-hidden rounded-xl border p-3.5 transition ${
+            previewTier === "Early"
+              ? "border-baseblue bg-baseblue/[0.03] shadow-[0_4px_16px_rgba(0,0,255,0.1)] ring-1 ring-baseblue/30"
+              : "border-black/10 bg-white"
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="rounded-md bg-[#0000FF] px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-wider text-white">
+                Early
+              </span>
+              <span className="font-mono text-[0.7rem] font-bold text-black/40">#100 – #499</span>
+            </div>
+            <p className="mt-2.5 text-xs font-semibold text-ink">Early Contributor</p>
+            <p className="mt-0.5 text-[0.7rem] leading-relaxed text-black/55">
+              Early supporter tier, priority ranking boost, ecosystem token perks.
+            </p>
+          </div>
+
+          {/* Member */}
+          <div className={`relative overflow-hidden rounded-xl border p-3.5 transition ${
+            previewTier === "Member"
+              ? "border-black/25 bg-black/[0.03] shadow-[0_4px_16px_rgba(0,0,0,0.06)]"
+              : "border-black/10 bg-white"
+          }`}>
+            <div className="flex items-center justify-between">
+              <span className="rounded-md bg-[#333D4B] px-2 py-0.5 text-[0.65rem] font-black uppercase tracking-wider text-white">
+                Member
+              </span>
+              <span className="font-mono text-[0.7rem] font-bold text-black/40">#500 – #999</span>
+            </div>
+            <p className="mt-2.5 text-xs font-semibold text-ink">Verified Member</p>
+            <p className="mt-0.5 text-[0.7rem] leading-relaxed text-black/55">
+              On-chain membership proof, verified badge on Base and public leaderboard.
+            </p>
+          </div>
+        </div>
+      </section>
       </div>
 
       {/* success modal — pops the NFT art when the mint confirms */}

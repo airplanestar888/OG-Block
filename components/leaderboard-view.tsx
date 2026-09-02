@@ -328,28 +328,48 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           {tableRows.map((profile, index) => {
             const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
             const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
+            const isMe = !!(myHandle && profile.xHandle && profile.xHandle.toLowerCase() === myHandle.toLowerCase());
+
             return (
               <li
                 key={`m-${profile.xHandle || index}`}
                 onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
-                className={`flex items-center gap-3 px-4 py-3.5 transition hover:bg-baseblue/[0.05] ${
-                  profile.xHandle ? "cursor-pointer" : ""
-                }`}
+                className={`flex items-center gap-3 px-4 py-3.5 transition ${
+                  isMe
+                    ? "bg-[#0000FF]/[0.06] hover:bg-[#0000FF]/[0.1] ring-1 ring-inset ring-[#0000FF]/25"
+                    : "hover:bg-baseblue/[0.05]"
+                } ${profile.xHandle ? "cursor-pointer" : ""}`}
               >
-                <span className="inline-flex min-w-11 items-center justify-center rounded-full bg-black/[0.04] px-2.5 py-1 text-xs font-bold text-black/70">
+                <span className={`inline-flex min-w-11 items-center justify-center rounded-full px-2.5 py-1 text-xs font-bold ${
+                  isMe ? "bg-[#0000FF] text-white shadow-sm" : "bg-black/[0.04] text-black/70"
+                }`}>
                   {profile.rank ? `#${profile.rank}` : "-"}
                 </span>
                 <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
                     <p className="truncate text-sm font-semibold text-black/85">@{profile.xHandle}</p>
+                    {isMe ? (
+                      <span className="rounded-full bg-[#0000FF] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
+                        YOU
+                      </span>
+                    ) : null}
                     {profile.profileRole === "agent" ? (
                       <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.62rem] font-bold uppercase text-black/60">
                         Agent
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-xs text-black/40">{profile.nftCount.toLocaleString()} NFT</p>
+                  <div className="flex items-center gap-1.5 text-xs text-black/45">
+                    <span>{profile.nftCount.toLocaleString()} NFTs</span>
+                    <span>·</span>
+                    <span className="inline-flex items-center gap-0.5" title="Indexed on Base, ETH, Robinhood & Solana">
+                      <span className="size-1.5 rounded-full bg-[#0000FF]" />
+                      <span className="size-1.5 rounded-full bg-[#627EEA]" />
+                      <span className="size-1.5 rounded-full bg-[#00C805]" />
+                      <span className="size-1.5 rounded-full bg-[#9945FF]" />
+                    </span>
+                  </div>
                 </div>
                 <div className="flex flex-col items-end gap-0.5">
                   <span className="rounded-full bg-baseblue px-2.5 py-0.5 text-xs font-bold text-white">
@@ -394,21 +414,25 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             </thead>
             <tbody className="divide-y divide-black/10">
               {tableRows.map((profile, index) => {
-                // A zero score with a negative delta reads oddly ("why minus
-                // at 0?") — only show movement for profiles that still hold
-                // points.
                 const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
                 const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
+                const isMe = !!(myHandle && profile.xHandle && profile.xHandle.toLowerCase() === myHandle.toLowerCase());
 
                 return (
                   <tr
                     key={profile.xHandle || index}
                     onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
-                    className={`transition hover:bg-baseblue/[0.05] ${profile.xHandle ? "cursor-pointer" : ""}`}
+                    className={`transition ${
+                      isMe
+                        ? "bg-[#0000FF]/[0.05] hover:bg-[#0000FF]/[0.09]"
+                        : "hover:bg-baseblue/[0.05]"
+                    } ${profile.xHandle ? "cursor-pointer" : ""}`}
                   >
                     {/* Rank */}
                     <td className="px-6 py-4 text-center">
-                      <span className="inline-flex min-w-12 items-center justify-center rounded-full bg-black/[0.04] px-3 py-1 text-xs font-bold text-black/70">
+                      <span className={`inline-flex min-w-12 items-center justify-center rounded-full px-3 py-1 text-xs font-bold ${
+                        isMe ? "bg-[#0000FF] text-white shadow-sm" : "bg-black/[0.04] text-black/70"
+                      }`}>
                         {profile.rank ? `#${profile.rank}` : "-"}
                       </span>
                     </td>
@@ -432,15 +456,27 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                                 `@${profile.xHandle}`
                               )}
                             </p>
+                            {isMe ? (
+                              <span className="rounded-full bg-[#0000FF] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
+                                YOU
+                              </span>
+                            ) : null}
                             {profile.profileRole === "agent" ? (
                               <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
                                 Agent
                               </span>
                             ) : null}
                           </div>
-                          <p className="text-xs text-black/40">
-                            {profile.nftCount.toLocaleString()} NFT on Base
-                          </p>
+                          <div className="flex items-center gap-1.5 text-xs text-black/45">
+                            <span>{profile.nftCount.toLocaleString()} NFTs</span>
+                            <span>·</span>
+                            <span className="inline-flex items-center gap-1" title="Indexed on Base, ETH, Robinhood & Solana">
+                              <span className="size-1.5 rounded-full bg-[#0000FF]" />
+                              <span className="size-1.5 rounded-full bg-[#627EEA]" />
+                              <span className="size-1.5 rounded-full bg-[#00C805]" />
+                              <span className="size-1.5 rounded-full bg-[#9945FF]" />
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
