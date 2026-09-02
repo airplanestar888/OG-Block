@@ -43,7 +43,7 @@ export default async function HomePage() {
             {/* CTA Pill Banner — premium minting capsule */}
             <Link
               href="/og-card"
-              className="focus-ring group relative inline-flex self-start overflow-hidden rounded-full p-px shadow-[0_10px_30px_rgba(0,0,255,0.35)] transition-transform duration-200 active:scale-[0.98]"
+              className="focus-ring group relative inline-flex self-start overflow-hidden rounded-full p-px transition-transform duration-200 active:scale-[0.98]"
               style={{
                 background:
                   "linear-gradient(135deg, rgba(0,0,255,0.9), rgba(91,140,255,0.9) 50%, rgba(20,28,181,0.9))",
