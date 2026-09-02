@@ -40,14 +40,45 @@ export default async function HomePage() {
           {/* ── LEFT — copy ── */}
           <aside className="flex flex-col gap-6 sm:gap-7">
 
-            {/* CTA Pill Banner */}
+            {/* CTA Pill Banner — premium minting capsule */}
             <Link
               href="/og-card"
-              className="focus-ring group inline-flex items-center gap-2 self-start rounded-full border border-[#0000FF]/25 bg-[#0000FF]/[0.06] px-3.5 py-1.5 text-xs font-semibold text-[#0000FF] transition hover:bg-[#0000FF]/12 active:scale-95"
+              className="focus-ring group relative inline-flex self-start overflow-hidden rounded-full p-px shadow-[0_10px_30px_rgba(0,0,255,0.35)] transition-transform duration-200 active:scale-[0.98]"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(0,0,255,0.9), rgba(91,140,255,0.9) 50%, rgba(20,28,181,0.9))",
+              }}
             >
-              <span className="flex size-2 rounded-full bg-[#0000FF] animate-pulse" />
-              <span>✨ Official OG Badge Minting is Live</span>
-              <span className="transition-transform duration-150 group-hover:translate-x-0.5">→</span>
+              <span className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-[#0000FF] via-[#141CB5] to-[#0000FF] px-4 py-2">
+                <span className="grid size-5 place-items-center rounded-[6px] bg-white/15 text-[0.55rem] font-black leading-none text-white">
+                  OG
+                </span>
+                <span className="text-xs font-semibold tracking-tight text-white">
+                  Official OG Badge
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-white">
+                  <span className="relative flex size-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
+                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-300" />
+                  </span>
+                  Minting is Live
+                </span>
+                <svg
+                  width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"
+                  className="text-white/80 transition-transform duration-150 group-hover:translate-x-0.5"
+                >
+                  <path
+                    d="M2 7h10M8 3l4 4-4 4"
+                    stroke="currentColor" strokeWidth="1.4"
+                    strokeLinecap="round" strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              {/* shine sweep on hover */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -translate-x-full bg-[linear-gradient(110deg,transparent_30%,rgba(255,255,255,0.3)_50%,transparent_70%)] transition-transform duration-700 ease-out group-hover:translate-x-full"
+              />
             </Link>
 
             {/* Headline */}
