@@ -5,8 +5,11 @@ import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 // Hologram treatment for the hero NFT grid: pointer-tracked 3D tilt, a
 // counter-parallax on the image itself, an iridescent sheen that follows the
 // cursor, scanlines, and a projector beam rising from the bottom edge (the
-// direction of the On Chain strip). Cosmetic only — disabled for
-// reduced-motion users.
+// direction of the On Chain strip). On hover the image itself fades to 80%
+// and wobbles through an SVG turbulence filter, so it reads as a projection
+// breaking up under a hand. Every light layer stays clipped inside the image
+// frame — nothing bleeds onto neighbouring panels. Cosmetic only; disabled
+// for reduced-motion users.
 export function HoloImage({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [holo, setHolo] = useState({ rx: 0, ry: 0, px: 50, py: 50, active: false });
@@ -37,16 +40,35 @@ export function HoloImage({ children }: { children: ReactNode }) {
       onMouseLeave={onLeave}
       className="relative [perspective:1200px]"
     >
+      {/* Animated water-ripple filter, referenced only while hovering */}
+      <svg aria-hidden="true" className="absolute h-0 w-0">
+        <filter id="holo-ripple" x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" numOctaves="2" result="waves">
+            <animate
+              attributeName="baseFrequency"
+              dur="7s"
+              values="0.010 0.018;0.013 0.024;0.010 0.018"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="waves" scale="9" />
+        </filter>
+      </svg>
+
       <div
         className="relative transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
         style={{ transform: `rotateX(${holo.rx}deg) rotateY(${holo.ry}deg)` }}
       >
         <div
-          className="nft-image-wrap transition-transform duration-200 ease-out will-change-transform"
+          className="nft-image-wrap overflow-hidden transition-[transform,opacity,filter] duration-300 ease-out will-change-transform"
           style={{
             transform: holo.active
               ? `translate(${(holo.px - 50) * 0.08}px, ${(holo.py - 50) * 0.08}px)`
-              : "translate(0, 0)"
+              : "translate(0, 0)",
+            // Projection breakup: the picture fades to 80% and ripples
+            // like water while the pointer is over it.
+            opacity: holo.active ? 0.8 : 1,
+            filter: holo.active ? "url(#holo-ripple)" : undefined
           }}
         >
           {children}
@@ -90,12 +112,6 @@ export function HoloImage({ children }: { children: ReactNode }) {
           />
         </div>
       </div>
-
-      {/* light spill onto the surface below the card */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-10 -bottom-2 h-4 rounded-full bg-cyan-300/40 blur-md"
-      />
     </div>
   );
 }
