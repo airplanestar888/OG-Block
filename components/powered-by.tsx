@@ -3,8 +3,8 @@ const STACK = [
   // normalize to mono-black like the rest for a consistent row.
   { name: "Base", src: "/logos/base-lockup-black.svg", h: 19 },
   { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
-  { name: "Robinhood", src: "/logos/robinhood.svg", h: 22 },
-  { name: "Solana", src: "/logos/solana.svg", h: 22 },
+  { name: "Robinhood", src: "/logos/robinhood.svg", h: 26.4 },
+  { name: "Solana", src: "/logos/solana.svg", h: 19.8 },
   { name: "Etherscan", src: "/logos/etherscan.svg", h: 24 },
   { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 },
   { name: "WalletConnect", src: "/logos/walletconnect.svg", h: 22 },
