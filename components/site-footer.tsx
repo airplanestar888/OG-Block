@@ -1,195 +1,26 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 
 const linkClass =
   "text-sm font-semibold text-white/85 transition hover:text-white";
 
-// Idle particle wave (footer): small square pixels that drift right-to-left
-// like flowing water, with a vertical sine bob. Canvas 2D, no Three.js. Faded
-// into the solid blue footer via a left gradient so the text stays readable.
-// White-only palette (varying alpha gives the gradient/depth feel).
-const PARTICLE_COLORS = ["#ffffff"];
-
-function FooterWave() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number>(0);
-
-  useEffect(() => {
-    const el = canvasRef.current;
-    const context = el?.getContext("2d");
-    if (!el || !context) return;
-    const canvas = el;
-    const ctx = context;
-
-    let dpr = 1;
-    let w = 0;
-    let h = 0;
-
-    type Particle = {
-      x: number;
-      y: number;
-      baseY: number;
-      size: number;
-      color: string;
-      speed: number;
-      amp: number;
-      phase: number;
-      freq: number;
-      alpha: number;
-    };
-    let particles: Particle[] = [];
-
-    function makeParticle(atRightEdge: boolean): Particle {
-      const size = 4 + Math.floor(Math.random() * 8);
-      const baseY = Math.random() * h;
-      // Density falloff: particles spawn across 75% of the width from the
-      // right edge, weighted dense near the right and sparse toward the left
-      // (x² sampling biases picks toward the right side of the range).
-      const range = w * 0.75;
-      const bias = Math.pow(Math.random(), 2);
-      const x = w - range + (1 - bias) * range;
-      return {
-        x: atRightEdge ? w + Math.random() * 40 : x,
-        y: baseY,
-        baseY,
-        size,
-        color: PARTICLE_COLORS[Math.floor(Math.random() * PARTICLE_COLORS.length)],
-        speed: 18 + Math.random() * 42, // px/sec leftward
-        amp: 6 + Math.random() * 20, // vertical wave amplitude
-        phase: Math.random() * Math.PI * 2,
-        freq: 0.6 + Math.random() * 1.4,
-        alpha: 0.4 + Math.random() * 0.5
-      };
-    }
-
-    function build() {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = parent.clientWidth;
-      h = parent.clientHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-
-      const count = Math.max(80, Math.floor((w * h) / 1300));
-      particles = Array.from({ length: count }, () => makeParticle(false));
-    }
-    build();
-    window.addEventListener("resize", build, { passive: true });
-
-    let prev = performance.now();
-    let t = 0;
-    function step(dt: number) {
-      t += dt;
-
-      // Particles live in the right 75% of the bar, recycling at the zone's
-      // left bound; alpha fades toward that bound so density reads as
-      // many (right) → few (left).
-      const leftBound = w * 0.25;
-      const fadeSpan = w * 0.2;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      ctx.scale(dpr, dpr);
-      for (const p of particles) {
-        // flow leftward
-        p.x -= p.speed * dt;
-        // wave bob
-        p.y = p.baseY + Math.sin(t * p.freq + p.phase) * p.amp;
-        // recycle at the zone's left edge back to the right
-        if (p.x < leftBound) {
-          Object.assign(p, makeParticle(true));
-        }
-        const posAlpha = Math.min(1, Math.max(0.15, (p.x - leftBound) / fadeSpan));
-        ctx.globalAlpha = p.alpha * posAlpha;
-        ctx.fillStyle = p.color;
-        ctx.fillRect(p.x, p.y, p.size, p.size);
-      }
-      ctx.restore();
-    }
-
-    function tick() {
-      const now = performance.now();
-      const dt = Math.min((now - prev) / 1000, 0.05);
-      prev = now;
-      step(dt);
-      rafRef.current = requestAnimationFrame(tick);
-    }
-
-    // The footer sits below the fold on every page, so the loop only runs
-    // while it's actually near the viewport; reduced-motion users get a
-    // single static frame instead of an endless animation.
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let inView = false;
-    let animating = false;
-
-    function syncAnimation() {
-      const shouldRun = inView && !reducedMotion.matches;
-      if (shouldRun && !animating) {
-        prev = performance.now();
-        animating = true;
-        rafRef.current = requestAnimationFrame(tick);
-      } else if (!shouldRun && animating) {
-        cancelAnimationFrame(rafRef.current);
-        animating = false;
-      }
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        inView = entries.some((entry) => entry.isIntersecting);
-        syncAnimation();
-      },
-      { rootMargin: "120px" }
-    );
-    observer.observe(el);
-
-    const onMotionPreferenceChange = () => {
-      if (reducedMotion.matches) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        step(0);
-      }
-      syncAnimation();
-    };
-
-    // Static texture for reduced motion (before the first intersection fires)
-    if (reducedMotion.matches) step(0);
-
-    reducedMotion.addEventListener("change", onMotionPreferenceChange);
-    syncAnimation();
-
-    return () => {
-      window.removeEventListener("resize", build);
-      reducedMotion.removeEventListener("change", onMotionPreferenceChange);
-      observer.disconnect();
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />;
-}
-
+// Big-type poster footer: Klein blue slab, statement set in Syne — the
+// display face culture/web3 brands use. The second line is outlined to
+// echo poster lettering. No animation layer; the type is the visual.
 export function SiteFooter() {
   return (
-    <footer
-      className="relative overflow-hidden border-y border-white/20 bg-[#0000FF]"
-    >
-      {/* animation layer (right side), faded into solid blue toward the left */}
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-3/4">
-        <FooterWave />
-        <div
-          className="absolute inset-0"
-          style={{ background: "linear-gradient(to right, rgb(0,0,255) 5%, transparent 22%)" }}
-        />
-      </div>
+    <footer className="border-y border-white/20 bg-[#0000FF] text-white">
+      <div className="mx-auto max-w-6xl px-5 pb-6 pt-10 sm:pb-8 sm:pt-14">
+        <p className="font-[family-name:var(--font-syne)] text-[clamp(2.75rem,9.5vw,8rem)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em]">
+          Own status.
+          <span
+            className="block text-transparent"
+            style={{ WebkitTextStroke: "2px rgba(255,255,255,0.92)" }}
+          >
+            Prove culture.
+          </span>
+        </p>
 
-      {/* content (left aligned) */}
-      <div className="relative mx-auto flex max-w-6xl flex-col items-start gap-4 px-5 py-8 text-left">
-        <nav className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <nav className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 sm:mt-12">
           <a
             className="text-white/85 transition hover:text-white"
             href="https://x.com/OGBLOCKHAIN"
@@ -209,7 +40,7 @@ export function SiteFooter() {
             aria-label="GitHub"
           >
             <svg width="19" height="19" viewBox="0 0 98 96" fill="currentColor" aria-hidden="true">
-              <path d="M41.4395 69.3848C28.8066 67.8535 19.9062 58.7617 19.9062 46.9902C19.9062 42.2051 21.6289 37.0371 24.5 33.5918C23.2559 30.4336 23.4473 23.7344 24.8828 20.959C28.7109 20.4805 33.8789 22.4902 36.9414 25.2656C40.5781 24.1172 44.4062 23.543 49.0957 23.543C53.7852 23.543 57.6133 24.1172 61.0586 25.1699C64.0254 22.4902 69.2891 20.4805 73.1172 20.959C74.457 23.543 74.6484 30.2422 73.4043 33.4961C76.4668 37.1328 78.0937 42.0137 78.0937 46.9902C78.0937 58.7617 69.1934 67.6621 56.3691 69.2891C59.623 71.3945 61.8242 75.9883 61.8242 81.252L61.8242 91.2051C61.8242 94.0762 64.2168 95.7031 67.0879 94.5547C84.4102 87.9512 98 70.6289 98 49.1914C98 22.1074 75.9883 0 48.9043 0C21.8203 0 0 22.1074 0 49.1914C0 70.4375 13.4941 88.0469 31.6777 94.6504C34.2617 95.6074 36.75 93.8848 36.75 91.3008L36.75 83.6445C35.4375 84.2188 33.6875 84.6016 32.1562 84.6016C25.8398 84.6016 22.1074 81.1563 19.4277 74.7441C18.375 72.1602 17.2266 70.6289 15.0254 70.3418C13.877 70.2461 13.4941 69.7676 13.4941 69.1934C13.4941 68.0449 15.4082 67.1836 17.3223 67.1836C20.0977 67.1836 22.4902 68.9063 24.9785 72.4473C26.8926 75.2227 28.9023 76.4668 31.2949 76.4668C33.6875 76.4668 35.2187 75.6055 37.4199 73.4043C39.0469 71.7773 40.291 70.3418 41.4395 69.3848Z" />
+              <path d="M41.4395 69.3848C28.8066 67.8535 19.9062 58.7617 19.9062 46.9902C19.9062 42.2051 21.6289 37.0371 24.5 33.5918C23.2559 30.4336 23.4473 23.7344 24.8828 20.959C28.7109 20.4805 33.8789 22.4902 36.9414 25.2656C40.5781 24.1172 44.4062 23.543 49.0957 23.543C53.7852 23.543 57.6133 24.1172 61.0586 25.1699C64.0254 22.4902 69.2891 20.4805 73.1172 20.959C74.457 23.543 74.6484 30.2422 73.4043 33.4961C76.4668 37.1328 78.0937 42.0137 78.0937 46.9902C78.0937 58.7617 69.1934 67.6621 56.3691 69.2891C59.623 71.3945 61.8242 75.9883 61.8242 81.252L61.8242 91.2051C61.8242 94.0762 64.2168 95.7031 67.0879 94.5547C84.4102 87.9512 98 70.6289 98 49.1914C98 22.1074 75.9883 0 48.9043 0C21.8203 0 0 22.1074 0 49.1914C0 70.4375 13.4941 88.0469 31.6777 94.6504C34.2617 95.6074 36.75 93.8848 36.75 91.3008L36.75 83.6445C35.4375 84.2188 33.6875 84.6016 32.1562 84.6016C25.8398 84.6016 22.1074 81.1563 19.4277 74.7441C18.375 72.1602 17.2266 70.6289 15.0254 70.3418C13.877 70.2461 13.4941 69.7676 13.4941 69.1934C13.4941 68.0449 15.4082 67.1836 17.3223 67.1836C20.0977 67.1836 22.4902 68.9063 24.9785 72.4473C26.8926 75.2227 28.9023 76.4668 31.2949 76.4668C33.6876 76.4668 35.2187 75.6055 37.4199 73.4043C39.0469 71.7773 40.291 70.3418 41.4395 69.3848Z" />
             </svg>
           </a>
           <Link className={linkClass} href="/privacy">
@@ -219,7 +50,7 @@ export function SiteFooter() {
             Terms
           </Link>
         </nav>
-        <p className="text-[0.625rem] text-white/70">© 2026 OG BLOCK All Rights Reserved</p>
+        <p className="mt-3 text-[0.625rem] text-white/70">© 2026 OG BLOCK All Rights Reserved</p>
       </div>
     </footer>
   );
