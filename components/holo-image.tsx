@@ -88,14 +88,15 @@ export function HoloImage({ children }: { children: ReactNode }) {
             }}
           />
 
-          {/* iridescent sheen following the cursor */}
+          {/* iridescent sheen following the cursor — kept faint so the
+              ripple disc stays the star */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 transition-opacity duration-300"
             style={{
-              opacity: holo.active ? 1 : 0,
+              opacity: holo.active ? 0.38 : 0,
               mixBlendMode: "screen",
-              background: `radial-gradient(120% 90% at ${holo.px}% ${holo.py}%, rgba(140,225,255,0.4) 0%, rgba(0,0,255,0.22) 42%, transparent 72%)`
+              background: `radial-gradient(120% 90% at ${holo.px}% ${holo.py}%, rgba(140,225,255,0.22) 0%, rgba(0,0,255,0.12) 42%, transparent 72%)`
             }}
           />
 
