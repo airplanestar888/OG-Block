@@ -92,9 +92,22 @@ img, video {
 .reveal-d3 { animation-delay: 0.22s; }
 .reveal-d4 { animation-delay: 0.30s; }
 
+/* Directional convergence (features section): pieces slide in from both
+   sides and settle into one layout */
+@keyframes slide-from-left {
+  from { opacity: 0; transform: translateX(-56px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slide-from-right {
+  from { opacity: 0; transform: translateX(56px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.reveal-left  { animation: slide-from-left 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.reveal-right { animation: slide-from-right 0.8s cubic-bezier(0.16, 1, 0.3, 1) both; }
+
 /* Respect prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
-  .reveal, .nft-img { animation: none !important; }
+  .reveal, .reveal-left, .reveal-right, .nft-img { animation: none !important; }
 }
 
 /* ─── Feature rows ───────────────────────────────── */

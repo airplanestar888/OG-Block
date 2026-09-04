@@ -152,8 +152,8 @@ export default async function HomePage() {
       {/* ── FEATURES — standalone screen: title left, 2x2 icon grid right ── */}
       <section className="page-container relative flex min-h-[88vh] flex-col justify-center py-20 sm:py-24">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          {/* Title block */}
-          <div className="reveal reveal-d1">
+          {/* Title block — slides in from the left */}
+          <div className="reveal-left">
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
               What you get
             </p>
@@ -168,8 +168,8 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Feature grid — all five, 2 columns */}
-          <div className="reveal reveal-d2 grid gap-x-10 gap-y-12 sm:grid-cols-2">
+          {/* Feature grid — items converge from alternating sides */}
+          <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
             {[
               {
                 num: "01",
@@ -239,8 +239,12 @@ export default async function HomePage() {
                   </g>
                 )
               }
-            ].map(({ num, title, copy, wide, icon }) => (
-              <div key={title} className={`flex items-start gap-5 ${wide ? "sm:col-span-2" : ""}`}>
+            ].map(({ num, title, copy, wide, icon }, i) => (
+              <div
+                key={title}
+                className={`flex items-start gap-5 ${wide ? "sm:col-span-2" : ""} ${i % 2 === 0 ? "reveal-left" : "reveal-right"}`}
+                style={{ animationDelay: `${0.12 + i * 0.09}s` }}
+              >
                 <svg
                   width="46" height="46" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="1.6"
