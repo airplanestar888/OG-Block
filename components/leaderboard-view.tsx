@@ -135,39 +135,29 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
   return (
     <div className="space-y-8">
-      {/* Top Header & Stats */}
-      <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+      {/* Top Header & live strip — no card, the blue podium is the only solid */}
+      <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Own Gang · Leaderboard</p>
           <PageHeading className="mt-2 max-w-2xl" outline="Who ranks the highest.">
             Who holds the most.
           </PageHeading>
           <p className="mt-4 max-w-md text-sm leading-6 text-black/60">
-            Every verified gang profile, ranked live from on-chain NFT holdings across chains.
+            Gang status is earned, not claimed. Every verified gang, ranked live across chains.
           </p>
         </div>
 
-        <div className="rounded-[1.5rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
-          <div className="p-6">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Live standings</p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-emerald-700">
-                <span className="relative flex size-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                </span>
-                Live
-              </span>
-            </div>
-            <p className="mt-3 text-base font-semibold leading-snug text-ink">
-              Gang status is earned, not claimed.
-            </p>
-            <div className="mt-5 grid grid-cols-3 gap-2.5">
-              <HeroStat label="Profiles" value={leaderboard.length} />
-              <HeroStat label="Total score" value={formatCompactNumber(totalScore)} />
-              <HeroStat label="NFTs" value={formatCompactNumber(totalNfts)} />
-            </div>
-          </div>
+        <div className="flex flex-wrap items-end gap-x-8 gap-y-4 lg:justify-end lg:pb-1">
+          <LiveFigure label="Gangs" value={leaderboard.length.toLocaleString()} />
+          <LiveFigure label="Total score" value={formatCompactNumber(totalScore)} />
+          <LiveFigure label="NFTs" value={formatCompactNumber(totalNfts)} />
+          <span className="inline-flex items-center gap-1.5 pb-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-emerald-600">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+            </span>
+            Live
+          </span>
         </div>
       </div>
 
@@ -546,11 +536,13 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   );
 }
 
-function HeroStat({ label, value }: { label: string; value: string | number }) {
+function LiveFigure({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-2 py-3.5 text-center shadow-sm">
-      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
+    <div>
+      <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-black/40">{label}</p>
+      <p className="font-orbitron mt-1 text-2xl font-bold leading-none tracking-tight text-ink lg:text-3xl">
+        {value}
+      </p>
     </div>
   );
 }
