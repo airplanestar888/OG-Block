@@ -6,7 +6,6 @@ import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { WalletScorePanel } from "@/components/wallet-score-panel";
 import { XAvatar } from "@/components/x-avatar";
-import { PageHeading } from "@/components/page-heading";
 import { getOgCardConfig } from "@/lib/app-config";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
@@ -122,65 +121,70 @@ export default async function DashboardPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
       <div className="relative mx-auto max-w-6xl space-y-6">
-        {/* ── Hero: identity + culture score in one breath ── */}
-        <section className="relative overflow-hidden rounded-[1.5rem] border border-black/[0.07] bg-white shadow-[0_1px_2px_rgba(10,11,13,0.04)]">
-          <div className="flex flex-wrap items-center justify-between gap-4 px-6 pt-7 md:px-9 md:pt-8">
+        {/* ── Hero: web3 identity card — ink slab, blue glow, giant score ── */}
+        <section className="relative overflow-hidden rounded-[1.5rem] bg-[#0A0B0D] text-white shadow-[0_24px_60px_rgba(0,0,255,0.22)]">
+          {/* glow + grid */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(0,0,255,0.55),transparent_55%),radial-gradient(circle_at_90%_100%,rgba(17,187,154,0.18),transparent_50%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.14)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.09)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
+
+          <div className="relative flex flex-wrap items-center justify-between gap-4 px-6 pt-7 md:px-9 md:pt-8">
             <div className="flex items-center gap-4">
-              <XAvatar src={user.x_avatar} handle={user.x_handle} size={64} />
+              <span className="rounded-full bg-white p-0.5 shadow-[0_10px_24px_rgba(0,0,0,0.4)] ring-2 ring-white/80">
+                <XAvatar src={user.x_avatar} handle={user.x_handle} size={56} />
+              </span>
               <div className="min-w-0">
-                <p className="truncate text-sm text-black/50">@{user.x_handle}</p>
-                <p className="truncate text-base font-semibold leading-tight text-ink md:text-xl">
+                <p className="truncate text-sm text-white/55">@{user.x_handle}</p>
+                <p className="truncate text-base font-semibold leading-tight md:text-xl">
                   {user.x_name || user.x_handle}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 border border-baseblue/20 bg-baseblue/10 px-3 py-1.5">
-              <span className="size-2 rounded-full bg-baseblue" />
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-baseblue">
-                {score?.rank ? `Rank #${score.rank}` : "Unranked"}
-              </p>
+            <div className="flex items-center gap-2 rounded-full bg-baseblue px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_rgba(0,0,255,0.5)]">
+              <span className="size-2 rounded-full bg-white" />
+              {score?.rank ? `Rank #${score.rank}` : "Unranked"}
             </div>
           </div>
 
-          <div className="px-6 pb-2 pt-5 md:px-9">
-            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Dashboard</p>
-            <PageHeading className="mt-2" outline="Your rank, live.">
-              Your culture score.
-            </PageHeading>
-          </div>
-
-          <div className="flex items-end justify-between gap-4 border-t border-black/[0.07] px-6 py-6 md:px-9 md:py-7">
+          <div className="relative flex flex-wrap items-end justify-between gap-6 px-6 pb-7 pt-8 md:px-9 md:pt-10">
             <div>
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">
+              <p className="font-orbitron text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-white/45">
                 Culture score
               </p>
-              <p className="mt-1 text-5xl font-bold leading-none tracking-tight text-ink md:text-7xl">
+              <p className="font-orbitron mt-2 text-7xl font-bold leading-none tracking-tight md:text-8xl">
                 {(score?.score ?? 0).toLocaleString()}
               </p>
-              <p className="mt-3 text-xs text-black/65">
+              <p className="mt-3 text-xs text-white/50">
                 {score?.last_calculated_at
                   ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}`
                   : "Verify your wallet to generate your combined score."}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">Status</p>
-              <p className="mt-1 text-2xl font-bold leading-none tracking-tight text-ink md:text-4xl">
+              <p className="font-orbitron text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-white/45">Status</p>
+              <p className="mt-2 text-3xl font-bold leading-none tracking-tight md:text-4xl">
                 {ogClaim?.tier ? (
-                  ogClaim.tier
+                  <span className="rounded-full bg-baseblue px-4 py-1.5 text-xl md:text-2xl">{ogClaim.tier}</span>
                 ) : score?.is_og ? (
                   "OG"
                 ) : (
-                  <span className="text-black/30">Member</span>
+                  "Member"
                 )}
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-px border-t border-black/[0.07] bg-black/[0.07]">
-            <HeroStat label="NFTs counted" value={score?.nft_count ?? 0} />
-            <HeroStat label="Badges" value={badgeCount} />
-            <HeroStat label="Rank" value={score?.rank ? `#${score.rank}` : "—"} />
+          <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10">
+            <HeroStatDark label="NFTs counted" value={score?.nft_count ?? 0} />
+            <HeroStatDark label="Badges" value={badgeCount} />
+            <HeroStatDark label="Rank" value={score?.rank ? `#${score.rank}` : "—"} />
+          </div>
+
+          <div className="relative flex items-center justify-between border-t border-white/10 px-6 py-3.5 md:px-9">
+            <div className="flex items-center gap-2">
+              <span className="inline-block size-4 rounded-[5px] bg-[#2E4BFF]" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">OG BLOCK</p>
+            </div>
+            <p className="text-xs text-white/40">Base culture score</p>
           </div>
         </section>
 
@@ -413,11 +417,11 @@ function formatUtcDate(value: string) {
   }).format(new Date(value));
 }
 
-function HeroStat({ label, value }: { label: string; value: string | number }) {
+function HeroStatDark({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="bg-white px-4 py-4 text-center">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/40">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-black/88">{value}</p>
+    <div className="px-4 py-4 text-center">
+      <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/40">{label}</p>
+      <p className="mt-1 text-lg font-semibold">{value}</p>
     </div>
   );
 }
