@@ -81,8 +81,9 @@ export function HoloImage({ children }: { children: ReactNode }) {
     }
     if (discRef.current) {
       const r = (curHole.current / 90) * 110;
-      discRef.current.style.clipPath = `circle(${r.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%)`;
-      discRef.current.style.webkitClipPath = `circle(${r.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%)`;
+      const cp = `circle(${r.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%)`;
+      discRef.current.style.clipPath = cp;
+      discRef.current.style.setProperty("-webkit-clip-path", cp);
       const mm = `radial-gradient(circle ${curHole.current.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 55%, transparent 100%)`;
       discRef.current.style.maskImage = mm;
       discRef.current.style.webkitMaskImage = mm;
