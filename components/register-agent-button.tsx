@@ -24,7 +24,7 @@ function useCountdown(expiresAt: number | null) {
   return { expired: ms <= 0, label: `${m}:${s.toString().padStart(2, "0")}` };
 }
 
-export function RegisterAgentButton() {
+export function RegisterAgentButton({ accent = "blue" }: { accent?: "blue" | "green" }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<CodeResponse | null>(null);
@@ -32,6 +32,9 @@ export function RegisterAgentButton() {
   const [copied, setCopied] = useState(false);
   const countdown = useCountdown(data?.expiresAt ?? null);
   const openedOnce = useRef(false);
+  const ctaClass =
+    "focus-ring rounded-full px-5 py-2.5 text-sm font-semibold text-white " +
+    (accent === "green" ? "bg-[#11bb9a] hover:bg-[#0d8a72]" : "bg-baseblue hover:bg-[#141CB5]");
 
   async function generate() {
     setLoading(true);
@@ -73,7 +76,7 @@ export function RegisterAgentButton() {
       <button
         type="button"
         onClick={openModal}
-        className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#141CB5]"
+        className={ctaClass}
       >
         Connect agent
       </button>

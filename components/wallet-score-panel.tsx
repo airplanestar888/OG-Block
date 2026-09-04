@@ -28,6 +28,7 @@ type WalletScorePanelProps = {
   description: string;
   verifiedWallet?: string | null;
   allowBrowserConnect?: boolean;
+  accent?: "blue" | "green";
 };
 
 export function WalletScorePanel({
@@ -39,7 +40,8 @@ export function WalletScorePanel({
   title,
   description,
   verifiedWallet,
-  allowBrowserConnect = true
+  allowBrowserConnect = true,
+  accent = "blue"
 }: WalletScorePanelProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -136,16 +138,32 @@ export function WalletScorePanel({
     }
   }
 
+  const isGreen = accent === "green";
+  // Agent (green) accent — #11bb9a tint, border, badge, and CTA.
+  const cardClass = isGreen
+    ? "border-[#11bb9a]/30 bg-[#11bb9a]/[0.05]"
+    : "border-black/10 bg-white";
+  const kickerClass = isGreen ? "text-[#11bb9a]" : "text-baseblue";
+  const badgeVerifiedClass = isGreen
+    ? "bg-[#11bb9a]/10 text-[#0d8a72]"
+    : "bg-baseblue/10 text-baseblue";
+  const ctaClass =
+    "focus-ring rounded-full px-5 py-2.5 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50 " +
+    (isGreen ? "bg-[#11bb9a] hover:bg-[#0d8a72]" : "bg-baseblue hover:bg-blue-700");
+
   return (
-    <div className="h-full rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
+    <div className={`h-full rounded-2xl border shadow-[0_1px_8px_rgba(0,0,0,0.035)] ${cardClass}`}>
       <div className="flex h-full flex-col p-5">
       <div className="flex items-start gap-4">
         <div className="min-w-0 flex-1">
-          <h2 className="font-semibold text-ink">{title}</h2>
+          <p className={`text-xs font-extrabold uppercase tracking-[0.2em] ${kickerClass}`}>
+            {isGreen ? "Agent Wallet" : "Wallet"}
+          </p>
+          <h2 className="mt-1 font-semibold text-ink">{title}</h2>
           <p className="mt-2 max-w-xl text-sm leading-6 text-black/60">{description}</p>
         </div>
         {verifiedWallet ? (
-          <span className="shrink-0 rounded-full bg-baseblue/10 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] text-baseblue">
+          <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold uppercase tracking-[0.08em] ${badgeVerifiedClass}`}>
             Verified
           </span>
         ) : (
@@ -201,11 +219,11 @@ export function WalletScorePanel({
       ) : null}
 
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
-        {!allowBrowserConnect && !verifiedWallet ? <RegisterAgentButton /> : null}
+        {!allowBrowserConnect && !verifiedWallet ? <RegisterAgentButton accent={accent} /> : null}
 
         {allowBrowserConnect && !verifiedWallet && !browserWalletReady ? (
           <button
-            className="focus-ring rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className={ctaClass}
             disabled={!mounted || busy}
             onClick={() => openAppKit()}
             type="button"

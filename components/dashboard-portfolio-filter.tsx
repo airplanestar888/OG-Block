@@ -127,7 +127,7 @@ export function DashboardPortfolioFilter({ holdings }: Props) {
               </dl>
 
               <Link
-                className="mt-4 inline-flex items-center gap-1 rounded-md border border-black/15 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 transition hover:border-baseblue hover:text-baseblue"
+                className="btn-secondary mt-4 h-9 px-4 text-xs"
                 href={holding.explorerUrl}
                 target="_blank"
                 rel="noreferrer"

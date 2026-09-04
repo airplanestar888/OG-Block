@@ -6,6 +6,7 @@ import { getOrCreateCurrentUser } from "@/lib/users";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { WalletScorePanel } from "@/components/wallet-score-panel";
 import { XAvatar } from "@/components/x-avatar";
+import { PageHeading } from "@/components/page-heading";
 import { getOgCardConfig } from "@/lib/app-config";
 import { shortAddress } from "@/lib/address";
 import { getHoldingScoreBreakdown } from "@/lib/display";
@@ -121,44 +122,65 @@ export default async function DashboardPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
       <div className="relative mx-auto max-w-6xl space-y-6">
-        {/* Profile header */}
-        <section className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <XAvatar src={user.x_avatar} handle={user.x_handle} size={64} />
-            <div>
-              <p className="text-sm text-black/50">@{user.x_handle}</p>
-              <h1 className="text-3xl font-semibold tracking-tight text-ink">{user.x_name || user.x_handle}</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 border border-baseblue/20 bg-baseblue/10 px-3 py-1.5">
-            <span className="size-2 rounded-full bg-baseblue" />
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-baseblue">
-              {score?.rank ? `Rank #${score.rank}` : "Unranked"}
-            </p>
-          </div>
-        </section>
-
-        {/* Culture score — roadmap-style flat card with hairline stat grid */}
-        <section className="overflow-hidden rounded-2xl border border-black/10 bg-black/10">
-          <div className="bg-[#f0f1f3] p-6 md:p-8">
-            <div className="flex flex-wrap items-end justify-between gap-6">
-              <div>
-                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Culture score</p>
-                <p className="mt-2 text-6xl font-bold leading-none tracking-tight text-ink md:text-7xl">
-                  {(score?.score ?? 0).toLocaleString()}
-                </p>
-                <p className="mt-3 text-xs text-black/65">
-                  {score?.last_calculated_at
-                    ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}`
-                    : "Verify your wallet to generate your combined score."}
+        {/* ── Hero: identity + culture score in one breath ── */}
+        <section className="relative overflow-hidden rounded-[1.5rem] border border-black/[0.07] bg-white shadow-[0_1px_2px_rgba(10,11,13,0.04)]">
+          <div className="flex flex-wrap items-center justify-between gap-4 px-6 pt-7 md:px-9 md:pt-8">
+            <div className="flex items-center gap-4">
+              <XAvatar src={user.x_avatar} handle={user.x_handle} size={64} />
+              <div className="min-w-0">
+                <p className="truncate text-sm text-black/50">@{user.x_handle}</p>
+                <p className="truncate text-base font-semibold leading-tight text-ink md:text-xl">
+                  {user.x_name || user.x_handle}
                 </p>
               </div>
             </div>
+            <div className="flex items-center gap-2 border border-baseblue/20 bg-baseblue/10 px-3 py-1.5">
+              <span className="size-2 rounded-full bg-baseblue" />
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-baseblue">
+                {score?.rank ? `Rank #${score.rank}` : "Unranked"}
+              </p>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-px bg-black/10">
+
+          <div className="px-6 pb-2 pt-5 md:px-9">
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Dashboard</p>
+            <PageHeading className="mt-2" outline="Your rank, live.">
+              Your culture score.
+            </PageHeading>
+          </div>
+
+          <div className="flex items-end justify-between gap-4 border-t border-black/[0.07] px-6 py-6 md:px-9 md:py-7">
+            <div>
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">
+                Culture score
+              </p>
+              <p className="mt-1 text-5xl font-bold leading-none tracking-tight text-ink md:text-7xl">
+                {(score?.score ?? 0).toLocaleString()}
+              </p>
+              <p className="mt-3 text-xs text-black/65">
+                {score?.last_calculated_at
+                  ? `Last refreshed ${formatUtcDate(score.last_calculated_at)}`
+                  : "Verify your wallet to generate your combined score."}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">Status</p>
+              <p className="mt-1 text-2xl font-bold leading-none tracking-tight text-ink md:text-4xl">
+                {ogClaim?.tier ? (
+                  ogClaim.tier
+                ) : score?.is_og ? (
+                  "OG"
+                ) : (
+                  <span className="text-black/30">Member</span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-px border-t border-black/[0.07] bg-black/[0.07]">
             <HeroStat label="NFTs counted" value={score?.nft_count ?? 0} />
             <HeroStat label="Badges" value={badgeCount} />
-            <HeroStat label="Status" value={ogClaim?.tier ? ogClaim.tier : score?.is_og ? "OG" : "Member"} />
+            <HeroStat label="Rank" value={score?.rank ? `#${score.rank}` : "—"} />
           </div>
         </section>
 
@@ -179,94 +201,99 @@ export default async function DashboardPage() {
             xName={user.x_name}
             xAvatar={user.x_avatar}
             walletSlot="agent"
-            title="Agent Wallet"
+            title="Let your agent hold & score"
             description="Virtual Protocol agent wallet. Its NFTs also accumulate into the same OG score."
             verifiedWallet={agentWallet?.address}
             allowBrowserConnect={false}
+            accent="green"
           />
         </div>
 
-        {/* Badges & Perks — roadmap-style flat card */}
+        {/* Badges & Perks — thin banner when empty, full card when claimed */}
+        {!ogClaim ? (
+          <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-baseblue/20 bg-baseblue/[0.05] px-5 py-4 md:px-6">
+            <div className="flex items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-baseblue/10 text-baseblue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M8 21h8M12 17.5V21M7 4h10v5a5 5 0 0 1-10 0V4Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M7 6H4.2a2.8 2.8 0 0 0 3.1 3.6M17 6h2.8a2.8 2.8 0 0 1-3.1 3.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-ink">No badge yet — claim your Official OG Badge NFT.</p>
+                <p className="text-xs text-black/55">Collection NFTs stay in Blockchain Legacy below.</p>
+              </div>
+            </div>
+            <Link className="btn-primary" href="/og-card">
+              Claim Badge/NFT
+            </Link>
+          </section>
+        ) : (
         <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
           <div className="flex flex-col gap-6 md:grid md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
             <div className="min-w-0">
               <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Badges &amp; perks</p>
               <h2 className="mt-2 text-xl font-semibold text-ink">
-                {ogClaim ? "OG Card claimed." : "OG BLOCK badge field is ready."}
+                OG Card claimed.
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-black/60">
-                {ogClaim
-                  ? "Your Official OG Badge is minted on Base. More perks unlock over time."
-                  : "Claim your Official OG Badge NFT to fill this field. Collection NFTs stay in Blockchain Legacy below."}
+                Your Official OG Badge is minted on Base. More perks unlock over time.
               </p>
             </div>
             <div className="rounded-xl border border-baseblue/20 bg-baseblue/10 px-6 py-4 text-center md:col-start-2 md:row-start-1">
               <p className="text-3xl font-semibold text-ink">{badgeCount}</p>
               <p className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-baseblue">Badges</p>
             </div>
-            {!ogClaim ? (
-              <Link
-                className="focus-ring inline-flex self-start rounded-full bg-baseblue px-5 py-2.5 text-sm font-semibold text-white transition duration-200 hover:bg-[#141CB5] md:col-start-1 md:row-start-2 md:justify-self-start"
-                href="/og-card"
-              >
-                Claim Badge/NFT
-              </Link>
-            ) : null}
           </div>
 
-          {ogClaim ? (
-            <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-black/10 bg-white p-4">
-              <Image
-                className="rounded-lg object-cover"
-                src="/api/og-card/image"
-                alt="OG Card"
-                width={72}
-                height={72}
-                unoptimized
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-ink">
-                  OG Card{ogClaim.token_id ? ` #${ogClaim.token_id}` : ""}
-                </p>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                  {ogClaim.tier ? (
-                    <span className="rounded-full bg-baseblue/10 px-2.5 py-1 font-bold uppercase tracking-[0.08em] text-baseblue">
-                      {ogClaim.tier}
-                    </span>
-                  ) : null}
-                  <span className="font-mono text-black/50">{shortAddress(ogClaim.wallet_address)}</span>
-                </div>
-              </div>
-              {ogClaim.token_id && ogClaim.chain_id ? (
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    className="rounded-md border border-black/15 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-black/70 transition hover:border-baseblue hover:text-baseblue"
-                    href={getOgCardExplorerUrl(ogClaim.chain_id, ogCardConfig?.contractAddress ?? null, ogClaim.token_id)}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    BaseScan
-                  </Link>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </section>
-
-        {/* Blockchain Legacy — roadmap-style flat receipt card */}
-        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-ink">Blockchain Legacy</h2>
-              <p className="mt-1 text-sm text-black/55">
-                Verified collection receipts — only verified contracts appear here.
+          <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-black/10 bg-white p-4">
+            <Image
+              className="rounded-lg object-cover"
+              src="/api/og-card/image"
+              alt="OG Card"
+              width={72}
+              height={72}
+              unoptimized
+            />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-ink">
+                OG Card{ogClaim.token_id ? ` #${ogClaim.token_id}` : ""}
               </p>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                {ogClaim.tier ? (
+                  <span className="rounded-full bg-baseblue/10 px-2.5 py-1 font-bold uppercase tracking-[0.08em] text-baseblue">
+                    {ogClaim.tier}
+                  </span>
+                ) : null}
+                <span className="font-mono text-black/50">{shortAddress(ogClaim.wallet_address)}</span>
+              </div>
             </div>
-            <div className="grid w-full grid-cols-3 gap-px overflow-hidden rounded-xl border border-black/10 bg-black/10 text-center text-xs sm:w-auto sm:max-w-xs">
-              <ReceiptStat label="Items" value={score?.nft_count ?? (holdings || []).length} />
-              <ReceiptStat label="Score" value={score?.score ?? 0} />
-              <ReceiptStat label="Rank" value={score?.rank ? `#${score.rank}` : "-"} />
-            </div>
+            {ogClaim.token_id && ogClaim.chain_id ? (
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  className="btn-secondary h-9 px-4 text-xs"
+                  href={getOgCardExplorerUrl(ogClaim.chain_id, ogCardConfig?.contractAddress ?? null, ogClaim.token_id)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  BaseScan
+                </Link>
+              </div>
+            ) : null}
+          </div>
+        </section>
+        )}
+
+        {/* Blockchain Legacy — verified collection receipts */}
+        <section className="rounded-2xl border border-black/10 bg-white p-6 shadow-[0_1px_8px_rgba(0,0,0,0.035)] md:p-8">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
+              Blockchain Legacy · {score?.nft_count ?? 0} verified NFTs
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-ink">Verified collection receipts</h2>
+            <p className="mt-1 text-sm text-black/55">
+              Only verified contracts appear here.
+            </p>
           </div>
 
           <div className="mt-6">
@@ -391,24 +418,6 @@ function HeroStat({ label, value }: { label: string; value: string | number }) {
     <div className="bg-white px-4 py-4 text-center">
       <p className="text-[0.65rem] font-bold uppercase tracking-[0.14em] text-black/40">{label}</p>
       <p className="mt-1 text-lg font-semibold text-black/88">{value}</p>
-    </div>
-  );
-}
-
-function ReceiptStat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div className="bg-white px-4 py-3">
-      <p className="text-[0.65rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
-      <p className="mt-1 font-semibold text-black/88">{value}</p>
-    </div>
-  );
-}
-
-function ReceiptLine({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div>
-      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-black/45">{label}</dt>
-      <dd className={`mt-1 text-black/75 ${mono ? "font-mono text-xs" : ""}`}>{value}</dd>
     </div>
   );
 }
