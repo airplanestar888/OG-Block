@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { getPublicProfileByHandle } from "@/lib/public-profiles";
 import { ShareProfileButton } from "@/components/share-profile-button";
 import { ProfileCardAvatar } from "@/components/profile-card-avatar";
-import { AbyssWallpaper } from "@/components/abyss-wallpaper";
 
 function formatCompactNumber(value: number): string {
   const absValue = Math.abs(value);
@@ -73,9 +72,10 @@ export default async function PublicProfilePage(
   const earlyPct = profile.nftCount > 0 ? Math.round((profile.earlyCount / profile.nftCount) * 100) : 0;
 
   return (
-    <main className="relative min-h-screen overflow-hidden px-4 py-12 text-ink">
-      {/* Live abyss wallpaper — animated gradient + film grain, WebGL */}
-      <AbyssWallpaper />
+    <main className="relative min-h-screen overflow-hidden bg-[#08070D] px-4 py-12 text-ink">
+      {/* Black-violet-blue gradient backdrop — static, cheap, no WebGL */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(88,28,135,0.55),transparent_45%),radial-gradient(circle_at_85%_20%,rgba(0,0,255,0.35),transparent_40%),radial-gradient(circle_at_50%_110%,rgba(30,27,75,0.8),transparent_55%),linear-gradient(180deg,#0B0714_0%,#0A0B1E_55%,#05060F_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(139,92,246,0.07)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.06)_1px,transparent_1px)] bg-[length:44px_44px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
 
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
         {/* ── Identity card — the shareable profile hero ── */}
