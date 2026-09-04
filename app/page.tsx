@@ -168,13 +168,14 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* 2x2 feature grid */}
-          <div className="reveal reveal-d2 grid gap-x-10 gap-y-10 sm:grid-cols-2 sm:gap-y-12">
+          {/* Feature grid — all five, 2 columns */}
+          <div className="reveal reveal-d2 grid gap-x-10 gap-y-12 sm:grid-cols-2">
             {[
               {
                 num: "01",
                 title: "Membership",
                 copy: "Your NFTs become your identity",
+                wide: false,
                 icon: (
                   <g>
                     <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
@@ -187,11 +188,12 @@ export default async function HomePage() {
                 num: "02",
                 title: "Culture Score",
                 copy: "Rank built from what you actually hold",
+                wide: false,
                 icon: (
                   <g>
                     <path d="M4 19.5h16" />
-                    <path d="M5.5 16l3.5-4 3 2.5 4-5.5 2.5 3" />
-                    <circle cx="16" cy="9" r="1.1" />
+                    <path d="M5.5 15.5l3.5-4 3 2.5 4-5.5 2.5 3" />
+                    <circle cx="16" cy="8.5" r="1.1" />
                   </g>
                 )
               },
@@ -199,6 +201,7 @@ export default async function HomePage() {
                 num: "03",
                 title: "Leaderboard",
                 copy: "Public proof of where you stand",
+                wide: false,
                 icon: (
                   <g>
                     <path d="M4 20h16" />
@@ -212,20 +215,37 @@ export default async function HomePage() {
                 num: "04",
                 title: "X Visibility",
                 copy: "Your rank, live on every X profile",
+                wide: false,
                 icon: (
                   <g>
                     <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12z" />
                     <circle cx="12" cy="12" r="2.4" />
                   </g>
                 )
+              },
+              {
+                num: "05",
+                title: "Agent Wallet Ready",
+                copy: "Let your agent hold, score, and mint — its own verified wallet on the profile.",
+                wide: true,
+                icon: (
+                  <g>
+                    <rect x="4.5" y="8.5" width="15" height="11" rx="3" />
+                    <path d="M12 8.5V5.5" />
+                    <circle cx="12" cy="4" r="1.2" />
+                    <circle cx="9" cy="13" r="0.9" fill="currentColor" stroke="none" />
+                    <circle cx="15" cy="13" r="0.9" fill="currentColor" stroke="none" />
+                    <path d="M9.5 16.5h5" />
+                  </g>
+                )
               }
-            ].map(({ num, title, copy, icon }) => (
-              <div key={title} className="flex items-start gap-4">
+            ].map(({ num, title, copy, wide, icon }) => (
+              <div key={title} className={`flex items-start gap-5 ${wide ? "sm:col-span-2" : ""}`}>
                 <svg
-                  width="30" height="30" viewBox="0 0 24 24" fill="none"
-                  stroke="#0A0B0D" strokeWidth="1.4"
+                  width="46" height="46" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="1.3"
                   strokeLinecap="round" strokeLinejoin="round"
-                  className="mt-0.5 shrink-0"
+                  className="mt-0.5 shrink-0 text-[#0A0B0D]"
                   aria-hidden="true"
                 >
                   {icon}
@@ -235,53 +255,11 @@ export default async function HomePage() {
                   <p className="mt-1.5 text-[0.85rem] font-extrabold uppercase tracking-[0.08em] text-[#0A0B0D]">
                     {title}
                   </p>
-                  <p className="mt-1.5 text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">{copy}</p>
+                  <p className="mt-1.5 max-w-md text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">{copy}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-
-        {/* 05 — flagship banner: the agent feature */}
-        <div className="reveal reveal-d3 mt-14 sm:mt-16">
-          <Link
-            href="/agent-guide"
-            className="group flex flex-wrap items-center gap-x-5 gap-y-3 rounded-2xl border border-black/[0.06] bg-white/80 p-5 shadow-[0_1px_10px_rgba(0,0,0,0.04)] backdrop-blur-sm transition hover:border-[#0000FF]/30 sm:p-6"
-          >
-            <svg
-              width="34" height="34" viewBox="0 0 24 24" fill="none"
-              stroke="#0000FF" strokeWidth="1.4"
-              strokeLinecap="round" strokeLinejoin="round"
-              className="shrink-0" aria-hidden="true"
-            >
-              <rect x="4.5" y="8.5" width="15" height="11" rx="3" />
-              <path d="M12 8.5V5.5" />
-              <circle cx="12" cy="4" r="1.2" />
-              <circle cx="9" cy="13" r="0.9" fill="#0000FF" stroke="none" />
-              <circle cx="15" cy="13" r="0.9" fill="#0000FF" stroke="none" />
-              <path d="M9.5 16.5h5" />
-            </svg>
-            <div className="min-w-0 flex-1">
-              <p className="font-syne text-[0.72rem] leading-none text-baseblue">05</p>
-              <p className="mt-1.5 text-[0.85rem] font-extrabold uppercase tracking-[0.08em] text-[#0A0B0D]">
-                Agent Wallet Ready
-              </p>
-              <p className="mt-1.5 text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">
-                Let your agent hold, score, and mint — its own verified wallet on the profile.
-              </p>
-            </div>
-            <svg
-              width="15" height="15" viewBox="0 0 14 14" fill="none"
-              className="shrink-0 text-[#0A0B0D]/40 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#0000FF]"
-              aria-hidden="true"
-            >
-              <path
-                d="M2 7h10M8 3l4 4-4 4"
-                stroke="currentColor" strokeWidth="1.4"
-                strokeLinecap="round" strokeLinejoin="round"
-              />
-            </svg>
-          </Link>
         </div>
       </section>
     </main>
