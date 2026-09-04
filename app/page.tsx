@@ -158,47 +158,139 @@ export default async function HomePage() {
       {/* ── POWERED BY ───────────────────────────────── */}
       <PoweredBy />
 
-      {/* ── FEATURES ─────────────────────────────────── */}
-      <section className="page-container relative pb-16 pt-2 sm:pb-20 sm:pt-4">
-        <div className="reveal reveal-d3 border-t border-[rgba(10,11,13,0.08)]">
-          {[
-            { num: "01", title: "Membership",         copy: "Your NFTs become your identity" },
-            { num: "02", title: "Culture Score",      copy: "Rank built from what you actually hold" },
-            { num: "03", title: "Leaderboard",        copy: "Public proof of where you stand" },
-            { num: "04", title: "X Visibility",       copy: "Your rank, live on every X profile" },
-            { num: "05", title: "Agent Wallet Ready", copy: "Let your agent hold, score, and mint" },
-          ].map(({ num, title, copy }) => (
-            <div
-              key={title}
-              className="feature-row flex items-center justify-between gap-4 py-4 sm:gap-6 sm:py-5"
-            >
-              <div className="flex items-center gap-4 sm:gap-5">
-                <span className="font-syne w-8 shrink-0 text-[0.95rem] leading-none text-baseblue sm:w-9 sm:text-[1.05rem]">
-                  {num}
-                </span>
+      {/* ── FEATURES — standalone screen: title left, 2x2 icon grid right ── */}
+      <section className="page-container relative flex min-h-[88vh] flex-col justify-center py-20 sm:py-24">
+        <div className="grid w-full items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
+          {/* Title block */}
+          <div className="reveal reveal-d1">
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
+              What you get
+            </p>
+            <h2 className="font-syne mt-3 leading-[0.98] text-[#0A0B0D]" style={{ fontSize: "clamp(2.3rem, 4.6vw, 3.6rem)" }}>
+              <span className="block text-[#0A0B0D]/35">Built for</span>
+              culture.
+            </h2>
+            <div className="mt-6 h-[3px] w-20 bg-[#0A0B0D]" />
+            <p className="mt-6 max-w-sm text-[0.9rem] leading-[1.6] text-[#0A0B0D]/65">
+              One profile turns everything you hold into status you can prove —
+              scored, ranked, and visible everywhere that matters.
+            </p>
+          </div>
+
+          {/* 2x2 feature grid */}
+          <div className="reveal reveal-d2 grid gap-x-10 gap-y-10 sm:grid-cols-2 sm:gap-y-12">
+            {[
+              {
+                num: "01",
+                title: "Membership",
+                copy: "Your NFTs become your identity",
+                icon: (
+                  <g>
+                    <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
+                    <circle cx="8.5" cy="11" r="1.6" />
+                    <path d="M13 9.5h4.5M13 12.5h4.5M6 15.5h12" />
+                  </g>
+                )
+              },
+              {
+                num: "02",
+                title: "Culture Score",
+                copy: "Rank built from what you actually hold",
+                icon: (
+                  <g>
+                    <path d="M4 19.5h16" />
+                    <path d="M5.5 16l3.5-4 3 2.5 4-5.5 2.5 3" />
+                    <circle cx="16" cy="9" r="1.1" />
+                  </g>
+                )
+              },
+              {
+                num: "03",
+                title: "Leaderboard",
+                copy: "Public proof of where you stand",
+                icon: (
+                  <g>
+                    <path d="M4 20h16" />
+                    <rect x="5" y="12.5" width="4" height="7.5" rx="0.5" />
+                    <rect x="10" y="8" width="4" height="12" rx="0.5" />
+                    <rect x="15" y="10.5" width="4" height="9.5" rx="0.5" />
+                  </g>
+                )
+              },
+              {
+                num: "04",
+                title: "X Visibility",
+                copy: "Your rank, live on every X profile",
+                icon: (
+                  <g>
+                    <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12z" />
+                    <circle cx="12" cy="12" r="2.4" />
+                  </g>
+                )
+              }
+            ].map(({ num, title, copy, icon }) => (
+              <div key={title} className="flex items-start gap-4">
+                <svg
+                  width="30" height="30" viewBox="0 0 24 24" fill="none"
+                  stroke="#0A0B0D" strokeWidth="1.4"
+                  strokeLinecap="round" strokeLinejoin="round"
+                  className="mt-0.5 shrink-0"
+                  aria-hidden="true"
+                >
+                  {icon}
+                </svg>
                 <div>
-                  <p
-                    className="text-[0.88rem] font-semibold text-[#0A0B0D] sm:text-[0.9rem]"
-                    style={{ letterSpacing: "-0.01em" }}
-                  >
+                  <p className="font-syne text-[0.72rem] leading-none text-baseblue">{num}</p>
+                  <p className="mt-1.5 text-[0.85rem] font-extrabold uppercase tracking-[0.08em] text-[#0A0B0D]">
                     {title}
                   </p>
-                  <p className="mt-0.5 text-[0.75rem] text-[#0A0B0D]/65 sm:text-[0.78rem]">{copy}</p>
+                  <p className="mt-1.5 text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">{copy}</p>
                 </div>
               </div>
-              <svg
-                width="13" height="13" viewBox="0 0 14 14" fill="none"
-                className="shrink-0 text-[#0A0B0D]/40"
-                aria-hidden="true"
-              >
-                <path
-                  d="M2 7h10M8 3l4 4-4 4"
-                  stroke="currentColor" strokeWidth="1.4"
-                  strokeLinecap="round" strokeLinejoin="round"
-                />
-              </svg>
+            ))}
+          </div>
+        </div>
+
+        {/* 05 — flagship banner: the agent feature */}
+        <div className="reveal reveal-d3 mt-14 sm:mt-16">
+          <Link
+            href="/agent-guide"
+            className="group flex flex-wrap items-center gap-x-5 gap-y-3 rounded-2xl border border-black/[0.06] bg-white/80 p-5 shadow-[0_1px_10px_rgba(0,0,0,0.04)] backdrop-blur-sm transition hover:border-[#0000FF]/30 sm:p-6"
+          >
+            <svg
+              width="34" height="34" viewBox="0 0 24 24" fill="none"
+              stroke="#0000FF" strokeWidth="1.4"
+              strokeLinecap="round" strokeLinejoin="round"
+              className="shrink-0" aria-hidden="true"
+            >
+              <rect x="4.5" y="8.5" width="15" height="11" rx="3" />
+              <path d="M12 8.5V5.5" />
+              <circle cx="12" cy="4" r="1.2" />
+              <circle cx="9" cy="13" r="0.9" fill="#0000FF" stroke="none" />
+              <circle cx="15" cy="13" r="0.9" fill="#0000FF" stroke="none" />
+              <path d="M9.5 16.5h5" />
+            </svg>
+            <div className="min-w-0 flex-1">
+              <p className="font-syne text-[0.72rem] leading-none text-baseblue">05</p>
+              <p className="mt-1.5 text-[0.85rem] font-extrabold uppercase tracking-[0.08em] text-[#0A0B0D]">
+                Agent Wallet Ready
+              </p>
+              <p className="mt-1.5 text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">
+                Let your agent hold, score, and mint — its own verified wallet on the profile.
+              </p>
             </div>
-          ))}
+            <svg
+              width="15" height="15" viewBox="0 0 14 14" fill="none"
+              className="shrink-0 text-[#0A0B0D]/40 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-[#0000FF]"
+              aria-hidden="true"
+            >
+              <path
+                d="M2 7h10M8 3l4 4-4 4"
+                stroke="currentColor" strokeWidth="1.4"
+                strokeLinecap="round" strokeLinejoin="round"
+              />
+            </svg>
+          </Link>
         </div>
       </section>
     </main>
