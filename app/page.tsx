@@ -245,7 +245,7 @@ export default async function HomePage() {
                   width="46" height="46" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" strokeWidth="1.6"
                   strokeLinecap="round" strokeLinejoin="round"
-                  className="mt-0.5 shrink-0 text-[#0A0B0D]"
+                  className="mt-0.5 shrink-0 text-[#0A0B0D]/35"
                   aria-hidden="true"
                 >
                   {icon}
