@@ -51,7 +51,7 @@ export function HoloImage({ children }: { children: ReactNode }) {
               repeatCount="indefinite"
             />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="waves" scale="9" />
+          <feDisplacementMap in="SourceGraphic" in2="waves" scale="12" />
         </filter>
       </svg>
 
@@ -94,9 +94,9 @@ export function HoloImage({ children }: { children: ReactNode }) {
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 transition-opacity duration-300"
             style={{
-              opacity: holo.active ? 0.38 : 0,
+              opacity: holo.active ? 0.27 : 0,
               mixBlendMode: "screen",
-              background: `radial-gradient(120% 90% at ${holo.px}% ${holo.py}%, rgba(140,225,255,0.22) 0%, rgba(0,0,255,0.12) 42%, transparent 72%)`
+              background: `radial-gradient(120% 90% at ${holo.px}% ${holo.py}%, rgba(140,225,255,0.15) 0%, rgba(0,0,255,0.09) 42%, transparent 72%)`
             }}
           />
 
