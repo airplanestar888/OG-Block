@@ -237,7 +237,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   </p>
 
                   <p className="font-orbitron relative mt-4 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/60">
-                    Culture score
+                    Score
                   </p>
                   <p className="font-orbitron relative mt-1 text-3xl font-bold leading-none tracking-tight">
                     {formatCompactNumber(profile.score)}

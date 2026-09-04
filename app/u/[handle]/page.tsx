@@ -72,67 +72,68 @@ export default async function PublicProfilePage(
   const earlyPct = profile.nftCount > 0 ? Math.round((profile.earlyCount / profile.nftCount) * 100) : 0;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#08070D] px-4 py-12 text-ink">
-      {/* Black-violet-blue gradient backdrop — static, cheap, no WebGL */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_8%,rgba(88,28,135,0.55),transparent_45%),radial-gradient(circle_at_85%_20%,rgba(0,0,255,0.35),transparent_40%),radial-gradient(circle_at_50%_110%,rgba(30,27,75,0.8),transparent_55%),linear-gradient(180deg,#0B0714_0%,#0A0B1E_55%,#05060F_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(139,92,246,0.07)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.06)_1px,transparent_1px)] bg-[length:44px_44px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
+    <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
+      {/* Footer-grade backdrop — Klein blue wash + hairline grid, echoes the footer slab */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_8%,rgba(0,0,255,0.16),transparent_32%),linear-gradient(90deg,rgba(0,0,255,0.05)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.04)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
       <div className="relative mx-auto w-full max-w-[400px] space-y-6 md:max-w-[880px]">
-        {/* ── Identity card — the shareable profile hero ── */}
-        <section className="relative overflow-hidden rounded-[1.5rem] border border-black/[0.07] bg-white text-ink shadow-[0_1px_2px_rgba(10,11,13,0.04)]">
+        {/* ── Identity card — footer-blue slab, the shareable profile hero ── */}
+        <section className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.25),transparent_60%)]" />
+          <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
           {/* Identity header */}
           <div className="relative px-6 pb-6 pt-8 md:px-9 md:pt-9">
-            <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold text-ink md:right-9 md:top-9 md:text-sm">
+            <div className="absolute right-4 top-4 z-10 inline-flex items-center gap-1.5 text-[0.68rem] font-bold md:right-9 md:top-9 md:text-sm">
               Verified on-chain
-              <span className="grid size-4 place-items-center rounded-full bg-[#0000FF] text-[0.55rem] text-white md:size-5 md:text-[0.7rem]">✓</span>
+              <span className="grid size-4 place-items-center rounded-full bg-white text-[0.55rem] text-[#0000FF] md:size-5 md:text-[0.7rem]">✓</span>
             </div>
             <div className="flex items-center gap-3.5">
               <ProfileCardAvatar src={avatarSrc} handle={cleanHandle} />
               <div className="min-w-0">
-                <p className="truncate text-base font-semibold leading-tight text-ink md:text-2xl">{displayName}</p>
-                <p className="truncate text-sm text-black/50 md:text-base">@{cleanHandle}</p>
+                <p className="truncate text-base font-semibold leading-tight md:text-2xl">{displayName}</p>
+                <p className="truncate text-sm text-white/70 md:text-base">@{cleanHandle}</p>
               </div>
             </div>
           </div>
 
-          {/* Culture score (dominant) + Rank (secondary anchor) */}
-          <div className="flex items-end justify-between gap-4 border-t border-black/[0.07] px-6 py-6 md:px-9 md:py-7">
+          {/* Score (dominant) + Rank (secondary anchor) */}
+          <div className="relative flex items-end justify-between gap-4 border-t border-white/15 px-6 py-6 md:px-9 md:py-7">
             <div>
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">
-                Culture score
+              <p className="font-orbitron text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/60">
+                Score
               </p>
-              <p className="mt-1 text-5xl font-bold leading-none tracking-tight text-ink md:text-7xl">
+              <p className="font-orbitron mt-1 text-5xl font-bold leading-none tracking-tight md:text-7xl">
                 {formatCompactNumber(profile.score)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-black/40">Rank</p>
-              <p className="mt-1 text-2xl font-bold leading-none tracking-tight text-ink md:text-4xl">
+              <p className="font-orbitron text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white/60">Rank</p>
+              <p className="mt-1 text-2xl font-bold leading-none tracking-tight md:text-4xl">
                 {profile.rank ? (
                   <>
-                    <span className="text-[#0000FF]">#</span>
+                    <span className="text-white/60">#</span>
                     {profile.rank}
                   </>
                 ) : (
-                  <span className="text-black/30">—</span>
+                  <span className="text-white/40">—</span>
                 )}
               </p>
             </div>
           </div>
 
           {/* Compact stat row — hairlines and whitespace, no nested cards */}
-          <div className="grid grid-cols-2 gap-y-5 border-t border-black/[0.07] px-4 py-5 md:grid-cols-4 md:divide-x md:divide-black/[0.07] md:px-6">
-            <StatCell label="NFTs" value={profile.nftCount.toLocaleString()} />
-            <StatCell
+          <div className="relative grid grid-cols-2 gap-y-5 border-t border-white/15 px-4 py-5 md:grid-cols-4 md:divide-x md:divide-white/15 md:px-6">
+            <StatCellDark label="NFTs" value={profile.nftCount.toLocaleString()} />
+            <StatCellDark
               label="Status"
               value={profile.tier ? profile.tier : profile.isOg ? "OG" : "Member"}
             />
-            <StatCell
+            <StatCellDark
               label="Rare"
               value={`${rarePct}%`}
               caption={`${profile.rareCount} of ${profile.nftCount}`}
             />
-            <StatCell
+            <StatCellDark
               label="Early"
               value={`${earlyPct}%`}
               caption={`${profile.earlyCount} of ${profile.nftCount}`}
@@ -140,12 +141,12 @@ export default async function PublicProfilePage(
           </div>
 
           {/* Footer strip */}
-          <div className="flex items-center justify-between border-t border-black/[0.07] px-6 py-3.5 md:px-9">
+          <div className="relative flex items-center justify-between border-t border-white/15 px-6 py-3.5 md:px-9">
             <div className="flex items-center gap-2">
-              <span className="inline-block size-4 rounded-[5px] bg-[#0000FF]" />
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-ink">OG BLOCK</p>
+              <span className="inline-block size-4 rounded-[5px] bg-white" />
+              <p className="text-xs font-bold uppercase tracking-[0.18em]">OG BLOCK</p>
             </div>
-            <p className="text-xs text-black/35">Base culture score</p>
+            <p className="text-xs text-white/60">Own Gang on Blockchain</p>
           </div>
         </section>
 
@@ -213,6 +214,17 @@ function StatCell({ label, value, caption }: { label: string; value: string; cap
       <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
       <p className="mt-1 text-lg font-semibold text-ink md:text-xl">{value}</p>
       {caption ? <p className="text-[0.6rem] text-black/35">{caption}</p> : null}
+    </div>
+  );
+}
+
+/* Dark stat cell — for the footer-blue identity slab. */
+function StatCellDark({ label, value, caption }: { label: string; value: string; caption?: string }) {
+  return (
+    <div className="text-center">
+      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-white/60">{label}</p>
+      <p className="mt-1 text-lg font-semibold md:text-xl">{value}</p>
+      {caption ? <p className="text-[0.6rem] text-white/50">{caption}</p> : null}
     </div>
   );
 }
