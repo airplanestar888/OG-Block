@@ -19,7 +19,6 @@ const PLACE_STYLES: Record<
   PodiumPlace,
   {
     chip: string;
-    glow: string;
     avatarRing: string;
     avatarSize: number;
     nameSize: string;
@@ -27,22 +26,19 @@ const PLACE_STYLES: Record<
 > = {
   1: {
     chip: "bg-gradient-to-b from-[#F7D77A] to-[#E5B54A] text-[#0A0B0D]",
-    glow: "shadow-[0_24px_60px_rgba(217,169,63,0.22)]",
-    avatarRing: "ring-[#E5B54A]/60",
+    avatarRing: "ring-white/70",
     avatarSize: 88,
     nameSize: "text-xl",
   },
   2: {
     chip: "bg-gradient-to-b from-[#EAEEF3] to-[#C9D1DB] text-[#0A0B0D]",
-    glow: "shadow-[0_18px_44px_rgba(0,0,255,0.18)]",
-    avatarRing: "ring-white/30",
+    avatarRing: "ring-white/50",
     avatarSize: 68,
     nameSize: "text-lg",
   },
   3: {
     chip: "bg-gradient-to-b from-[#F0D2B2] to-[#D8A26A] text-[#0A0B0D]",
-    glow: "shadow-[0_18px_44px_rgba(192,138,85,0.20)]",
-    avatarRing: "ring-[#D8A26A]/60",
+    avatarRing: "ring-white/50",
     avatarSize: 68,
     nameSize: "text-lg",
   }
@@ -142,28 +138,28 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       {/* Top Header & Stats */}
       <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:items-start">
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#FF8AC2]">Own Gang · Leaderboard</p>
-          <PageHeading className="mt-2 max-w-2xl text-white [&>span]:!text-transparent" outline="Who ranks the highest.">
+          <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Own Gang · Leaderboard</p>
+          <PageHeading className="mt-2 max-w-2xl" outline="Who ranks the highest.">
             Who holds the most.
           </PageHeading>
-          <p className="mt-4 max-w-md text-sm leading-6 text-white/60">
+          <p className="mt-4 max-w-md text-sm leading-6 text-black/60">
             Every verified gang profile, ranked live from on-chain NFT holdings across chains.
           </p>
         </div>
 
-        <div className="glass relative overflow-hidden rounded-[1.5rem] text-white">
-          <div className="relative p-6">
+        <div className="rounded-[1.5rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
+          <div className="p-6">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/50">Live standings</p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-emerald-200">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Live standings</p>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-emerald-700">
                 <span className="relative flex size-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-75" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-300" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
                 </span>
                 Live
               </span>
             </div>
-            <p className="mt-3 text-base font-semibold leading-snug">
+            <p className="mt-3 text-base font-semibold leading-snug text-ink">
               Gang status is earned, not claimed.
             </p>
             <div className="mt-5 grid grid-cols-3 gap-2.5">
@@ -171,13 +167,6 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               <HeroStat label="Total score" value={formatCompactNumber(totalScore)} />
               <HeroStat label="NFTs" value={formatCompactNumber(totalNfts)} />
             </div>
-          </div>
-          <div className="relative flex items-center justify-between border-t border-white/10 px-6 py-3">
-            <div className="flex items-center gap-2">
-              <span className="inline-block size-3.5 rounded-[5px] bg-gradient-to-br from-[#FF2E9A] to-[#7B2FF7]" />
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em]">OG BLOCK</p>
-            </div>
-            <p className="text-[0.65rem] text-white/45">Own Gang on Blockchain</p>
           </div>
         </div>
       </div>
@@ -202,10 +191,11 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 >
                 <article
                   onClick={() => openProfile(profile.xHandle)}
-                  className={`glass group relative flex flex-col items-center overflow-hidden rounded-[1.4rem] px-5 pb-6 pt-9 text-center text-white ${PEDESTAL_HEIGHT[place]} ${
+                  className={`group relative flex flex-col items-center overflow-hidden rounded-[1.4rem] bg-[#0000FF] px-5 pb-6 pt-9 text-center text-white shadow-[0_24px_60px_rgba(0,0,255,0.30)] ${PEDESTAL_HEIGHT[place]} ${
                     profile.xHandle ? "cursor-pointer" : ""
                   }`}
                 >
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.22),transparent_60%)]" />
                   <span
                     className={`absolute left-1/2 top-3 grid size-10 -translate-x-1/2 place-items-center rounded-xl ${styles.chip}`}
                   >
@@ -224,7 +214,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                         <Link
                           href={`/u/${profile.xHandle}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="transition hover:text-[#8FA2FF] hover:underline"
+                          className="transition hover:underline"
                         >
                           {profile.xName || `@${profile.xHandle}`}
                         </Link>
@@ -233,24 +223,24 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                       )}
                     </h2>
                     {profile.profileRole === "agent" ? (
-                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-white/60">
+                      <span className="rounded bg-white/20 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-white">
                         Agent
                       </span>
                     ) : null}
                   </div>
-                  <p className="relative text-xs text-white/45">
+                  <p className="relative text-xs text-white/70">
                     {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
                   </p>
 
-                  <p className="font-orbitron relative mt-4 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/40">
+                  <p className="font-orbitron relative mt-4 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/60">
                     Culture score
                   </p>
                   <p className="font-orbitron relative mt-1 text-3xl font-bold leading-none tracking-tight">
                     {formatCompactNumber(profile.score)}
                   </p>
-                  <div className="relative mt-3 flex items-center gap-4 text-xs font-semibold text-white/55">
+                  <div className="relative mt-3 flex items-center gap-4 text-xs font-semibold text-white/80">
                     <span>{profile.nftCount.toLocaleString()} NFT</span>
-                    <span className="h-3 w-px bg-white/15" aria-hidden="true" />
+                    <span className="h-3 w-px bg-white/30" aria-hidden="true" />
                     <span>{profile.badgeCount.toLocaleString()} badge</span>
                   </div>
                 </article>
@@ -261,7 +251,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
           {/* Personal standing pill */}
           <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#FF2E9A] to-[#7B2FF7] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_28px_rgba(255,46,154,0.35)]">
+            <div className="inline-flex items-center gap-2 rounded-full bg-baseblue px-5 py-2.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,255,0.28)]">
               <span className="inline-block size-2 rounded-full bg-white" aria-hidden="true" />
               {myProfile?.rank ? (
                 <span>
@@ -280,12 +270,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       ) : null}
 
       {/* Main Culture Board */}
-      <section className="glass-strong overflow-hidden rounded-[1.5rem]">
+      <section className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-white/85 shadow-sm backdrop-blur">
         {/* Table Header Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-4 text-white">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
           <div>
-            <h2 className="font-semibold">Culture board</h2>
-            <p className="mt-1 text-sm text-white/55">
+            <h2 className="font-semibold text-black/88">Culture board</h2>
+            <p className="mt-1 text-sm text-black/65">
               {podiumVisible
                 ? "Full gang rankings — top 3 featured above."
                 : "Live rankings across all verified OG BLOCK gangs."}
@@ -301,12 +291,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 aria-label="Search profiles by X handle or name"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-xs text-white placeholder:text-white/40 focus:border-[#2E4BFF] focus:outline-none focus:ring-1 focus:ring-[#2E4BFF]"
+                className="w-full rounded-xl border border-black/10 bg-[#fbfcff] px-3.5 py-1.5 text-xs text-ink placeholder:text-black/50 focus:border-baseblue focus:outline-none focus:ring-1 focus:ring-baseblue"
               />
               {searchQuery ? (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-white/40 hover:text-white"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-black/40 hover:text-black"
                   type="button"
                 >
                   ✕
@@ -317,13 +307,13 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         </div>
 
         {/* Mobile Swipe Notice */}
-        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:hidden">
-          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-white/45">Swipe table</span>
-          <span className="text-sm text-[#FF8AC2]" aria-hidden="true">-&gt;</span>
+        <div className="flex items-center justify-between border-b border-black/10 px-4 py-3 sm:hidden">
+          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-black/45">Swipe table</span>
+          <span className="text-sm text-baseblue" aria-hidden="true">-&gt;</span>
         </div>
 
         {/* Mobile ranking cards — compact rows instead of a swipe table */}
-        <ol className="divide-y divide-white/[0.07] sm:hidden">
+        <ol className="divide-y divide-black/[0.07] sm:hidden">
           {tableRows.map((profile, index) => {
             const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
             const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
@@ -335,31 +325,31 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
                 className={`flex items-center gap-3 px-4 py-3.5 transition ${
                   isMe
-                    ? "bg-[#FF2E9A]/[0.12] ring-1 ring-inset ring-[#FF2E9A]/40"
-                    : "hover:bg-white/[0.05]"
+                    ? "bg-[#0000FF]/[0.06] hover:bg-[#0000FF]/[0.1] ring-1 ring-inset ring-[#0000FF]/25"
+                    : "hover:bg-baseblue/[0.05]"
                 } ${profile.xHandle ? "cursor-pointer" : ""}`}
               >
                 <span className={`inline-flex min-w-11 items-center justify-center rounded-full px-2.5 py-1 text-xs font-bold ${
-                  isMe ? "bg-gradient-to-r from-[#FF2E9A] to-[#7B2FF7] text-white shadow-sm" : "bg-white/10 text-white/70"
+                  isMe ? "bg-[#0000FF] text-white shadow-sm" : "bg-black/[0.04] text-black/70"
                 }`}>
                   {profile.rank ? `#${profile.rank}` : "-"}
                 </span>
                 <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5">
-                    <p className="truncate text-sm font-semibold text-white">@{profile.xHandle}</p>
+                    <p className="truncate text-sm font-semibold text-black/85">@{profile.xHandle}</p>
                     {isMe ? (
-                      <span className="rounded-full bg-gradient-to-r from-[#FF2E9A] to-[#7B2FF7] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
+                      <span className="rounded-full bg-[#0000FF] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
                         YOU
                       </span>
                     ) : null}
                     {profile.profileRole === "agent" ? (
-                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase text-white/60">
+                      <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.62rem] font-bold uppercase text-black/60">
                         Agent
                       </span>
                     ) : null}
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-white/45">
+                  <div className="flex items-center gap-1.5 text-xs text-black/45">
                     <span>{profile.nftCount.toLocaleString()} NFTs</span>
                     <span>·</span>
                     <span className="inline-flex items-center gap-0.5" title="Indexed on Base, ETH, Robinhood & Solana">
@@ -371,16 +361,16 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-0.5">
-                  <span className="rounded-full bg-gradient-to-r from-[#2E5BFF] to-[#7B2FF7] px-2.5 py-0.5 text-xs font-bold text-white">
+                  <span className="rounded-full bg-baseblue px-2.5 py-0.5 text-xs font-bold text-white">
                     {formatCompactNumber(profile.score)}
                   </span>
                   {hasGain && profile.recentPointsDelta ? (
-                    <span className="text-[0.65rem] font-bold text-emerald-300">
+                    <span className="text-[0.65rem] font-bold text-emerald-600">
                       ▲ {formatCompactNumber(profile.recentPointsDelta)}
                     </span>
                   ) : null}
                   {hasDrop && profile.recentPointsDelta ? (
-                    <span className="text-[0.65rem] font-bold text-rose-300">
+                    <span className="text-[0.65rem] font-bold text-rose-600">
                       ▼ {formatCompactNumber(profile.recentPointsDelta)}
                     </span>
                   ) : null}
@@ -389,7 +379,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             );
           })}
           {tableRows.length === 0 ? (
-            <li className="px-4 py-10 text-center text-sm text-white/55">
+            <li className="px-4 py-10 text-center text-sm text-black/55">
               {searchQuery
                 ? `No profiles matching "${searchQuery}"`
                 : leaderboard.length > 0
@@ -402,16 +392,16 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         {/* Rankings Table with balanced column widths & alignment (desktop) */}
         <div className="hidden overflow-x-auto overscroll-x-contain sm:block">
           <table className="w-full min-w-[720px] table-fixed text-left text-sm">
-            <thead className="text-white/50">
-              <tr className="border-b border-white/10">
-                <th className="font-orbitron w-[10%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">Rank</th>
-                <th className="font-orbitron w-[38%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">X</th>
-                <th className="font-orbitron w-[15%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">NFT</th>
-                <th className="font-orbitron w-[15%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">Badge</th>
-                <th className="font-orbitron w-[22%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">Score</th>
+            <thead className="bg-black/[0.03] text-black/55">
+              <tr>
+                <th className="w-[10%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Rank</th>
+                <th className="w-[38%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">X</th>
+                <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">NFT</th>
+                <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Badge</th>
+                <th className="w-[22%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Score</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.07]">
+            <tbody className="divide-y divide-black/10">
               {tableRows.map((profile, index) => {
                 const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
                 const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
@@ -423,14 +413,14 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                     onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
                     className={`transition ${
                       isMe
-                        ? "bg-[#FF2E9A]/[0.10] hover:bg-[#FF2E9A]/[0.16]"
-                        : "hover:bg-white/[0.05]"
+                        ? "bg-[#0000FF]/[0.05] hover:bg-[#0000FF]/[0.09]"
+                        : "hover:bg-baseblue/[0.05]"
                     } ${profile.xHandle ? "cursor-pointer" : ""}`}
                   >
                     {/* Rank */}
                     <td className="px-6 py-4 text-center">
                       <span className={`inline-flex min-w-12 items-center justify-center rounded-full px-3 py-1 text-xs font-bold ${
-                        isMe ? "bg-gradient-to-r from-[#FF2E9A] to-[#7B2FF7] text-white shadow-sm" : "bg-white/10 text-white/70"
+                        isMe ? "bg-[#0000FF] text-white shadow-sm" : "bg-black/[0.04] text-black/70"
                       }`}>
                         {profile.rank ? `#${profile.rank}` : "-"}
                       </span>
@@ -442,12 +432,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                         <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <p className="truncate font-semibold text-white">
+                            <p className="truncate font-semibold text-black/85">
                               {profile.xHandle ? (
                                 <Link
                                   href={`/u/${profile.xHandle}`}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="transition hover:text-[#FF8AC2] hover:underline"
+                                  className="transition hover:text-baseblue hover:underline"
                                 >
                                   @{profile.xHandle}
                                 </Link>
@@ -456,24 +446,24 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                               )}
                             </p>
                             {isMe ? (
-                              <span className="rounded-full bg-gradient-to-r from-[#FF2E9A] to-[#7B2FF7] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
+                              <span className="rounded-full bg-[#0000FF] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
                                 YOU
                               </span>
                             ) : null}
                             {profile.profileRole === "agent" ? (
-                              <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-white/60">
+                              <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
                                 Agent
                               </span>
                             ) : null}
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-white/45">
+                          <div className="flex items-center gap-1.5 text-xs text-black/45">
                             <span>{profile.nftCount.toLocaleString()} NFTs</span>
                             <span>·</span>
-                            <span className="inline-flex items-center gap-1" title="Indexed across chains">
-                              <span className="size-1.5 rounded-full bg-[#38E1FF]" />
-                              <span className="size-1.5 rounded-full bg-[#7B2FF7]" />
+                            <span className="inline-flex items-center gap-1" title="Indexed on Base, ETH, Robinhood & Solana">
+                              <span className="size-1.5 rounded-full bg-[#0000FF]" />
+                              <span className="size-1.5 rounded-full bg-[#627EEA]" />
                               <span className="size-1.5 rounded-full bg-[#00C805]" />
-                              <span className="size-1.5 rounded-full bg-[#FF2E9A]" />
+                              <span className="size-1.5 rounded-full bg-[#9945FF]" />
                             </span>
                           </div>
                         </div>
@@ -481,26 +471,26 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                     </td>
 
                     {/* NFT */}
-                    <td className="px-6 py-4 text-center font-semibold text-white/80">
+                    <td className="px-6 py-4 text-center font-semibold text-black/76">
                       {profile.nftCount.toLocaleString()}
                     </td>
 
                     {/* Badge */}
-                    <td className="px-6 py-4 text-center font-semibold text-white/80">
+                    <td className="px-6 py-4 text-center font-semibold text-black/76">
                       {profile.badgeCount.toLocaleString()}
                     </td>
 
                     {/* Score & ▲ +X pts placed right beside the Score */}
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2.5">
-                        <span className="rounded-full bg-gradient-to-r from-[#2E5BFF] to-[#7B2FF7] px-3 py-1 text-xs font-bold text-white shadow-sm">
+                        <span className="rounded-full bg-baseblue px-3 py-1 text-xs font-bold text-white shadow-sm">
                           {formatCompactNumber(profile.score)}
                         </span>
 
                         {/* ▲ +X pts directly beside the score */}
                         {hasGain && profile.recentPointsDelta ? (
                           <span
-                            className="inline-flex items-center gap-1 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-2.5 py-0.5 text-xs font-bold text-emerald-200"
+                            className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-700"
                             title={`Score increased by +${profile.recentPointsDelta.toLocaleString()} points`}
                           >
                             <span className="text-[0.68rem]">▲</span>
@@ -510,7 +500,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
                         {hasDrop && profile.recentPointsDelta ? (
                           <span
-                            className="inline-flex items-center gap-1 rounded-full border border-rose-300/25 bg-rose-300/10 px-2.5 py-0.5 text-xs font-bold text-rose-200"
+                            className="inline-flex items-center gap-1 rounded-full border border-rose-500/25 bg-rose-500/10 px-2.5 py-0.5 text-xs font-bold text-rose-700"
                             title={`Score decreased by ${profile.recentPointsDelta.toLocaleString()} points`}
                           >
                             <span className="text-[0.68rem]">▼</span>
@@ -525,12 +515,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
               {tableRows.length === 0 ? (
                 <tr>
-                  <td className="px-6 py-12 text-center text-white/55" colSpan={5}>
+                  <td className="px-6 py-12 text-center text-black/55" colSpan={5}>
                     {searchQuery
-                      ? `No gangs matching "${searchQuery}"`
+                      ? `No profiles matching "${searchQuery}"`
                       : leaderboard.length > 0
                         ? "The top 3 are featured above."
-                        : "No scored gangs yet."}
+                        : "No scored profiles yet."}
                   </td>
                 </tr>
               ) : null}
@@ -540,7 +530,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       </section>
 
       {latestGeneratedAt ? (
-        <p className="-mt-2.5 text-left text-xs italic text-white/40">
+        <p className="-mt-2.5 text-left text-xs italic text-black/40">
           Latest generated global score:{" "}
           <time dateTime={latestGeneratedAt}>
             {formatUtcDate(latestGeneratedAt)} UTC
@@ -554,9 +544,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
 function HeroStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-2 py-3.5 text-center">
-      <p className="font-orbitron text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-white/40">{label}</p>
-      <p className="font-orbitron mt-1 text-lg font-bold">{value}</p>
+    <div className="rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-2 py-3.5 text-center shadow-sm">
+      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
+      <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
     </div>
   );
 }
