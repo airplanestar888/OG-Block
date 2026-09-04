@@ -11,10 +11,48 @@
   --border:    rgba(10, 11, 13, 0.08);
   --surface:   #ffffff;
 
+  /* Aurora — the Own Gang glow: magenta / violet / electric blue blooms
+     over a near-black violet base. Used on dark showcase surfaces. */
+  --aurora-base:   #0B0A24;
+  --aurora-deep:   #05060F;
+  --aurora-pink:   #FF2E9A;
+  --aurora-violet: #7B2FF7;
+  --aurora-blue:   #2E5BFF;
+  --aurora-cyan:   #38E1FF;
+  --aurora-amber:  #FFB020;
+  --aurora-gold:   #FFC94D;
+
   /* Fluid spacing tokens */
   --page-px:   clamp(1.1rem, 4vw, 2rem);
   --hero-pt:   clamp(2rem, 5vw, 4rem);
   --hero-pb:   clamp(1.5rem, 4vw, 2.5rem);
+}
+
+/* ─── Aurora backdrop — static layered blooms over the violet base ── */
+.aurora-backdrop {
+  background:
+    radial-gradient(circle at 12% 6%, rgba(255, 46, 154, 0.42), transparent 42%),
+    radial-gradient(circle at 88% 12%, rgba(46, 91, 255, 0.40), transparent 44%),
+    radial-gradient(circle at 55% 45%, rgba(123, 47, 247, 0.34), transparent 52%),
+    radial-gradient(circle at 20% 95%, rgba(56, 225, 255, 0.14), transparent 45%),
+    radial-gradient(circle at 90% 100%, rgba(255, 46, 154, 0.16), transparent 40%),
+    linear-gradient(180deg, #0D0B28 0%, #0B0A24 45%, #05060F 100%);
+}
+
+/* ─── Glass card — frosted surface that sits on the aurora ────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 24px 60px rgba(3, 2, 18, 0.45);
+}
+.glass-strong {
+  /* Solid-ish dark for large surfaces (tables): no backdrop-filter here —
+     blurring a full-height card is expensive and glitches compositing. */
+  background: rgba(13, 11, 40, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(3, 2, 18, 0.55);
 }
 
 /* ─── Reset ──────────────────────────────────────── */
