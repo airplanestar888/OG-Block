@@ -60,15 +60,20 @@ export function HoloImage({ children }: { children: ReactNode }) {
         style={{ transform: `rotateX(${holo.rx}deg) rotateY(${holo.ry}deg)` }}
       >
         <div
-          className="nft-image-wrap overflow-hidden transition-[transform,opacity,filter] duration-300 ease-out will-change-transform"
+          className="nft-image-wrap overflow-hidden transition-transform duration-300 ease-out will-change-transform"
           style={{
             transform: holo.active
               ? `translate(${(holo.px - 50) * 0.08}px, ${(holo.py - 50) * 0.08}px)`
               : "translate(0, 0)",
-            // Projection breakup: the picture fades to 80% and ripples
-            // like water while the pointer is over it.
-            opacity: holo.active ? 0.8 : 1,
-            filter: holo.active ? "url(#holo-ripple)" : undefined
+            // While hovering, punch a soft cursor-sized hole in the base
+            // image so the rippling projection below shows through only
+            // there — the rest of the picture stays untouched.
+            maskImage: holo.active
+              ? `radial-gradient(circle 90px at ${holo.px}% ${holo.py}%, transparent 30%, black 100%)`
+              : undefined,
+            WebkitMaskImage: holo.active
+              ? `radial-gradient(circle 90px at ${holo.px}% ${holo.py}%, transparent 30%, black 100%)`
+              : undefined
           }}
         >
           {children}
@@ -110,6 +115,24 @@ export function HoloImage({ children }: { children: ReactNode }) {
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-8 bottom-0 h-px bg-cyan-200/80 shadow-[0_0_14px_2px_rgba(140,225,255,0.75)]"
           />
+
+          {/* The rippling projection itself: a cursor-sized disc of the same
+              picture, faded to 80% and displaced by the water filter, with a
+              soft masked edge. clip-path bounds the filter's work region. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+            style={{
+              opacity: holo.active ? 1 : 0,
+              filter: "url(#holo-ripple)",
+              clipPath: `circle(110px at ${holo.px}% ${holo.py}%)`,
+              WebkitClipPath: `circle(110px at ${holo.px}% ${holo.py}%)`,
+              maskImage: `radial-gradient(circle 90px at ${holo.px}% ${holo.py}%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 55%, transparent 100%)`,
+              WebkitMaskImage: `radial-gradient(circle 90px at ${holo.px}% ${holo.py}%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 55%, transparent 100%)`
+            }}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>
