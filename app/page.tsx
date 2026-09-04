@@ -108,7 +108,7 @@ export default async function HomePage() {
               <div className="score-label-col flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-3 py-2.5 sm:px-4 sm:py-3">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0000FF]" />
                 <span className="font-orbitron whitespace-nowrap text-[0.55rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/60 sm:text-[0.58rem]">
-                  On Base
+                  On Chain
                 </span>
               </div>
 
