@@ -4,30 +4,56 @@ const STACK = [
   { name: "Base", src: "/logos/base-lockup-black.svg", h: 19 },
   { name: "Ethereum", src: "/logos/ethereum.svg", h: 30 },
   { name: "Robinhood", src: "/logos/robinhood.svg", h: 22 },
+  { name: "Solana", src: "/logos/solana.svg", h: 22 },
   { name: "Etherscan", src: "/logos/etherscan.svg", h: 24 },
   { name: "Alchemy", src: "/logos/alchemy-logo.svg", h: 22 },
   { name: "WalletConnect", src: "/logos/walletconnect.svg", h: 22 },
   { name: "Virtual Protocol", src: "/logos/virtual-protocol.svg", h: 29 }
 ];
 
-// Trust strip: the stack we're built on. All logos normalized to mono-black.
+// Trust strip over a fully-visible OG mega-word backdrop. The logos run in a
+// continuous marquee (pauses on hover, static for reduced-motion users); the
+// second copy of the stack exists purely to make the loop seamless.
 export function PoweredBy() {
   return (
-    <section className="page-container py-8 sm:py-10">
-      <p className="text-center text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#0A0B0D]/35">
+    <section className="page-container relative flex min-h-[min(22vw,19rem)] flex-col justify-center py-10 sm:py-12">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden"
+      >
+        <span
+          className="font-syne text-[min(22vw,17rem)] font-extrabold leading-none text-transparent"
+          style={{ WebkitTextStroke: "1.5px rgba(0,0,255,0.11)" }}
+        >
+          OG
+        </span>
+      </div>
+
+      <p className="relative text-center text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#0A0B0D]/35">
         Powered by
       </p>
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-x-9 gap-y-6 sm:gap-x-14">
-        {STACK.map(({ name, src, h }) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={name}
-            src={src}
-            alt={name}
-            style={{ height: h }}
-            className="w-auto opacity-45 brightness-0 transition hover:opacity-80"
-          />
-        ))}
+      <div
+        className="relative mt-6 overflow-hidden"
+        style={{
+          maskImage:
+            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)"
+        }}
+      >
+        <div className="marquee-track flex w-max items-center">
+          {[...STACK, ...STACK].map(({ name, src, h }, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={`${name}-${i}`}
+              src={src}
+              alt={i < STACK.length ? name : ""}
+              aria-hidden={i >= STACK.length || undefined}
+              style={{ height: h }}
+              className="mr-14 w-auto shrink-0 opacity-45 brightness-0 transition hover:opacity-80"
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

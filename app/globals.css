@@ -242,6 +242,25 @@ img, video {
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
+/* Powered-by logo marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+  }
+}
 /* LED-style numeric face for scores/metrics */
 .font-orbitron {
   font-family: var(--font-orbitron), 'Orbitron', sans-serif;

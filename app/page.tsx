@@ -25,15 +25,6 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
-      {/* Mega-word backdrop: a static poster watermark behind the hero,
-          echoing the footer's outlined type. Purely decorative. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-6 right-0 z-0 hidden select-none font-syne text-[23.8rem] font-extrabold leading-none text-transparent md:block"
-        style={{ WebkitTextStroke: "1.5px rgba(0,0,255,0.10)" }}
-      >
-        OG
-      </div>
 
       {/* ── HERO ─────────────────────────────────────── */}
       <section
