@@ -43,7 +43,13 @@ export function HoloImage({ children }: { children: ReactNode }) {
     const canvas = canvasRef.current;
     const img = wrapRef.current?.querySelector("img");
     if (!canvas || !img) return;
-    const gl = canvas.getContext("webgl", { alpha: false, antialias: false });
+    // preserveDrawingBuffer keeps the last frame on screen after the render
+    // loop pauses — without it the picture vanishes when the mouse leaves.
+    const gl = canvas.getContext("webgl", {
+      alpha: false,
+      antialias: false,
+      preserveDrawingBuffer: true
+    });
     if (!gl) {
       setWebglOk(false);
       return;
@@ -139,6 +145,22 @@ export function HoloImage({ children }: { children: ReactNode }) {
 
     const imageTex = gl.createTexture()!;
     let ready = false;
+    const drawStatic = () => {
+      const S = glRef.current;
+      if (!S) return;
+      gl.viewport(0, 0, S.w, S.h);
+      gl.useProgram(S.drawProg);
+      (S as unknown as { bindQuad: (p: WebGLProgram) => void }).bindQuad(S.drawProg);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, S.tex);
+      gl.uniform1i(S.drawUniforms.uTex!, 0);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, S.fieldA.tex);
+      gl.uniform1i(S.drawUniforms.uField!, 1);
+      gl.uniform1f(S.drawUniforms.uTime!, performance.now() / 1000);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
     const load = () => {
       gl.bindTexture(gl.TEXTURE_2D, imageTex);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -148,6 +170,7 @@ export function HoloImage({ children }: { children: ReactNode }) {
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img as HTMLImageElement);
       ready = true;
+      drawStatic();
     };
     if ((img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0) load();
     else (img as HTMLImageElement).addEventListener("load", load, { once: true });
@@ -161,6 +184,11 @@ export function HoloImage({ children }: { children: ReactNode }) {
       const parent = canvas.parentElement!;
       canvas.width = Math.floor(parent.clientWidth * dpr);
       canvas.height = Math.floor(parent.clientHeight * dpr);
+      if (glRef.current) {
+        glRef.current.w = canvas.width;
+        glRef.current.h = canvas.height;
+      }
+      if (ready) drawStatic();
     };
     resize();
     window.addEventListener("resize", resize, { passive: true });
