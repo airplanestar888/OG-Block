@@ -172,8 +172,6 @@ export function HoloImage({ children }: { children: ReactNode }) {
       ready = true;
       drawStatic();
     };
-    if ((img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0) load();
-    else (img as HTMLImageElement).addEventListener("load", load, { once: true });
 
     const SIZE = 256;
     const fieldA = makeTarget(SIZE);
@@ -218,6 +216,11 @@ export function HoloImage({ children }: { children: ReactNode }) {
     (glRef.current as unknown as { ready: () => boolean }).ready = () => ready;
     (glRef.current as unknown as { drawProgExtra: number }).drawProgExtra = SIZE;
 
+    // Wire the image upload AFTER the ref is fully wired, so the first static
+    // frame actually renders (the img is already in the DOM at this point).
+    if ((img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0) load();
+    else (img as HTMLImageElement).addEventListener("load", load, { once: true });
+
     return () => {
       window.removeEventListener("resize", resize);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
@@ -228,6 +231,11 @@ export function HoloImage({ children }: { children: ReactNode }) {
   function tick(t: number) {
     const S = glRef.current;
     if (!S) return;
+    if (!(S as unknown as { ready: () => boolean }).ready()) {
+      // texture not uploaded yet — try again next frame
+      rafRef.current = requestAnimationFrame(() => tick(performance.now()));
+      return;
+    }
     const { gl } = S;
     const bindQuad = (S as unknown as { bindQuad: (p: WebGLProgram) => void }).bindQuad;
     const dt = lastT.current ? Math.min((t - lastT.current) / 1000, 0.05) : 0.016;
@@ -339,7 +347,9 @@ export function HoloImage({ children }: { children: ReactNode }) {
           <canvas
             ref={canvasRef}
             aria-hidden="true"
-            className={`absolute inset-0 h-full w-full ${webglOk === true ? "" : "invisible"}`}
+            // Block + fixed aspect: this canvas is what gives the frame its
+            // height (the source img sits hidden for texture use only).
+            className={`block w-full aspect-[1776/864] ${webglOk === true ? "" : "invisible"}`}
           />
 
           {/* hologram scanlines */}
