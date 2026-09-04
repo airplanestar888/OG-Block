@@ -148,7 +148,7 @@ export default async function HomePage() {
               {/* Label — hidden xs */}
               <div className="score-label-col flex items-center gap-2 border-r border-[rgba(10,11,13,0.07)] px-3 py-2.5 sm:px-4 sm:py-3">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0000FF]" />
-                <span className="whitespace-nowrap text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/60 sm:text-[0.6rem]">
+                <span className="font-orbitron whitespace-nowrap text-[0.55rem] font-semibold uppercase tracking-[0.12em] text-[#0A0B0D]/60 sm:text-[0.58rem]">
                   On Base
                 </span>
               </div>
@@ -163,7 +163,7 @@ export default async function HomePage() {
               {/* Live — hidden xs */}
               <div className="score-live-col flex items-center gap-1.5 border-l border-[rgba(10,11,13,0.07)] px-3 sm:px-4">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#00c48c]" />
-                <span className="text-[0.58rem] font-semibold text-[#0A0B0D]/60 sm:text-[0.6rem]">Live</span>
+                <span className="font-orbitron text-[0.55rem] font-semibold text-[#0A0B0D]/60 sm:text-[0.58rem]">Live</span>
               </div>
             </div>
 
@@ -249,10 +249,10 @@ export default async function HomePage() {
 function ScoreMetric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-1 flex-col justify-center px-3 py-2.5 text-center sm:px-4 sm:py-3">
-      <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF] sm:text-[0.55rem]">
+      <p className="font-orbitron text-[0.5rem] font-semibold uppercase tracking-[0.12em] text-[#0000FF] sm:text-[0.53rem]">
         {label}
       </p>
-      <p className="font-syne mt-0.5 text-[1rem] leading-none text-[#0A0B0D] sm:text-[1.15rem]">
+      <p className="font-orbitron mt-0.5 text-[0.9rem] font-bold leading-none tracking-[0.02em] text-[#0A0B0D] sm:text-[1rem]">
         {value}
       </p>
     </div>

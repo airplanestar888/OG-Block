@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Syne } from "next/font/google";
+import { Inter, Orbitron, Syne } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-syne" });
+const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" });
 import { Providers } from "@/components/providers";
 import { SiteNav } from "@/components/site-nav";
 import { SiteFooter } from "@/components/site-footer";
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${syne.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${syne.variable} ${orbitron.variable}`}>
       <body className="flex min-h-screen flex-col font-sans antialiased" suppressHydrationWarning>
         <Providers>
           <SiteNav />

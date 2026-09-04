@@ -242,3 +242,7 @@ img, video {
   letter-spacing: -0.02em;
   text-transform: uppercase;
 }
+/* LED-style numeric face for scores/metrics */
+.font-orbitron {
+  font-family: var(--font-orbitron), 'Orbitron', sans-serif;
+}
