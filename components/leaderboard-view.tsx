@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { XAvatar } from "@/components/x-avatar";
 import { PageHeading } from "@/components/page-heading";
+import { SlideIn } from "@/components/reveal-in-view";
 import type { PublicLeaderboardProfile } from "@/lib/types";
 
 type LeaderboardViewProps = {
@@ -18,34 +19,30 @@ const PLACE_STYLES: Record<
   PodiumPlace,
   {
     chip: string;
-    chipRing: string;
-    pedestal: string;
-    panelGlow: string;
+    glow: string;
+    avatarRing: string;
     avatarSize: number;
     nameSize: string;
   }
 > = {
   1: {
-    chip: "bg-gradient-to-b from-[#F7D77A] to-[#E5B54A] text-white",
-    chipRing: "ring-[#D9A93F]/40",
-    pedestal: "from-[#fdfdfb] to-[#f4ecda]",
-    panelGlow: "shadow-[0_18px_44px_rgba(217,169,63,0.16)]",
+    chip: "bg-gradient-to-b from-[#F7D77A] to-[#E5B54A] text-[#0A0B0D]",
+    glow: "shadow-[0_24px_60px_rgba(217,169,63,0.22)]",
+    avatarRing: "ring-[#E5B54A]/60",
     avatarSize: 88,
     nameSize: "text-xl",
   },
   2: {
-    chip: "bg-gradient-to-b from-[#EAEEF3] to-[#C9D1DB] text-white",
-    chipRing: "ring-[#B7BFCB]/50",
-    pedestal: "from-[#fcfdfe] to-[#eceff4]",
-    panelGlow: "shadow-[0_14px_36px_rgba(10,11,13,0.08)]",
+    chip: "bg-gradient-to-b from-[#EAEEF3] to-[#C9D1DB] text-[#0A0B0D]",
+    glow: "shadow-[0_18px_44px_rgba(0,0,255,0.18)]",
+    avatarRing: "ring-white/30",
     avatarSize: 68,
     nameSize: "text-lg",
   },
   3: {
-    chip: "bg-gradient-to-b from-[#F0D2B2] to-[#D8A26A] text-white",
-    chipRing: "ring-[#C08A55]/40",
-    pedestal: "from-[#fdfcfa] to-[#f3e7d8]",
-    panelGlow: "shadow-[0_14px_36px_rgba(192,138,85,0.14)]",
+    chip: "bg-gradient-to-b from-[#F0D2B2] to-[#D8A26A] text-[#0A0B0D]",
+    glow: "shadow-[0_18px_44px_rgba(192,138,85,0.20)]",
+    avatarRing: "ring-[#D8A26A]/60",
     avatarSize: 68,
     nameSize: "text-lg",
   }
@@ -151,22 +148,24 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           </PageHeading>
         </div>
 
-        <div className="rounded-[1.5rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">
-          <div className="p-6">
+        <div className="relative overflow-hidden rounded-[1.5rem] bg-[#0A0B0D] text-white shadow-[0_24px_60px_rgba(0,0,255,0.22)]">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(0,0,255,0.5),transparent_55%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.14)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.09)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
+          <div className="relative p-6">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-black/40">Live standings</p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-emerald-700">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-white/45">Live standings</p>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2.5 py-1 text-[0.62rem] font-bold uppercase tracking-[0.1em] text-emerald-300">
                 <span className="relative flex size-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
                 </span>
                 Live
               </span>
             </div>
-            <p className="mt-3 text-base font-semibold leading-snug text-ink">
+            <p className="mt-3 text-base font-semibold leading-snug">
               OG status is earned, not claimed.
             </p>
-            <p className="mt-1.5 text-sm leading-6 text-black/55">
+            <p className="mt-1.5 text-sm leading-6 text-white/55">
               Every verified profile, ranked live from on-chain Base holdings.
             </p>
             <div className="mt-5 grid grid-cols-3 gap-2.5">
@@ -174,6 +173,13 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               <HeroStat label="Total score" value={formatCompactNumber(totalScore)} />
               <HeroStat label="NFTs" value={formatCompactNumber(totalNfts)} />
             </div>
+          </div>
+          <div className="relative flex items-center justify-between border-t border-white/10 px-6 py-3">
+            <div className="flex items-center gap-2">
+              <span className="inline-block size-3.5 rounded-[5px] bg-[#2E4BFF]" />
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em]">OG BLOCK</p>
+            </div>
+            <p className="text-[0.65rem] text-white/40">Base culture score</p>
           </div>
         </div>
       </div>
@@ -190,27 +196,39 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 place === 1 ? "order-1 sm:order-2" : place === 2 ? "order-2 sm:order-1" : "order-3";
 
               return (
-                <article
+                <SlideIn
                   key={`podium-${profile.xHandle || place}`}
+                  direction={position % 2 === 0 ? "left" : "right"}
+                  delay={0.1 + position * 0.09}
+                  className={orderClass}
+                >
+                <article
                   onClick={() => openProfile(profile.xHandle)}
-                  className={`group flex flex-col items-center text-center ${orderClass} ${
+                  className={`group relative flex flex-col items-center overflow-hidden rounded-[1.4rem] bg-[#0A0B0D] px-5 pb-6 pt-9 text-center text-white ${PEDESTAL_HEIGHT[place]} ${styles.glow} ${
                     profile.xHandle ? "cursor-pointer" : ""
                   }`}
                 >
-                  <span className="rounded-full bg-white p-0.5 shadow-[0_10px_24px_rgba(10,11,13,0.14)] ring-2 ring-white">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(0,0,255,0.5),transparent_60%)]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.12)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.08)_1px,transparent_1px)] bg-[length:28px_28px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
+                  <span
+                    className={`absolute left-1/2 top-3 grid size-10 -translate-x-1/2 place-items-center rounded-xl ${styles.chip}`}
+                  >
+                    <TrophyIcon />
+                  </span>
+                  <span className={`relative rounded-full bg-white p-0.5 ring-2 ${styles.avatarRing}`}>
                     <XAvatar
                       src={profile.xAvatar}
                       handle={profile.xHandle}
                       size={styles.avatarSize}
                     />
                   </span>
-                  <div className="mt-3 flex items-center gap-1.5">
-                    <h2 className={`font-semibold tracking-tight text-black/90 ${styles.nameSize}`}>
+                  <div className="relative mt-3 flex items-center gap-1.5">
+                    <h2 className={`font-semibold tracking-tight ${styles.nameSize}`}>
                       {profile.xHandle ? (
                         <Link
                           href={`/u/${profile.xHandle}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="transition hover:text-baseblue hover:underline"
+                          className="transition hover:text-[#8FA2FF] hover:underline"
                         >
                           {profile.xName || `@${profile.xHandle}`}
                         </Link>
@@ -219,37 +237,28 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                       )}
                     </h2>
                     {profile.profileRole === "agent" ? (
-                      <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-black/55">
+                      <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-white/60">
                         Agent
                       </span>
                     ) : null}
                   </div>
-                  <p className="text-xs text-black/45">
+                  <p className="relative text-xs text-white/45">
                     {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
                   </p>
 
-                  {/* Pedestal */}
-                  <div
-                    className={`relative mt-9 flex w-full flex-col items-center rounded-t-[1.4rem] border border-b-0 border-black/[0.07] bg-gradient-to-b px-5 pt-9 pb-6 ${PEDESTAL_HEIGHT[place]} ${styles.pedestal} ${styles.panelGlow} transition-all duration-200 group-hover:-translate-y-0.5`}
-                  >
-                    <span
-                      className={`absolute -top-5 grid size-10 place-items-center rounded-xl ring-4 ring-white ${styles.chip} ${styles.chipRing}`}
-                    >
-                      <TrophyIcon />
-                    </span>
-                    <p className="text-[0.6rem] font-bold uppercase tracking-[0.18em] text-black/40">
-                      Culture score
-                    </p>
-                    <p className="mt-1 text-3xl font-bold leading-none tracking-tight text-ink">
-                      {formatCompactNumber(profile.score)}
-                    </p>
-                    <div className="mt-3 flex items-center gap-4 text-xs font-semibold text-black/55">
-                      <span>{profile.nftCount.toLocaleString()} NFT</span>
-                      <span className="h-3 w-px bg-black/10" aria-hidden="true" />
-                      <span>{profile.badgeCount.toLocaleString()} badge</span>
-                    </div>
+                  <p className="font-orbitron relative mt-4 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/40">
+                    Culture score
+                  </p>
+                  <p className="font-orbitron relative mt-1 text-3xl font-bold leading-none tracking-tight">
+                    {formatCompactNumber(profile.score)}
+                  </p>
+                  <div className="relative mt-3 flex items-center gap-4 text-xs font-semibold text-white/55">
+                    <span>{profile.nftCount.toLocaleString()} NFT</span>
+                    <span className="h-3 w-px bg-white/15" aria-hidden="true" />
+                    <span>{profile.badgeCount.toLocaleString()} badge</span>
                   </div>
                 </article>
+                </SlideIn>
               );
             })}
           </section>
@@ -275,12 +284,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       ) : null}
 
       {/* Main Culture Board */}
-      <section className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-sm">
+      <section className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-white shadow-[0_18px_44px_rgba(0,0,255,0.08)]">
         {/* Table Header Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 bg-[#0A0B0D] px-5 py-4 text-white">
           <div>
-            <h2 className="font-semibold text-black/88">Culture board</h2>
-            <p className="mt-1 text-sm text-black/65">
+            <h2 className="font-semibold">Culture board</h2>
+            <p className="mt-1 text-sm text-white/55">
               {podiumVisible
                 ? "Full rankings across all verified OG BLOCK profiles — top 3 featured above."
                 : "Live rankings across all verified OG BLOCK profiles."}
@@ -296,12 +305,12 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 aria-label="Search profiles by X handle or name"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-black/10 bg-[#fbfcff] px-3.5 py-1.5 text-xs text-ink placeholder:text-black/50 focus:border-baseblue focus:outline-none focus:ring-1 focus:ring-baseblue"
+                className="w-full rounded-xl border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-xs text-white placeholder:text-white/40 focus:border-[#2E4BFF] focus:outline-none focus:ring-1 focus:ring-[#2E4BFF]"
               />
               {searchQuery ? (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-black/40 hover:text-black"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-white/40 hover:text-white"
                   type="button"
                 >
                   ✕
@@ -397,13 +406,13 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         {/* Rankings Table with balanced column widths & alignment (desktop) */}
         <div className="hidden overflow-x-auto overscroll-x-contain sm:block">
           <table className="w-full min-w-[720px] table-fixed text-left text-sm">
-            <thead className="bg-black/[0.03] text-black/55">
+            <thead className="bg-[#0A0B0D] text-white/60">
               <tr>
-                <th className="w-[10%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Rank</th>
-                <th className="w-[38%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">X</th>
-                <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">NFT</th>
-                <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Badge</th>
-                <th className="w-[22%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Score</th>
+                <th className="font-orbitron w-[10%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">Rank</th>
+                <th className="font-orbitron w-[38%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">X</th>
+                <th className="font-orbitron w-[15%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">NFT</th>
+                <th className="font-orbitron w-[15%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">Badge</th>
+                <th className="font-orbitron w-[22%] px-6 py-4 text-center text-[0.65rem] font-semibold uppercase tracking-[0.14em]">Score</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-black/10">
@@ -549,9 +558,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
 function HeroStat({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl border border-black/10 bg-gradient-to-b from-[#f7f8fb] to-white px-2 py-3.5 text-center shadow-sm">
-      <p className="text-[0.6rem] font-bold uppercase tracking-[0.12em] text-black/40">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-ink">{value}</p>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.05] px-2 py-3.5 text-center">
+      <p className="font-orbitron text-[0.6rem] font-semibold uppercase tracking-[0.14em] text-white/40">{label}</p>
+      <p className="font-orbitron mt-1 text-lg font-bold">{value}</p>
     </div>
   );
 }

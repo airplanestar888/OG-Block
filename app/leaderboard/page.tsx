@@ -9,6 +9,18 @@ export default async function LeaderboardPage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f7f8fb] px-4 py-12 text-ink">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(0,0,255,0.14),transparent_30%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
+      {/* Mega-word backdrop — culture poster treatment, echoes the OG slab */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 flex select-none justify-center overflow-hidden pt-6"
+      >
+        <span
+          className="font-syne whitespace-nowrap text-[min(20vw,15rem)] font-extrabold leading-none text-transparent"
+          style={{ WebkitTextStroke: "1.5px rgba(0,0,255,0.10)" }}
+        >
+          RANK
+        </span>
+      </div>
 
       <section className="relative mx-auto max-w-6xl">
         <LeaderboardView leaderboard={leaderboard} />
