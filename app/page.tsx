@@ -3,6 +3,7 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/public-profiles";
 import { PoweredBy } from "@/components/powered-by";
+import { HoloImage } from "@/components/holo-image";
 
 export default async function HomePage() {
   const session = await auth();
@@ -89,8 +90,8 @@ export default async function HomePage() {
           {/* ── RIGHT — NFT image + score ── */}
           <div className="reveal reveal-d2 flex flex-col gap-2.5">
 
-            {/* Image */}
-            <div className="nft-image-wrap">
+            {/* Image — hologram treatment */}
+            <HoloImage>
               <Image
                 className="nft-img h-full w-full object-cover"
                 src="/og-nft-grid.png"
@@ -99,7 +100,7 @@ export default async function HomePage() {
                 height={864}
                 priority
               />
-            </div>
+            </HoloImage>
 
             {/* Score strip */}
             <div className="flex items-stretch overflow-hidden rounded-[14px] border border-[rgba(10,11,13,0.08)] bg-white shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
