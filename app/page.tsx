@@ -178,9 +178,11 @@ export default async function HomePage() {
                 wide: false,
                 icon: (
                   <g>
-                    <rect x="3.5" y="5.5" width="17" height="13" rx="2" />
-                    <circle cx="8.5" cy="11" r="1.6" />
-                    <path d="M13 9.5h4.5M13 12.5h4.5M6 15.5h12" />
+                    <path d="M16 10h2" />
+                    <path d="M16 14h2" />
+                    <path d="M6.17 15a3 3 0 0 1 5.66 0" />
+                    <circle cx="9" cy="11" r="2" />
+                    <rect x="2" y="5" width="20" height="14" rx="2" />
                   </g>
                 )
               },
@@ -191,9 +193,8 @@ export default async function HomePage() {
                 wide: false,
                 icon: (
                   <g>
-                    <path d="M4 19.5h16" />
-                    <path d="M5.5 15.5l3.5-4 3 2.5 4-5.5 2.5 3" />
-                    <circle cx="16" cy="8.5" r="1.1" />
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+                    <polyline points="16 7 22 7 22 13" />
                   </g>
                 )
               },
@@ -204,10 +205,9 @@ export default async function HomePage() {
                 wide: false,
                 icon: (
                   <g>
-                    <path d="M4 20h16" />
-                    <rect x="5" y="12.5" width="4" height="7.5" rx="0.5" />
-                    <rect x="10" y="8" width="4" height="12" rx="0.5" />
-                    <rect x="15" y="10.5" width="4" height="9.5" rx="0.5" />
+                    <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+                    <rect x="15" y="5" width="4" height="12" rx="1" />
+                    <rect x="7" y="8" width="4" height="9" rx="1" />
                   </g>
                 )
               },
@@ -218,8 +218,8 @@ export default async function HomePage() {
                 wide: false,
                 icon: (
                   <g>
-                    <path d="M2.5 12S6 6.5 12 6.5 21.5 12 21.5 12 18 17.5 12 17.5 2.5 12 2.5 12z" />
-                    <circle cx="12" cy="12" r="2.4" />
+                    <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                    <circle cx="12" cy="12" r="3" />
                   </g>
                 )
               },
@@ -230,12 +230,12 @@ export default async function HomePage() {
                 wide: true,
                 icon: (
                   <g>
-                    <rect x="4.5" y="8.5" width="15" height="11" rx="3" />
-                    <path d="M12 8.5V5.5" />
-                    <circle cx="12" cy="4" r="1.2" />
-                    <circle cx="9" cy="13" r="0.9" fill="currentColor" stroke="none" />
-                    <circle cx="15" cy="13" r="0.9" fill="currentColor" stroke="none" />
-                    <path d="M9.5 16.5h5" />
+                    <path d="M12 8V4H8" />
+                    <rect x="4" y="8" width="16" height="12" rx="2" />
+                    <path d="M2 14h2" />
+                    <path d="M20 14h2" />
+                    <path d="M15 13v2" />
+                    <path d="M9 13v2" />
                   </g>
                 )
               }
@@ -243,7 +243,7 @@ export default async function HomePage() {
               <div key={title} className={`flex items-start gap-5 ${wide ? "sm:col-span-2" : ""}`}>
                 <svg
                   width="46" height="46" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="1.3"
+                  stroke="currentColor" strokeWidth="1.6"
                   strokeLinecap="round" strokeLinejoin="round"
                   className="mt-0.5 shrink-0 text-[#0A0B0D]"
                   aria-hidden="true"
