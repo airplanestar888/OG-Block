@@ -1,107 +1,291 @@
 "use client";
 
-import { useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { useRef, useState, useEffect, type MouseEvent, type ReactNode } from "react";
 
-// Hologram treatment for the hero NFT grid: pointer-tracked 3D tilt, an
-// iridescent sheen, scanlines, and a projector beam rising from the bottom
-// edge (the direction of the On Chain strip). The water feature is a
-// cursor-sized disc of the picture that fades to 80% and ripples via an
-// SVG turbulence filter. The disc trails the pointer with a spring lag and
-// keeps swaying gently when the mouse rests, so moving the mouse feels like
-// stirring water under a hologram; faster strokes raise the displacement.
-// Every light layer stays clipped inside the image frame. Cosmetic only;
-// disabled for reduced-motion users.
+// Liquid-hologram hero (in the spirit of Active Theory's Kandinsky piece):
+// the whole picture is rendered on a WebGL canvas and warped by a fluid
+// displacement field. Pointer movement injects a smooth splat whose strength
+// follows pointer velocity; the field decays and leaves a trailing wake, so
+// stirring the mouse makes the image undulate like ink under water and then
+// settle. DOM overlays (scanlines, sheen, projector beam) stay on top, and
+// the 3D tilt still applies to the whole frame. Falls back to a plain image
+// when WebGL is unavailable or reduced motion is requested.
 export function HoloImage({ children }: { children: ReactNode }) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const baseRef = useRef<HTMLDivElement>(null);
-  const discRef = useRef<HTMLDivElement>(null);
-  const dispRef = useRef<SVGFEDisplacementMapElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const glRef = useRef<{
+    gl: WebGLRenderingContext;
+    tex: WebGLTexture;
+    fieldA: { fb: WebGLFramebuffer; tex: WebGLTexture };
+    fieldB: { fb: WebGLFramebuffer; tex: WebGLFramebuffer extends never ? never : WebGLTexture };
+    fieldProg: WebGLProgram;
+    drawProg: WebGLProgram;
+    fieldUniforms: Record<string, WebGLUniformLocation | null>;
+    drawUniforms: Record<string, WebGLUniformLocation | null>;
+    w: number;
+    h: number;
+  } | null>(null);
+  const pointer = useRef({ x: 0.5, y: 0.5, vx: 0, vy: 0 });
+  const hover = useRef(false);
+  const running = useRef(false);
   const rafRef = useRef(0);
-  const loopOn = useRef(false);
-  const hovering = useRef(false);
-  const target = useRef({ x: 50, y: 50 });
-  const cur = useRef({ x: 50, y: 50 });
-  const curHole = useRef(0); // lerped base-mask hole radius (px)
-  const vel = useRef(0);
-  const [holo, setHolo] = useState({ rx: 0, ry: 0, px: 50, py: 50, active: false });
+  const lastT = useRef(0);
+  const decayUntil = useRef(0);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, px: 50, py: 50, active: false });
+  const [webglOk, setWebglOk] = useState<boolean | null>(null);
+
+  // ── WebGL setup ────────────────────────────────────────────
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setWebglOk(false);
+      return;
+    }
+    const canvas = canvasRef.current;
+    const img = wrapRef.current?.querySelector("img");
+    if (!canvas || !img) return;
+    const gl = canvas.getContext("webgl", { alpha: false, antialias: false });
+    if (!gl) {
+      setWebglOk(false);
+      return;
+    }
+    setWebglOk(true);
+
+    const compile = (src: string, type: number) => {
+      const sh = gl.createShader(type)!;
+      gl.shaderSource(sh, src);
+      gl.compileShader(sh);
+      return sh;
+    };
+    const link = (vs: string, fs: string) => {
+      const p = gl.createProgram()!;
+      gl.attachShader(p, compile(vs, gl.VERTEX_SHADER));
+      gl.attachShader(p, compile(fs, gl.FRAGMENT_SHADER));
+      gl.linkProgram(p);
+      return p;
+    };
+
+    const quadVs = `
+      attribute vec2 aPos;
+      varying vec2 vUv;
+      void main() {
+        vUv = aPos * 0.5 + 0.5;
+        gl_Position = vec4(aPos, 0.0, 1.0);
+      }`;
+
+    // Field update: decay previous displacement, add a gaussian splat at the
+    // pointer scaled by pointer velocity. Displacement stored as (v+1)/2.
+    const fieldFs = `
+      precision mediump float;
+      varying vec2 vUv;
+      uniform sampler2D uField;
+      uniform vec2 uPointer;
+      uniform vec2 uVel;
+      uniform float uDecay;
+      void main() {
+        vec2 prev = texture2D(uField, vUv).xy * 2.0 - 1.0;
+        prev *= uDecay;
+        vec2 d = vUv - uPointer;
+        d.x *= 1.6;
+        float g = exp(-dot(d, d) * 42.0);
+        prev += uVel * g;
+        gl_FragColor = vec4(clamp(prev, -1.0, 1.0) * 0.5 + 0.5, 0.0, 1.0);
+      }`;
+
+    // Draw: warp the whole image by the field, plus a faint ambient wobble.
+    const drawFs = `
+      precision mediump float;
+      varying vec2 vUv;
+      uniform sampler2D uTex;
+      uniform sampler2D uField;
+      uniform float uTime;
+      void main() {
+        vec2 disp = texture2D(uField, vUv).xy * 2.0 - 1.0;
+        vec2 wob = vec2(
+          sin(vUv.y * 9.0 + uTime * 0.9),
+          cos(vUv.x * 7.0 + uTime * 0.7)
+        ) * 0.0022;
+        vec2 uv = vUv + disp * 0.055 + wob;
+        gl_FragColor = texture2D(uTex, clamp(uv, 0.001, 0.999));
+      }`;
+
+    const fieldProg = link(quadVs, fieldFs);
+    const drawProg = link(quadVs, drawFs);
+
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    const bindQuad = (prog: WebGLProgram) => {
+      const loc = gl.getAttribLocation(prog, "aPos");
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    };
+
+    const makeTarget = (size: number) => {
+      const tex = gl.createTexture()!;
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      const fb = gl.createFramebuffer()!;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+      gl.clearColor(0.5, 0.5, 0.5, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      return { fb, tex };
+    };
+
+    const imageTex = gl.createTexture()!;
+    let ready = false;
+    const load = () => {
+      gl.bindTexture(gl.TEXTURE_2D, imageTex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img as HTMLImageElement);
+      ready = true;
+    };
+    if ((img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0) load();
+    else (img as HTMLImageElement).addEventListener("load", load, { once: true });
+
+    const SIZE = 256;
+    const fieldA = makeTarget(SIZE);
+    const fieldB = makeTarget(SIZE);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const resize = () => {
+      const parent = canvas.parentElement!;
+      canvas.width = Math.floor(parent.clientWidth * dpr);
+      canvas.height = Math.floor(parent.clientHeight * dpr);
+    };
+    resize();
+    window.addEventListener("resize", resize, { passive: true });
+
+    glRef.current = {
+      gl,
+      tex: imageTex,
+      fieldA,
+      fieldB,
+      fieldProg,
+      drawProg,
+      fieldUniforms: {
+        uField: gl.getUniformLocation(fieldProg, "uField"),
+        uPointer: gl.getUniformLocation(fieldProg, "uPointer"),
+        uVel: gl.getUniformLocation(fieldProg, "uVel"),
+        uDecay: gl.getUniformLocation(fieldProg, "uDecay")
+      },
+      drawUniforms: {
+        uTex: gl.getUniformLocation(drawProg, "uTex"),
+        uField: gl.getUniformLocation(drawProg, "uField"),
+        uTime: gl.getUniformLocation(drawProg, "uTime")
+      },
+      w: canvas.width,
+      h: canvas.height
+    };
+    (glRef.current as unknown as { bindQuad: (p: WebGLProgram) => void }).bindQuad = bindQuad;
+    (glRef.current as unknown as { ready: () => boolean }).ready = () => ready;
+    (glRef.current as unknown as { drawProgExtra: number }).drawProgExtra = SIZE;
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      gl.getExtension("WEBGL_lose_context")?.loseContext();
+    };
+  }, []);
+
+  // ── Render loop ────────────────────────────────────────────
+  function tick(t: number) {
+    const S = glRef.current;
+    if (!S) return;
+    const { gl } = S;
+    const bindQuad = (S as unknown as { bindQuad: (p: WebGLProgram) => void }).bindQuad;
+    const dt = lastT.current ? Math.min((t - lastT.current) / 1000, 0.05) : 0.016;
+    lastT.current = t;
+
+    // pointer velocity decays; wake fades ~1s after the mouse leaves
+    pointer.current.vx *= 0.9;
+    pointer.current.vy *= 0.9;
+    const decaying = performance.now() < decayUntil.current;
+    if (!hover.current && !decaying) {
+      running.current = false;
+      return;
+    }
+
+    gl.viewport(0, 0, 256, 256);
+    gl.useProgram(S.fieldProg);
+    bindQuad(S.fieldProg);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, S.fieldA.tex);
+    gl.uniform1i(S.fieldUniforms.uField!, 0);
+    gl.uniform2f(S.fieldUniforms.uPointer!, pointer.current.x, pointer.current.y);
+    const speed = Math.hypot(pointer.current.vx, pointer.current.vy);
+    const churn = hover.current ? 0.16 : 0;
+    gl.uniform2f(
+      S.fieldUniforms.uVel!,
+      pointer.current.vx * churn,
+      pointer.current.vy * churn
+    );
+    gl.uniform1f(S.fieldUniforms.uDecay!, Math.pow(0.9, dt * 60));
+    gl.bindFramebuffer(gl.FRAMEBUFFER, S.fieldB.fb);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    // swap
+    const tmp = S.fieldA;
+    glRef.current!.fieldA = S.fieldB;
+    glRef.current!.fieldB = tmp;
+
+    gl.viewport(0, 0, S.w, S.h);
+    gl.useProgram(S.drawProg);
+    bindQuad(S.drawProg);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, S.tex);
+    gl.uniform1i(S.drawUniforms.uTex!, 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, S.fieldA.tex);
+    gl.uniform1i(S.drawUniforms.uField!, 1);
+    gl.uniform1f(S.drawUniforms.uTime!, t / 1000);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    rafRef.current = requestAnimationFrame(tick);
+  }
+
+  function ensureLoop() {
+    if (!running.current) {
+      running.current = true;
+      lastT.current = 0;
+      rafRef.current = requestAnimationFrame(tick);
+    }
+  }
 
   function onMove(e: MouseEvent<HTMLDivElement>) {
     const el = wrapRef.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el || webglOk === false) return;
     const rect = el.getBoundingClientRect();
-    target.current = {
-      x: Math.min(Math.max(((e.clientX - rect.left) / rect.width) * 100, 0), 100),
-      y: Math.min(Math.max(((e.clientY - rect.top) / rect.height) * 100, 0), 100)
-    };
-    setHolo((h) => ({
-      rx: (0.5 - target.current.y / 100) * 9,
-      ry: (target.current.x / 100 - 0.5) * 11,
-      px: target.current.x,
-      py: target.current.y,
+    const x = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    const y = 1 - Math.min(Math.max((e.clientY - rect.top) / rect.height, 0), 1);
+    pointer.current.vx += x - pointer.current.x;
+    pointer.current.vy += y - pointer.current.y;
+    pointer.current.x = x;
+    pointer.current.y = y;
+    hover.current = true;
+    setTilt({
+      rx: (0.5 - y) * 9,
+      ry: (x - 0.5) * 11,
+      px: x * 100,
+      py: (1 - y) * 100,
       active: true
-    }));
-    if (!hovering.current) {
-      hovering.current = true;
-      if (!loopOn.current) {
-        loopOn.current = true;
-        rafRef.current = requestAnimationFrame(tick);
-      }
-    }
+    });
+    ensureLoop();
   }
 
   function onLeave() {
-    hovering.current = false;
-    vel.current = 0;
-    setHolo((h) => ({ ...h, rx: 0, ry: 0, active: false }));
-  }
-
-  function tick() {
-    const t = performance.now() / 1000;
-
-    // Spring lag: the disc chases the pointer, so hand movements make the
-    // water trail behind instead of snapping along.
-    const dx = target.current.x - cur.current.x;
-    const dy = target.current.y - cur.current.y;
-    vel.current = vel.current * 0.85 + Math.hypot(dx, dy) * 0.15;
-    cur.current.x += dx * 0.065;
-    cur.current.y += dy * 0.065;
-
-    // Gentle idle sway so the ripple never sits perfectly still.
-    const sx = cur.current.x + Math.sin(t * 1.4) * 1.6;
-    const sy = cur.current.y + Math.cos(t * 1.1) * 1.6;
-
-    // Hole in the base image opens/closes smoothly and rides the disc.
-    const holeTarget = hovering.current ? 90 : 0;
-    curHole.current += (holeTarget - curHole.current) * 0.14;
-
-    if (baseRef.current) {
-      const m = `radial-gradient(circle ${curHole.current.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%, transparent 30%, black 100%)`;
-      baseRef.current.style.maskImage = m;
-      baseRef.current.style.webkitMaskImage = m;
-    }
-    if (discRef.current) {
-      const r = (curHole.current / 90) * 110;
-      const cp = `circle(${r.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%)`;
-      discRef.current.style.clipPath = cp;
-      discRef.current.style.setProperty("-webkit-clip-path", cp);
-      const mm = `radial-gradient(circle ${curHole.current.toFixed(1)}px at ${sx.toFixed(2)}% ${sy.toFixed(2)}%, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.45) 55%, transparent 100%)`;
-      discRef.current.style.maskImage = mm;
-      discRef.current.style.webkitMaskImage = mm;
-    }
-    // Stirring strength: quick strokes churn the water harder, then settle.
-    if (dispRef.current) {
-      dispRef.current.setAttribute("scale", (12 + Math.min(vel.current * 1.4, 9)).toFixed(1));
-    }
-
-    if (!hovering.current && curHole.current < 0.5 && Math.hypot(dx, dy) < 0.05) {
-      loopOn.current = false;
-      if (baseRef.current) {
-        baseRef.current.style.maskImage = "";
-        baseRef.current.style.webkitMaskImage = "";
-      }
-      return;
-    }
-    rafRef.current = requestAnimationFrame(tick);
+    hover.current = false;
+    decayUntil.current = performance.now() + 1200;
+    setTilt((h) => ({ ...h, rx: 0, ry: 0, active: false }));
+    ensureLoop();
   }
 
   return (
@@ -111,36 +295,24 @@ export function HoloImage({ children }: { children: ReactNode }) {
       onMouseLeave={onLeave}
       className="relative [perspective:1200px]"
     >
-      {/* Animated water-ripple filter; displacement scale is steered live
-          from the tick loop via dispRef */}
-      <svg aria-hidden="true" className="absolute h-0 w-0">
-        <filter id="holo-ripple" x="-10%" y="-10%" width="120%" height="120%">
-          <feTurbulence type="fractalNoise" numOctaves="2" result="waves">
-            <animate
-              attributeName="baseFrequency"
-              dur="7s"
-              values="0.010 0.018;0.013 0.024;0.010 0.018"
-              repeatCount="indefinite"
-            />
-          </feTurbulence>
-          <feDisplacementMap ref={dispRef} in="SourceGraphic" in2="waves" scale="16" />
-        </filter>
-      </svg>
-
       <div
         className="relative transition-transform duration-200 ease-out will-change-transform [transform-style:preserve-3d]"
-        style={{ transform: `rotateX(${holo.rx}deg) rotateY(${holo.ry}deg)` }}
+        style={{ transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)` }}
       >
-        <div
-          ref={baseRef}
-          className="nft-image-wrap overflow-hidden transition-transform duration-300 ease-out will-change-transform"
-          style={{
-            transform: holo.active
-              ? `translate(${(holo.px - 50) * 0.08}px, ${(holo.py - 50) * 0.08}px)`
-              : "translate(0, 0)"
-          }}
-        >
-          {children}
+        <div className="nft-image-wrap overflow-hidden">
+          {/* Source image: texture source for WebGL and the no-WebGL fallback */}
+          {webglOk !== true ? (
+            children
+          ) : (
+            <div className="hidden">
+              {children}
+            </div>
+          )}
+          <canvas
+            ref={canvasRef}
+            aria-hidden="true"
+            className={`absolute inset-0 h-full w-full ${webglOk === true ? "" : "invisible"}`}
+          />
 
           {/* hologram scanlines */}
           <div
@@ -152,15 +324,14 @@ export function HoloImage({ children }: { children: ReactNode }) {
             }}
           />
 
-          {/* iridescent sheen following the cursor — kept faint so the
-              ripple disc stays the star */}
+          {/* iridescent sheen following the cursor — kept faint */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 transition-opacity duration-300"
             style={{
-              opacity: holo.active ? 0.19 : 0,
+              opacity: tilt.active ? 0.19 : 0,
               mixBlendMode: "screen",
-              background: `radial-gradient(120% 90% at ${holo.px}% ${holo.py}%, rgba(140,225,255,0.11) 0%, rgba(0,0,255,0.06) 42%, transparent 72%)`
+              background: `radial-gradient(120% 90% at ${tilt.px}% ${tilt.py}%, rgba(140,225,255,0.11) 0%, rgba(0,0,255,0.06) 42%, transparent 72%)`
             }}
           />
 
@@ -180,18 +351,6 @@ export function HoloImage({ children }: { children: ReactNode }) {
             aria-hidden="true"
             className="pointer-events-none absolute inset-x-8 bottom-0 h-px bg-cyan-200/80 shadow-[0_0_14px_2px_rgba(140,225,255,0.75)]"
           />
-
-          {/* The watery projection disc: the same picture, faded and
-              displaced by the ripple filter, chasing the pointer with a
-              spring lag and swaying gently while idle */}
-          <div
-            ref={discRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500"
-            style={{ filter: "url(#holo-ripple)" }}
-          >
-            {children}
-          </div>
         </div>
       </div>
     </div>
