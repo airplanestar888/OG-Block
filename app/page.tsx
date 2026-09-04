@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/public-profiles";
-import { PixelField } from "@/components/pixel-field";
 import { PoweredBy } from "@/components/powered-by";
 
 export default async function HomePage() {
@@ -25,7 +24,15 @@ export default async function HomePage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
-      <PixelField />
+      {/* Mega-word backdrop: a static poster watermark behind the hero,
+          echoing the footer's outlined type. Purely decorative. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-6 right-0 z-0 hidden select-none font-syne text-[34rem] font-extrabold leading-none text-transparent md:block"
+        style={{ WebkitTextStroke: "1.5px rgba(0,0,255,0.10)" }}
+      >
+        OG
+      </div>
 
       {/* ── HERO ─────────────────────────────────────── */}
       <section
@@ -81,17 +88,19 @@ export default async function HomePage() {
               />
             </Link>
 
-            {/* Headline */}
+            {/* Headline — poster treatment, mirroring the footer */}
             <div className="reveal reveal-d1 flex flex-col gap-3">
               <h1
-                className="font-bebas leading-[0.94] text-[#0A0B0D]"
-                style={{
-                  fontSize:      "clamp(3.2rem, 6.58vw, 4.89rem)",
-                  letterSpacing: "0.01em",
-                }}
+                className="font-syne leading-[0.98] text-[#0A0B0D]"
+                style={{ fontSize: "clamp(2.6rem, 5.6vw, 4.4rem)" }}
               >
-                Own status.<br />
-                Prove culture.
+                Own status.
+                <span
+                  className="block text-transparent"
+                  style={{ WebkitTextStroke: "1.5px rgba(10,11,13,0.9)" }}
+                >
+                  Prove culture.
+                </span>
               </h1>
               <p
                 className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/70 sm:text-[0.95rem]"
@@ -204,7 +213,7 @@ export default async function HomePage() {
               className="feature-row flex items-center justify-between gap-4 py-4 sm:gap-6 sm:py-5"
             >
               <div className="flex items-center gap-4 sm:gap-5">
-                <span className="w-6 shrink-0 text-[0.65rem] font-semibold tabular-nums text-[#0A0B0D]/45 sm:w-7 sm:text-[0.68rem]">
+                <span className="font-syne w-8 shrink-0 text-[0.95rem] leading-none text-baseblue sm:w-9 sm:text-[1.05rem]">
                   {num}
                 </span>
                 <div>
@@ -243,7 +252,7 @@ function ScoreMetric({ label, value }: { label: string; value: string }) {
       <p className="text-[0.52rem] font-semibold uppercase tracking-[0.11em] text-[#0000FF] sm:text-[0.55rem]">
         {label}
       </p>
-      <p className="mt-0.5 text-[0.95rem] font-bold leading-none tracking-tight text-[#0A0B0D] sm:text-[1.1rem]">
+      <p className="font-syne mt-0.5 text-[1rem] leading-none text-[#0A0B0D] sm:text-[1.15rem]">
         {value}
       </p>
     </div>

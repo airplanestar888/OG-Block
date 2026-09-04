@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, Inter, Syne } from "next/font/google";
+import { Inter, Syne } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const bebasNeue = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-bebas" });
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-syne" });
 import { Providers } from "@/components/providers";
 import { SiteNav } from "@/components/site-nav";
@@ -42,7 +41,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${bebasNeue.variable} ${syne.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${syne.variable}`}>
       <body className="flex min-h-screen flex-col font-sans antialiased" suppressHydrationWarning>
         <Providers>
           <SiteNav />

@@ -146,9 +146,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Leaderboard</p>
           <h1
-            className="font-bebas mt-2 max-w-2xl text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+            className="font-syne mt-2 max-w-2xl text-[clamp(1.9rem,3.6vw,2.7rem)] leading-[1.04] text-[#0A0B0D]"
             style={{
-              letterSpacing: "0.02em",
+              letterSpacing: "-0.01em",
             }}
           >
             Who holds the most.

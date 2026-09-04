@@ -31,9 +31,9 @@ export default function HowItWorksPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">How it works</p>
         <div className="mt-2 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
           <h1
-            className="font-bebas text-[clamp(2.2rem,4.5vw,3.4rem)] font-normal leading-[0.98] text-[#0A0B0D]"
+            className="font-syne text-[clamp(1.9rem,3.6vw,2.7rem)] leading-[1.04] text-[#0A0B0D]"
             style={{
-              letterSpacing: "0.02em",
+              letterSpacing: "-0.01em",
             }}
           >
             Proof, status, visibility.

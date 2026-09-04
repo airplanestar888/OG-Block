@@ -234,6 +234,11 @@ img, video {
   line-height: 0.92;
   font-weight: 800;
 }
-.font-bebas {
-  font-family: var(--font-bebas), 'Bebas Neue', sans-serif;
+/* Poster display face: Syne ExtraBold — the culture/web3 brand look that
+   anchors the footer statement. Uppercase by default. */
+.font-syne {
+  font-family: var(--font-syne), 'Syne', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
