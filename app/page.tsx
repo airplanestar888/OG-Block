@@ -131,7 +131,7 @@ export default async function HomePage() {
         </div>
 
         {/* ── MULTI-CHAIN CULTURE INDEXING STRIP ───────── */}
-        <div className="reveal reveal-d3 mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[rgba(10,11,13,0.08)] bg-white/70 p-3.5 backdrop-blur-sm sm:px-5 sm:py-3">
+        <div className="reveal reveal-d3 mt-8 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-transparent bg-white/70 p-3.5 backdrop-blur-sm sm:px-5 sm:py-3">
           <div className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-[#00c48c]" />
             <span className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-[#0A0B0D]/55 sm:text-xs">
