@@ -92,7 +92,7 @@ export default async function HomePage() {
             <div className="reveal reveal-d1 flex flex-col gap-3">
               <h1
                 className="font-syne leading-[0.98] text-[#0A0B0D]"
-                style={{ fontSize: "clamp(2.6rem, 5.6vw, 4.4rem)" }}
+                style={{ fontSize: "clamp(1.9rem, 4vw, 3.1rem)" }}
               >
                 Own status.
                 <span
