@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/public-profiles";
 import { PoweredBy } from "@/components/powered-by";
 import { HoloImage } from "@/components/holo-image";
+import { SlideIn } from "@/components/reveal-in-view";
 
 export default async function HomePage() {
   const session = await auth();
@@ -152,8 +153,8 @@ export default async function HomePage() {
       {/* ── FEATURES — standalone screen: title left, 2x2 icon grid right ── */}
       <section className="page-container relative flex min-h-[88vh] flex-col justify-center py-20 sm:py-24">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-          {/* Title block — slides in from the left */}
-          <div className="reveal-left">
+          {/* Title block — slides in from the left on scroll */}
+          <SlideIn direction="left" className="h-full">
             <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
               What you get
             </p>
@@ -166,7 +167,7 @@ export default async function HomePage() {
               One profile turns everything you hold into status you can prove —
               scored, ranked, and visible everywhere that matters.
             </p>
-          </div>
+          </SlideIn>
 
           {/* Feature grid — items converge from alternating sides */}
           <div className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
@@ -240,28 +241,31 @@ export default async function HomePage() {
                 )
               }
             ].map(({ num, title, copy, wide, icon }, i) => (
-              <div
+              <SlideIn
                 key={title}
-                className={`flex items-start gap-5 ${wide ? "sm:col-span-2" : ""} ${i % 2 === 0 ? "reveal-left" : "reveal-right"}`}
-                style={{ animationDelay: `${0.12 + i * 0.09}s` }}
+                direction={i % 2 === 0 ? "left" : "right"}
+                delay={0.1 + i * 0.09}
+                className={wide ? "sm:col-span-2" : ""}
               >
-                <svg
-                  width="46" height="46" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="1.6"
-                  strokeLinecap="round" strokeLinejoin="round"
-                  className="mt-0.5 shrink-0 text-[#0A0B0D]/35"
-                  aria-hidden="true"
-                >
-                  {icon}
-                </svg>
-                <div>
-                  <p className="font-syne text-[0.72rem] leading-none text-baseblue">{num}</p>
-                  <p className="mt-1.5 text-[0.85rem] font-extrabold uppercase tracking-[0.08em] text-[#0A0B0D]">
-                    {title}
-                  </p>
-                  <p className="mt-1.5 max-w-md text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">{copy}</p>
+                <div className="flex items-start gap-5">
+                  <svg
+                    width="46" height="46" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" strokeWidth="1.6"
+                    strokeLinecap="round" strokeLinejoin="round"
+                    className="mt-0.5 shrink-0 text-[#0A0B0D]/35"
+                    aria-hidden="true"
+                  >
+                    {icon}
+                  </svg>
+                  <div>
+                    <p className="font-syne text-[0.72rem] leading-none text-baseblue">{num}</p>
+                    <p className="mt-1.5 text-[0.85rem] font-extrabold uppercase tracking-[0.08em] text-[#0A0B0D]">
+                      {title}
+                    </p>
+                    <p className="mt-1.5 max-w-md text-[0.78rem] leading-[1.55] text-[#0A0B0D]/60">{copy}</p>
+                  </div>
                 </div>
-              </div>
+              </SlideIn>
             ))}
           </div>
         </div>
