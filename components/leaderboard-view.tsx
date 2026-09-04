@@ -191,11 +191,15 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 >
                 <article
                   onClick={() => openProfile(profile.xHandle)}
-                  className={`group relative flex flex-col items-center overflow-hidden rounded-[1.4rem] bg-[#0000FF] px-5 pb-6 pt-9 text-center text-white shadow-[0_24px_60px_rgba(0,0,255,0.30)] ${PEDESTAL_HEIGHT[place]} ${
+                  className={`group relative flex flex-col items-center overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] px-5 pb-6 pt-9 text-center text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10 ${PEDESTAL_HEIGHT[place]} ${
                     profile.xHandle ? "cursor-pointer" : ""
                   }`}
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.22),transparent_60%)]" />
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.25),transparent_60%)]" />
+                  {/* bottom fade into the page — the slab grows out of the lavender */}
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#0000C8]/40 to-transparent" />
+                  {/* inner top highlight — the 1px light line that makes it feel printed, not flat */}
+                  <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
                   <span
                     className={`absolute left-1/2 top-3 grid size-10 -translate-x-1/2 place-items-center rounded-xl ${styles.chip}`}
                   >
@@ -251,8 +255,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
           {/* Personal standing pill */}
           <div className="flex justify-center">
-            <div className="inline-flex items-center gap-2 rounded-full bg-baseblue px-5 py-2.5 text-sm text-white shadow-[0_10px_28px_rgba(0,0,255,0.28)]">
-              <span className="inline-block size-2 rounded-full bg-white" aria-hidden="true" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/85 px-5 py-2.5 text-sm text-black/70 shadow-[0_10px_28px_rgba(10,11,13,0.12)] backdrop-blur">
+              <span className="inline-block size-2 rounded-full bg-baseblue" aria-hidden="true" />
               {myProfile?.rank ? (
                 <span>
                   You&apos;re ranked <span className="font-bold">#{myProfile.rank}</span> of{" "}
