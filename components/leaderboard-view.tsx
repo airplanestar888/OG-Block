@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { XAvatar } from "@/components/x-avatar";
+import { PageHeading } from "@/components/page-heading";
 import type { PublicLeaderboardProfile } from "@/lib/types";
 
 type LeaderboardViewProps = {
@@ -145,16 +146,9 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       <div className="grid gap-12 lg:grid-cols-[1fr_0.85fr] lg:items-start">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Leaderboard</p>
-          <h1
-            className="font-syne mt-2 max-w-2xl text-[clamp(1.9rem,3.6vw,2.7rem)] leading-[1.04] text-[#0A0B0D]"
-            style={{
-              letterSpacing: "-0.01em",
-            }}
-          >
+          <PageHeading className="mt-2 max-w-2xl" outline="Who ranks the highest.">
             Who holds the most.
-            <br className="hidden lg:inline" />
-            Who ranks the highest.
-          </h1>
+          </PageHeading>
         </div>
 
         <div className="rounded-[1.5rem] border border-black/10 bg-white/85 shadow-[0_1px_2px_rgba(10,11,13,0.04),0_16px_40px_rgba(0,0,255,0.06)] backdrop-blur">

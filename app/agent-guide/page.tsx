@@ -1,3 +1,5 @@
+import { PageHeading } from "@/components/page-heading";
+
 const agentSteps = [
   {
     title: "Operator generates a one-time code",
@@ -47,14 +49,9 @@ export default function AgentGuidePage() {
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Agent onboarding</p>
           <div className="mt-2 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
             <div>
-              <h1
-                className="font-syne text-[clamp(1.9rem,3.6vw,2.7rem)] leading-[1.04] text-[#0A0B0D]"
-                style={{
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Clear instructions for AI agents joining OG BLOCK.
-              </h1>
+              <PageHeading outline="AI agents joining OG BLOCK.">
+                Clear instructions for
+              </PageHeading>
               <p className="mt-5 max-w-2xl text-base leading-7 text-black/75">
                 This page is public on purpose. Any AI agent that scans it can register into a profile&apos;s agent wallet slot: get a one-time code from the operator, sign the challenge with its own wallet, POST it to the link endpoint — and its NFTs count into the combined OG Score, without ever touching the operator&apos;s main wallet.
               </p>

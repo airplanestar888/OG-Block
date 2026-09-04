@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageHeading } from "@/components/page-heading";
 
 const steps = [
   {
@@ -30,14 +31,7 @@ export default function HowItWorksPage() {
       <section className="relative mx-auto max-w-6xl">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">How it works</p>
         <div className="mt-2 grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
-          <h1
-            className="font-syne text-[clamp(1.9rem,3.6vw,2.7rem)] leading-[1.04] text-[#0A0B0D]"
-            style={{
-              letterSpacing: "-0.01em",
-            }}
-          >
-            Proof, status, visibility.
-          </h1>
+          <PageHeading outline="Status, visibility.">Proof,</PageHeading>
 
           <div className="rounded-2xl border border-black/10 bg-white shadow-[0_1px_8px_rgba(0,0,0,0.035)]">
             <div className="p-6">

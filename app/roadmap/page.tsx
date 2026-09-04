@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageHeading } from "@/components/page-heading";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -110,18 +111,9 @@ export default function RoadmapPage() {
         <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Roadmap</p>
         <div className="mt-2 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
           <div>
-            <h1
-              className="font-syne text-[clamp(1.9rem,3.6vw,2.7rem)] leading-[1.04] text-[#0A0B0D]"
-              style={{
-                letterSpacing: "-0.01em",
-              }}
-            >
+            <PageHeading outline={<>Lock your rank.<br />Own the badge.</>}>
               Score your culture.
-              <br />
-              Lock your rank.
-              <br />
-              Own the badge.
-            </h1>
+            </PageHeading>
           </div>
           <div className="max-w-2xl lg:pb-2">
             <p className="text-base leading-8 text-black/70">

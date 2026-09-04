@@ -5,6 +5,7 @@ import { getLeaderboard } from "@/lib/public-profiles";
 import { PoweredBy } from "@/components/powered-by";
 import { HoloImage } from "@/components/holo-image";
 import { SlideIn } from "@/components/reveal-in-view";
+import { PageHeading } from "@/components/page-heading";
 
 export default async function HomePage() {
   const session = await auth();
@@ -42,18 +43,7 @@ export default async function HomePage() {
 
             {/* Headline — poster treatment, mirroring the footer */}
             <div className="reveal reveal-d1 flex flex-col gap-3">
-              <h1
-                className="font-syne leading-[0.98] text-[#0A0B0D]"
-                style={{ fontSize: "clamp(1.9rem, 4vw, 3.1rem)" }}
-              >
-                Own status.
-                <span
-                  className="block text-transparent"
-                  style={{ WebkitTextStroke: "1.5px rgba(10,11,13,0.9)" }}
-                >
-                  Prove culture.
-                </span>
-              </h1>
+              <PageHeading outline="Prove culture.">Own status.</PageHeading>
               <p
                 className="text-[0.9rem] leading-[1.55] text-[#0A0B0D]/70 sm:text-[0.95rem]"
                 style={{ letterSpacing: "-0.01em", maxWidth: "34ch" }}
