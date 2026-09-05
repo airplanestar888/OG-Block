@@ -186,38 +186,41 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#0000C8]/40 to-transparent" />
                   {/* inner top highlight — the 1px light line that makes it feel printed, not flat */}
                   <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                  {/* Top row — rank + name left, avatar right */}
+                  {/* Top row — avatar + name left, champion chip right */}
                   <div className="relative flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] ${styles.chip}`}>
-                        <TrophyIcon />
-                        {place === 1 ? "Champion" : place === 2 ? "Runner-up" : "Third"}
-                      </p>
-                      <h2 className={`mt-2 font-semibold leading-tight tracking-tight ${styles.nameSize}`}>
-                        {profile.xHandle ? (
-                          <Link
-                            href={`/u/${profile.xHandle}`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="transition hover:underline"
-                          >
-                            {profile.xName || `@${profile.xHandle}`}
-                          </Link>
-                        ) : (
-                          `@${profile.xHandle}`
-                        )}
-                      </h2>
-                      <p className="mt-0.5 truncate text-xs text-white/70">
-                        {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
-                        {profile.profileRole === "agent" ? " · Agent" : ""}
-                      </p>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className={`relative shrink-0 rounded-full bg-white p-0.5 ring-2 ${styles.avatarRing}`}>
+                        <XAvatar
+                          src={profile.xAvatar}
+                          handle={profile.xHandle}
+                          size={place === 1 ? 52 : 44}
+                        />
+                      </span>
+                      <div className="min-w-0">
+                        <h2 className={`truncate font-semibold leading-tight tracking-tight ${styles.nameSize}`}>
+                          {profile.xHandle ? (
+                            <Link
+                              href={`/u/${profile.xHandle}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="transition hover:underline"
+                              title={profile.xName || `@${profile.xHandle}`}
+                            >
+                              {profile.xName || `@${profile.xHandle}`}
+                            </Link>
+                          ) : (
+                            `@${profile.xHandle}`
+                          )}
+                        </h2>
+                        <p className="mt-0.5 truncate text-xs text-white/70" title={profile.xName ? `@${profile.xHandle}` : undefined}>
+                          {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
+                          {profile.profileRole === "agent" ? " · Agent" : ""}
+                        </p>
+                      </div>
                     </div>
-                    <span className={`relative shrink-0 rounded-full bg-white p-0.5 ring-2 ${styles.avatarRing}`}>
-                      <XAvatar
-                        src={profile.xAvatar}
-                        handle={profile.xHandle}
-                        size={place === 1 ? 56 : 48}
-                      />
-                    </span>
+                    <p className={`inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] ${styles.chip}`}>
+                      <TrophyIcon />
+                      {place === 1 ? "Champion" : place === 2 ? "Runner-up" : "Third"}
+                    </p>
                   </div>
                   {/* Score hero — the on-chain number owns the card */}
                   <div className="relative mt-4">
@@ -234,7 +237,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                       <span className="inline-block size-3 rounded-[4px] bg-white" />
                       <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em]">OG BLOCK</p>
                     </div>
-                    <p className="text-[0.6rem] text-white/50">Own Gang on Blockchain</p>
+                    <p className="text-[0.6rem] text-white/50">OG Blockchain</p>
                   </div>
                 </article>
                 </SlideIn>
@@ -242,8 +245,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             })}
           </section>
 
-          {/* Personal standing pill */}
-          <div className="flex justify-center">
+          {/* Personal standing pill — same rhythm above and below */}
+          <div className="flex justify-center py-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/85 px-5 py-2.5 text-sm text-black/70 shadow-[0_10px_28px_rgba(10,11,13,0.12)] backdrop-blur">
               <span className="inline-block size-2 rounded-full bg-baseblue" aria-hidden="true" />
               {myProfile?.rank ? (
