@@ -11,12 +11,12 @@ export function SiteFooter() {
     <footer className="border-y border-white/20 bg-[#0000FF] text-white">
       <div className="mx-auto max-w-6xl px-5 pb-6 pt-10 sm:pb-8 sm:pt-14">
         <p className="font-[family-name:var(--font-syne)] text-[clamp(2.75rem,9.5vw,8rem)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em]">
-          Join the gang.
+          Own status.
           <span
             className="block text-transparent"
             style={{ WebkitTextStroke: "2px rgba(255,255,255,0.92)" }}
           >
-            Rank up. Prove it.
+            Prove culture.
           </span>
         </p>
 
