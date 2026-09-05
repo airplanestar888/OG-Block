@@ -22,7 +22,7 @@ export function PoweredBy() {
         className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden"
       >
         <span
-          className="font-syne text-[min(22vw,17rem)] font-extrabold leading-none text-transparent"
+          className="font-syne text-[min(45vw,17rem)] font-extrabold leading-none text-transparent"
           style={{ WebkitTextStroke: "1.5px rgba(0,0,255,0.11)" }}
         >
           OG
