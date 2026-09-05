@@ -9,6 +9,9 @@ const config: Config = {
         baseblue: "#0000ff",
         mint: "#00c48c",
         ember: "#f97316"
+      },
+      fontFamily: {
+        sans: ["var(--font-manrope)", "Manrope", "ui-sans-serif", "system-ui", "sans-serif"]
       }
     }
   },

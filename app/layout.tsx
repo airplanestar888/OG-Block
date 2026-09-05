@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter, Orbitron, Syne } from "next/font/google";
+import { Manrope, Orbitron, Syne } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
 const syne = Syne({ subsets: ["latin"], weight: ["700", "800"], variable: "--font-syne" });
 const orbitron = Orbitron({ subsets: ["latin"], variable: "--font-orbitron" });
 import { Providers } from "@/components/providers";
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${syne.variable} ${orbitron.variable}`}>
-      <body className="flex min-h-screen flex-col font-sans antialiased" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${manrope.variable} ${syne.variable} ${orbitron.variable}`}>
+      <body className="flex min-h-screen flex-col antialiased" suppressHydrationWarning>
         <Providers>
           <SiteNav />
           <NetworkGuard />
