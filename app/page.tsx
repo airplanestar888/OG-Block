@@ -28,7 +28,7 @@ export default async function HomePage() {
       {/* ── SECTION 1 · HERO — the one exception: full screen so every
              element fits. All other sections match the footer height. ── */}
       <section
-        className="relative flex min-h-[100svh] flex-col"
+        className="relative flex min-h-[100svh] flex-col overflow-x-clip"
         style={{
           paddingTop:    "var(--hero-pt)",
           paddingBottom: "var(--hero-pb)",
@@ -80,34 +80,33 @@ export default async function HomePage() {
                     </Link>
                   )}
                 </div>
+
+                {/* ── Live figures — inside the hero block, under the CTA ── */}
+                <div className="reveal reveal-d3 mt-8 flex flex-wrap items-end gap-x-8 gap-y-4 border-t border-[rgba(10,11,13,0.1)] pt-5">
+                  <HeroFigure label="Gangs" value={profiles.toLocaleString()} />
+                  <HeroFigure label="Total score" value={formatCompactNumber(totalScore)} />
+                  <HeroFigure label="NFTs" value={formatCompactNumber(totalNfts)} />
+                  <span className="inline-flex items-center gap-1.5 pb-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-emerald-600">
+                    <span className="relative flex size-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                    </span>
+                    Live
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* RIGHT — mascot in front, locked to its natural 451:655 ratio
-                (width-driven, never upscaled past the source), feet level
-                with the CTA row, overlapping the headline tail slightly. */}
+            {/* RIGHT — mascot hugging the right edge, in front, locked to its
+                natural 451:655 ratio (never upscaled past the source). */}
             <div className="mascot-stage relative hidden lg:block">
               <img
                 src="/mascot.png"
                 alt="OG BLOCK mascot"
-                className="mascot-img absolute bottom-0 left-[-16%] z-10 h-auto max-w-none [aspect-ratio:451/655] object-contain"
-                style={{ width: "min(clamp(300px, 32vw, 436px), calc(70svh * 0.6887))" }}
+                className="mascot-img absolute bottom-0 right-[-7rem] z-10 h-auto max-w-none [aspect-ratio:451/655] object-contain"
+                style={{ width: "min(clamp(280px, 26vw, 333px), calc(60svh * 0.6887))" }}
               />
             </div>
-          </div>
-
-          {/* ── Live figures — hairline row pinned to the hero floor ── */}
-          <div className="reveal reveal-d3 mt-10 flex flex-wrap items-end gap-x-10 gap-y-5 border-t border-[rgba(10,11,13,0.1)] pt-6">
-            <HeroFigure label="Gangs" value={profiles.toLocaleString()} />
-            <HeroFigure label="Total score" value={formatCompactNumber(totalScore)} />
-            <HeroFigure label="NFTs" value={formatCompactNumber(totalNfts)} />
-            <span className="inline-flex items-center gap-1.5 pb-1 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-emerald-600">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-              </span>
-              Live
-            </span>
           </div>
         </div>
       </section>
