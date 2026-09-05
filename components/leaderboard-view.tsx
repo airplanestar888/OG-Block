@@ -15,29 +15,10 @@ type LeaderboardViewProps = {
 
 type PodiumPlace = 1 | 2 | 3;
 
-const PLACE_STYLES: Record<
-  PodiumPlace,
-  {
-    chip: string;
-    avatarRing: string;
-    nameSize: string;
-  }
-> = {
-  1: {
-    chip: "bg-gradient-to-b from-[#F7D77A] to-[#E5B54A] text-[#0A0B0D]",
-    avatarRing: "ring-white/70",
-    nameSize: "text-xl",
-  },
-  2: {
-    chip: "bg-gradient-to-b from-[#EAEEF3] to-[#C9D1DB] text-[#0A0B0D]",
-    avatarRing: "ring-white/50",
-    nameSize: "text-lg",
-  },
-  3: {
-    chip: "bg-gradient-to-b from-[#F0D2B2] to-[#D8A26A] text-[#0A0B0D]",
-    avatarRing: "ring-white/50",
-    nameSize: "text-lg",
-  }
+const PLACE_LABEL: Record<PodiumPlace, string> = {
+  1: "Champion",
+  2: "Runner-up",
+  3: "Third"
 };
 
 const PEDESTAL_HEIGHT: Record<PodiumPlace, string> = {
@@ -64,27 +45,6 @@ function formatUtcDate(value: string) {
     timeStyle: "short",
     timeZone: "UTC"
   }).format(new Date(value));
-}
-
-function TrophyIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M8 21h8M12 17.5V21M7 4h10v5a5 5 0 0 1-10 0V4Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M7 6H4.2a2.8 2.8 0 0 0 3.1 3.6M17 6h2.8a2.8 2.8 0 0 1-3.1 3.6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
@@ -164,7 +124,6 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             {podium.map((profile, position) => {
               if (!profile) return null;
               const place = ((position === 1 ? 1 : position === 0 ? 2 : 3) as PodiumPlace);
-              const styles = PLACE_STYLES[place];
               const orderClass =
                 place === 1 ? "order-1 sm:order-2" : place === 2 ? "order-2 sm:order-1" : "order-3";
 
@@ -175,21 +134,18 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   delay={0.1 + position * 0.09}
                   className={`min-w-0 ${orderClass}`}
                 >
+                {/* Podium slab — flat footer blue, typography does the talking.
+                    No gradient, no sheen, no glow: one blue, white type, one hairline. */}
                 <article
                   onClick={() => openProfile(profile.xHandle)}
-                  className={`group relative flex w-full min-w-0 flex-col overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] px-5 pb-6 pt-5 text-left text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10 ${PEDESTAL_HEIGHT[place]} ${
+                  className={`group flex w-full min-w-0 flex-col rounded-[1.4rem] bg-[#0000FF] px-6 pb-6 pt-6 text-left text-white ${PEDESTAL_HEIGHT[place]} ${
                     profile.xHandle ? "cursor-pointer" : ""
                   }`}
                 >
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.25),transparent_60%)]" />
-                  {/* bottom fade into the page — the slab grows out of the lavender */}
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#0000C8]/40 to-transparent" />
-                  {/* inner top highlight — the 1px light line that makes it feel printed, not flat */}
-                  <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                  {/* Top row — avatar + name left, champion chip right */}
-                  <div className="relative flex items-start justify-between gap-3">
+                  {/* Top row — avatar + name left, place right */}
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-3">
-                      <span className={`relative shrink-0 rounded-full bg-white p-0.5 ring-2 ${styles.avatarRing}`}>
+                      <span className="relative shrink-0 overflow-hidden rounded-full">
                         <XAvatar
                           src={profile.xAvatar}
                           handle={profile.xHandle}
@@ -197,7 +153,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                         />
                       </span>
                       <div className="min-w-0">
-                        <h2 className={`truncate font-semibold leading-tight tracking-tight ${styles.nameSize}`}>
+                        <h2 className="truncate text-lg font-semibold leading-tight tracking-tight">
                           {profile.xHandle ? (
                             <Link
                               href={`/u/${profile.xHandle}`}
@@ -217,27 +173,23 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                         </p>
                       </div>
                     </div>
-                    <p className={`inline-flex shrink-0 items-center gap-1 rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] ${styles.chip}`}>
-                      <TrophyIcon />
-                      {place === 1 ? "Champion" : place === 2 ? "Runner-up" : "Third"}
+                    <p className="shrink-0 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-white/70">
+                      {PLACE_LABEL[place]}
                     </p>
                   </div>
                   {/* Score hero — the on-chain number owns the card */}
-                  <div className="relative mt-4">
-                    <p className="font-orbitron mt-1 text-4xl font-bold leading-none tracking-tight">
+                  <div className="mt-5">
+                    <p className="font-orbitron text-5xl font-bold leading-none tracking-tight">
                       {formatCompactNumber(profile.score)}
                     </p>
-                    <p className="mt-1.5 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/60">
+                    <p className="mt-2 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/70">
                       Score · {profile.nftCount.toLocaleString()} NFT · {profile.badgeCount.toLocaleString()} badge
                     </p>
                   </div>
-                  {/* OG BLOCK strip — card footer, echoes the profile slab */}
-                  <div className="relative mt-auto flex items-center justify-between border-t border-white/15 pt-3">
-                    <div className="flex items-center gap-1.5">
-                      <span className="inline-block size-3 rounded-[4px] bg-white" />
-                      <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em]">OG BLOCK</p>
-                    </div>
-                    <p className="text-[0.6rem] text-white/50">OG Blockchain</p>
+                  {/* Hairline footer — Everest discipline: a line, not a box */}
+                  <div className="mt-auto flex items-center justify-between border-t border-white/25 pt-3">
+                    <p className="text-[0.62rem] font-bold uppercase tracking-[0.18em]">OG BLOCK</p>
+                    <p className="text-[0.62rem] uppercase tracking-[0.14em] text-white/60">OG Blockchain</p>
                   </div>
                 </article>
                 </SlideIn>
