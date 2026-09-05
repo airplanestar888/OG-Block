@@ -25,8 +25,8 @@ export default async function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
 
-      {/* ── SECTION 1 · HERO — exactly one full screen. Typography left,
-             mascot standing on the right, feet level with the CTA row. ── */}
+      {/* ── SECTION 1 · HERO — the one exception: full screen so every
+             element fits. All other sections match the footer height. ── */}
       <section
         className="relative flex min-h-[100svh] flex-col"
         style={{
@@ -91,7 +91,7 @@ export default async function HomePage() {
                 src="/mascot.png"
                 alt="OG BLOCK mascot"
                 className="mascot-img absolute bottom-0 left-[-16%] z-10 h-auto max-w-none [aspect-ratio:451/655] object-contain"
-                style={{ width: "min(clamp(300px, 32vw, 436px), calc(70vh * 0.6887))" }}
+                style={{ width: "min(clamp(300px, 32vw, 436px), calc(70svh * 0.6887))" }}
               />
             </div>
           </div>
@@ -116,7 +116,7 @@ export default async function HomePage() {
       <PoweredBy />
 
       {/* ── SECTION 3 · FEATURES — title left, numbered grid right ── */}
-      <section className="page-container relative flex min-h-[86svh] items-center py-20 sm:py-24">
+      <section className="page-container relative flex min-h-[81svh] items-center py-20 sm:py-24">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           {/* Title block — slides in from the left on scroll */}
           <SlideIn direction="left" className="h-full">
