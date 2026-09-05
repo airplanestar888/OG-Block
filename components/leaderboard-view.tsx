@@ -173,11 +173,11 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   key={`podium-${profile.xHandle || place}`}
                   direction={position % 2 === 0 ? "left" : "right"}
                   delay={0.1 + position * 0.09}
-                  className={orderClass}
+                  className={`min-w-0 ${orderClass}`}
                 >
                 <article
                   onClick={() => openProfile(profile.xHandle)}
-                  className={`group relative flex flex-col overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] px-5 pb-6 pt-5 text-left text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10 ${PEDESTAL_HEIGHT[place]} ${
+                  className={`group relative flex w-full min-w-0 flex-col overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] px-5 pb-6 pt-5 text-left text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10 ${PEDESTAL_HEIGHT[place]} ${
                     profile.xHandle ? "cursor-pointer" : ""
                   }`}
                 >
