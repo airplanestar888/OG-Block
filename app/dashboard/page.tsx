@@ -121,11 +121,11 @@ export default async function DashboardPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
       <div className="relative mx-auto max-w-6xl space-y-6">
-        {/* ── Hero: web3 identity card — ink slab, blue glow, giant score ── */}
-        <section className="relative overflow-hidden rounded-[1.5rem] bg-[#0A0B0D] text-white shadow-[0_24px_60px_rgba(0,0,255,0.22)]">
+        {/* ── Hero: web3 identity card — ink slab, neutral grey glow ── */}
+        <section className="relative overflow-hidden rounded-[1.5rem] bg-[#0A0B0D] text-white shadow-[0_24px_60px_rgba(10,11,13,0.35)]">
           {/* glow + grid */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(0,0,255,0.55),transparent_55%),radial-gradient(circle_at_90%_100%,rgba(17,187,154,0.18),transparent_50%)]" />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,255,0.14)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.09)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(255,255,255,0.14),transparent_55%),radial-gradient(circle_at_90%_100%,rgba(255,255,255,0.07),transparent_50%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(0deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
 
           <div className="relative flex flex-wrap items-center justify-between gap-4 px-6 pt-7 md:px-9 md:pt-8">
             <div className="flex items-center gap-4">
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-baseblue px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_rgba(0,0,255,0.5)]">
+            <div className="flex items-center gap-2 rounded-full bg-baseblue px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_rgba(10,11,13,0.35)]">
               <span className="size-2 rounded-full bg-white" />
               {score?.rank ? `Rank #${score.rank}` : "Unranked"}
             </div>

@@ -91,8 +91,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
 
   return (
     <div>
-      {/* Top Header & live strip — no card, the blue podium is the only solid */}
-      <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+      {/* Top Header & live strip — stats top-aligned to the "W" of Who */}
+      <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-start">
         <div>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Own Gang · Leaderboard</p>
           <PageHeading className="mt-2 max-w-2xl" outline="Who ranks the highest.">
@@ -103,7 +103,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-end gap-x-8 gap-y-4 lg:justify-end lg:pb-1">
+        <div className="flex flex-wrap items-start gap-x-8 gap-y-4 lg:justify-end lg:pt-[18px]">
           <LiveFigure label="Gangs" value={leaderboard.length.toLocaleString()} />
           <LiveFigure label="Total score" value={formatCompactNumber(totalScore)} />
           <LiveFigure label="NFTs" value={formatCompactNumber(totalNfts)} />
