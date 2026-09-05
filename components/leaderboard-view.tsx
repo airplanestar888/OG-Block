@@ -263,10 +263,10 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         </>
       ) : null}
 
-      {/* Main Culture Board */}
-      <section className="overflow-hidden rounded-[1.5rem] border border-black/10 bg-white/85 shadow-sm backdrop-blur">
+      {/* Main Culture Board — floating cards, lavender gaps so each row pops in 3D */}
+      <section>
         {/* Table Header Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/10 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1 py-4">
           <div>
             <h2 className="font-semibold text-black/88">Culture board</h2>
             <p className="mt-1 text-sm text-black/65">
@@ -285,7 +285,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 aria-label="Search profiles by X handle or name"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl border border-black/10 bg-[#fbfcff] px-3.5 py-1.5 text-xs text-ink placeholder:text-black/50 focus:border-baseblue focus:outline-none focus:ring-1 focus:ring-baseblue"
+                className="w-full rounded-xl border border-black/10 bg-white/85 px-3.5 py-1.5 text-xs text-ink shadow-sm backdrop-blur placeholder:text-black/50 focus:border-baseblue focus:outline-none focus:ring-1 focus:ring-baseblue"
               />
               {searchQuery ? (
                 <button
@@ -301,13 +301,13 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
         </div>
 
         {/* Mobile Swipe Notice */}
-        <div className="flex items-center justify-between border-b border-black/10 px-4 py-3 sm:hidden">
+        <div className="flex items-center justify-between px-1 py-3 sm:hidden">
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-black/45">Swipe table</span>
           <span className="text-sm text-baseblue" aria-hidden="true">-&gt;</span>
         </div>
 
-        {/* Mobile ranking cards — compact rows instead of a swipe table */}
-        <ol className="divide-y divide-black/[0.07] sm:hidden">
+        {/* Mobile ranking cards — floating, one card per gang */}
+        <ol className="space-y-2.5 sm:hidden">
           {tableRows.map((profile, index) => {
             const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
             const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
@@ -317,10 +317,10 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
               <li
                 key={`m-${profile.xHandle || index}`}
                 onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
-                className={`flex items-center gap-3 px-4 py-3.5 transition ${
+                className={`flex items-center gap-3 rounded-2xl border bg-white/90 px-4 py-3.5 shadow-[0_2px_10px_rgba(10,11,13,0.06)] backdrop-blur transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(10,11,13,0.10)] ${
                   isMe
-                    ? "bg-[#0000FF]/[0.06] hover:bg-[#0000FF]/[0.1] ring-1 ring-inset ring-[#0000FF]/25"
-                    : "hover:bg-baseblue/[0.05]"
+                    ? "border-[#0000FF]/30 ring-1 ring-inset ring-[#0000FF]/25"
+                    : "border-black/[0.07]"
                 } ${profile.xHandle ? "cursor-pointer" : ""}`}
               >
                 <span className={`inline-flex min-w-11 items-center justify-center rounded-full px-2.5 py-1 text-xs font-bold ${
@@ -383,143 +383,125 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
           ) : null}
         </ol>
 
-        {/* Rankings Table with balanced column widths & alignment (desktop) */}
-        <div className="hidden overflow-x-auto overscroll-x-contain sm:block">
-          <table className="w-full min-w-[720px] table-fixed text-left text-sm">
-            <thead className="bg-black/[0.03] text-black/55">
-              <tr>
-                <th className="w-[10%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Rank</th>
-                <th className="w-[38%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">X</th>
-                <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">NFT</th>
-                <th className="w-[15%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Badge</th>
-                <th className="w-[22%] px-6 py-4 text-center text-xs font-bold uppercase tracking-[0.12em]">Score</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-black/10">
-              {tableRows.map((profile, index) => {
-                const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
-                const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
-                const isMe = !!(myHandle && profile.xHandle && profile.xHandle.toLowerCase() === myHandle.toLowerCase());
+        {/* Rankings as floating cards (desktop) — one card per gang, gaps show the lavender */}
+        <div className="hidden sm:block">
+          <ol className="space-y-2.5">
+            {tableRows.map((profile, index) => {
+              const hasGain = (profile.recentPointsDelta ?? 0) > 0 && profile.score > 0;
+              const hasDrop = (profile.recentPointsDelta ?? 0) < 0 && profile.score > 0;
+              const isMe = !!(myHandle && profile.xHandle && profile.xHandle.toLowerCase() === myHandle.toLowerCase());
 
-                return (
-                  <tr
-                    key={profile.xHandle || index}
-                    onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
-                    className={`transition ${
-                      isMe
-                        ? "bg-[#0000FF]/[0.05] hover:bg-[#0000FF]/[0.09]"
-                        : "hover:bg-baseblue/[0.05]"
-                    } ${profile.xHandle ? "cursor-pointer" : ""}`}
-                  >
-                    {/* Rank */}
-                    <td className="px-6 py-4 text-center">
-                      <span className={`inline-flex min-w-12 items-center justify-center rounded-full px-3 py-1 text-xs font-bold ${
-                        isMe ? "bg-[#0000FF] text-white shadow-sm" : "bg-black/[0.04] text-black/70"
-                      }`}>
-                        {profile.rank ? `#${profile.rank}` : "-"}
-                      </span>
-                    </td>
+              return (
+                <li
+                  key={profile.xHandle || index}
+                  onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
+                  className={`grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-4 rounded-2xl border bg-white/90 px-5 py-3.5 shadow-[0_2px_10px_rgba(10,11,13,0.06)] backdrop-blur transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(10,11,13,0.10)] ${
+                    isMe
+                      ? "border-[#0000FF]/30 ring-1 ring-inset ring-[#0000FF]/25"
+                      : "border-black/[0.07]"
+                  } ${profile.xHandle ? "cursor-pointer" : ""}`}
+                >
+                  {/* Rank */}
+                  <span className={`inline-flex min-w-12 items-center justify-center rounded-full px-3 py-1 text-xs font-bold ${
+                    isMe ? "bg-[#0000FF] text-white shadow-sm" : "bg-black/[0.04] text-black/70"
+                  }`}>
+                    {profile.rank ? `#${profile.rank}` : "-"}
+                  </span>
 
-                    {/* X / Profile */}
-                    <td className="px-6 py-4 pl-[70px] text-left">
-                      <div className="flex items-center gap-3 text-left">
-                        <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
-                        <div className="min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <p className="truncate font-semibold text-black/85">
-                              {profile.xHandle ? (
-                                <Link
-                                  href={`/u/${profile.xHandle}`}
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="transition hover:text-baseblue hover:underline"
-                                >
-                                  @{profile.xHandle}
-                                </Link>
-                              ) : (
-                                `@${profile.xHandle}`
-                              )}
-                            </p>
-                            {isMe ? (
-                              <span className="rounded-full bg-[#0000FF] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
-                                YOU
-                              </span>
-                            ) : null}
-                            {profile.profileRole === "agent" ? (
-                              <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
-                                Agent
-                              </span>
-                            ) : null}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-xs text-black/45">
-                            <span>{profile.nftCount.toLocaleString()} NFTs</span>
-                            <span>·</span>
-                            <span className="inline-flex items-center gap-1" title="Indexed on Base, ETH, Robinhood & Solana">
-                              <span className="size-1.5 rounded-full bg-[#0000FF]" />
-                              <span className="size-1.5 rounded-full bg-[#627EEA]" />
-                              <span className="size-1.5 rounded-full bg-[#00C805]" />
-                              <span className="size-1.5 rounded-full bg-[#9945FF]" />
-                            </span>
-                          </div>
-                        </div>
+                  {/* X / Profile */}
+                  <div className="flex min-w-0 items-center gap-3">
+                    <XAvatar src={profile.xAvatar} handle={profile.xHandle} size={36} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate font-semibold text-black/85">
+                          {profile.xHandle ? (
+                            <Link
+                              href={`/u/${profile.xHandle}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="transition hover:text-baseblue hover:underline"
+                            >
+                              @{profile.xHandle}
+                            </Link>
+                          ) : (
+                            `@${profile.xHandle}`
+                          )}
+                        </p>
+                        {isMe ? (
+                          <span className="rounded-full bg-[#0000FF] px-1.5 py-0.2 text-[0.6rem] font-black uppercase tracking-wider text-white">
+                            YOU
+                          </span>
+                        ) : null}
+                        {profile.profileRole === "agent" ? (
+                          <span className="rounded bg-black/[0.06] px-1.5 py-0.5 text-[0.65rem] font-bold uppercase text-black/60">
+                            Agent
+                          </span>
+                        ) : null}
                       </div>
-                    </td>
-
-                    {/* NFT */}
-                    <td className="px-6 py-4 text-center font-semibold text-black/76">
-                      {profile.nftCount.toLocaleString()}
-                    </td>
-
-                    {/* Badge */}
-                    <td className="px-6 py-4 text-center font-semibold text-black/76">
-                      {profile.badgeCount.toLocaleString()}
-                    </td>
-
-                    {/* Score & ▲ +X pts placed right beside the Score */}
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-2.5">
-                        <span className="rounded-full bg-baseblue px-3 py-1 text-xs font-bold text-white shadow-sm">
-                          {formatCompactNumber(profile.score)}
+                      <div className="flex items-center gap-1.5 text-xs text-black/45">
+                        <span>{profile.nftCount.toLocaleString()} NFTs</span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1" title="Indexed on Base, ETH, Robinhood & Solana">
+                          <span className="size-1.5 rounded-full bg-[#0000FF]" />
+                          <span className="size-1.5 rounded-full bg-[#627EEA]" />
+                          <span className="size-1.5 rounded-full bg-[#00C805]" />
+                          <span className="size-1.5 rounded-full bg-[#9945FF]" />
                         </span>
-
-                        {/* ▲ +X pts directly beside the score */}
-                        {hasGain && profile.recentPointsDelta ? (
-                          <span
-                            className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-700"
-                            title={`Score increased by +${profile.recentPointsDelta.toLocaleString()} points`}
-                          >
-                            <span className="text-[0.68rem]">▲</span>
-                            <span>+{formatCompactNumber(profile.recentPointsDelta)}</span>
-                          </span>
-                        ) : null}
-
-                        {hasDrop && profile.recentPointsDelta ? (
-                          <span
-                            className="inline-flex items-center gap-1 rounded-full border border-rose-500/25 bg-rose-500/10 px-2.5 py-0.5 text-xs font-bold text-rose-700"
-                            title={`Score decreased by ${profile.recentPointsDelta.toLocaleString()} points`}
-                          >
-                            <span className="text-[0.68rem]">▼</span>
-                            <span>{formatCompactNumber(profile.recentPointsDelta)}</span>
-                          </span>
-                        ) : null}
                       </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                    </div>
+                  </div>
 
-              {tableRows.length === 0 ? (
-                <tr>
-                  <td className="px-6 py-12 text-center text-black/55" colSpan={5}>
-                    {searchQuery
-                      ? `No profiles matching "${searchQuery}"`
-                      : leaderboard.length > 0
-                        ? "The top 3 are featured above."
-                        : "No scored profiles yet."}
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
+                  {/* NFT */}
+                  <span className="min-w-14 text-center font-semibold text-black/76">
+                    {profile.nftCount.toLocaleString()}
+                    <span className="block text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/35">NFT</span>
+                  </span>
+
+                  {/* Badge */}
+                  <span className="min-w-14 text-center font-semibold text-black/76">
+                    {profile.badgeCount.toLocaleString()}
+                    <span className="block text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/35">Badge</span>
+                  </span>
+
+                  {/* Score & ▲ +X pts */}
+                  <div className="flex min-w-28 items-center justify-end gap-2.5">
+                    <span className="rounded-full bg-baseblue px-3 py-1 text-xs font-bold text-white shadow-sm">
+                      {formatCompactNumber(profile.score)}
+                    </span>
+
+                    {hasGain && profile.recentPointsDelta ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-bold text-emerald-700"
+                        title={`Score increased by +${profile.recentPointsDelta.toLocaleString()} points`}
+                      >
+                        <span className="text-[0.68rem]">▲</span>
+                        <span>+{formatCompactNumber(profile.recentPointsDelta)}</span>
+                      </span>
+                    ) : null}
+
+                    {hasDrop && profile.recentPointsDelta ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full border border-rose-500/25 bg-rose-500/10 px-2.5 py-0.5 text-xs font-bold text-rose-700"
+                        title={`Score decreased by ${profile.recentPointsDelta.toLocaleString()} points`}
+                      >
+                        <span className="text-[0.68rem]">▼</span>
+                        <span>{formatCompactNumber(profile.recentPointsDelta)}</span>
+                      </span>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+
+            {tableRows.length === 0 ? (
+              <li className="rounded-2xl border border-black/[0.07] bg-white/90 px-6 py-12 text-center text-black/55 shadow-[0_2px_10px_rgba(10,11,13,0.06)]">
+                {searchQuery
+                  ? `No profiles matching "${searchQuery}"`
+                  : leaderboard.length > 0
+                    ? "The top 3 are featured above."
+                    : "No scored profiles yet."}
+              </li>
+            ) : null}
+          </ol>
         </div>
       </section>
 
