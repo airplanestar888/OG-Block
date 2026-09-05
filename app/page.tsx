@@ -30,7 +30,7 @@ export default async function HomePage() {
       <section
         className="relative flex min-h-[100svh] flex-col overflow-x-clip"
         style={{
-          paddingTop:    "var(--hero-pt)",
+          paddingTop:    "clamp(0.75rem, 2vw, 1.5rem)",
           paddingBottom: "var(--hero-pb)",
         }}
       >
@@ -103,8 +103,7 @@ export default async function HomePage() {
               <img
                 src="/mascot.png"
                 alt="OG BLOCK mascot"
-                className="mascot-img absolute bottom-0 right-[-7rem] z-10 h-auto max-w-none [aspect-ratio:451/655] object-contain"
-                style={{ width: "min(clamp(280px, 26vw, 333px), calc(60svh * 0.6887))" }}
+                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(88svh,582px)] w-auto max-w-none [aspect-ratio:451/655] object-contain"
               />
             </div>
           </div>
