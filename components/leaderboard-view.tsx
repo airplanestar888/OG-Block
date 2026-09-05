@@ -500,7 +500,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       </section>
 
       {latestGeneratedAt ? (
-        <p className="-mt-2.5 text-left text-xs italic text-black/40">
+        <p className="mt-4 px-1 pb-2 text-left text-xs italic text-black/40">
           Latest generated global score:{" "}
           <time dateTime={latestGeneratedAt}>
             {formatUtcDate(latestGeneratedAt)} UTC
