@@ -177,13 +177,12 @@ img, video {
 }
 
 /* ─── Mascot — stands directly on the page (transparent PNG), no frame,
-       no aura, no float. Feet aligned to the CTA row by the hero grid.
-       A soft blue drop-shadow just grounds him. */
+       no aura, no float, no shadow. Completely clean. */
 .mascot-stage {
   background: none;
 }
 .mascot-img {
-  filter: drop-shadow(0 30px 50px rgba(0, 0, 255, 0.28));
+  filter: none;
 }
 
 /* ─── Page container ─────────────────────────────── */
