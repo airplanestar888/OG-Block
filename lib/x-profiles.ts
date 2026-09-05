@@ -31,30 +31,89 @@ async function fetchXUsers(userIds: string[]): Promise<XUser[]> {
   }
 }
 
+type FxUser = {
+  screen_name?: string;
+  name?: string;
+  avatar_url?: string;
+};
+
+/// Fetch one profile via the FxTwitter public proxy (no key needed).
+/// Returns null when the user is missing, protected, or the proxy fails.
+async function fetchFxUser(handle: string): Promise<XUser | null> {
+  try {
+    const res = await fetch(`https://api.fxtwitter.com/${encodeURIComponent(handle)}`, {
+      headers: { "User-Agent": "OG-BLOCK-avatar-heal/1.0" },
+      signal: AbortSignal.timeout(12_000)
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { user?: FxUser };
+    const u = json.user;
+    if (!u || !u.screen_name) return null;
+    return {
+      // FxTwitter gives screen_name, not the numeric id — caller maps by handle.
+      id: u.screen_name.toLowerCase(),
+      username: u.screen_name,
+      name: u.name,
+      profile_image_url: u.avatar_url
+    };
+  } catch {
+    return null;
+  }
+}
+
 /// Refresh stored x_handle / x_name / x_avatar for the given internal user ids.
-/// No-op (returns 0) when X_BEARER_TOKEN is not configured.
+///
+/// Primary path is the FxTwitter public proxy (no key, per-handle lookups).
+/// The official X API v2 batch is the fallback when a bearer token exists.
+/// Returns the number of rows actually updated.
 export async function refreshXProfiles(userIds: string[]): Promise<number> {
-  if (!env.X_BEARER_TOKEN || userIds.length === 0) return 0;
+  if (userIds.length === 0) return 0;
 
   const supabase = getSupabaseAdmin();
 
-  // map internal id -> x_user_id
+  // map internal id -> x_user_id + handle (FxTwitter resolves by handle)
   const { data: users } = await supabase
     .from("users")
-    .select("id,x_user_id")
+    .select("id,x_user_id,x_handle")
     .in("id", userIds);
 
   if (!users || users.length === 0) return 0;
 
-  const xIdToInternal = new Map<string, string>();
-  for (const u of users) xIdToInternal.set(u.x_user_id, u.id);
+  type UserRow = { id: string; x_user_id: string; x_handle: string };
+  const rows = users as UserRow[];
+  const byHandle = new Map(rows.map((u) => [u.x_handle.toLowerCase(), u]));
 
-  const xUsers = await fetchXUsers([...xIdToInternal.keys()]);
+  // Primary: FxTwitter, small pool so one slow lookup can't stall the cron tail.
+  const fetched = new Map<string, XUser>();
+  const queue = [...byHandle.keys()];
+  await Promise.all(
+    Array.from({ length: 4 }, async () => {
+      while (queue.length > 0) {
+        const handle = queue.shift();
+        if (!handle) return;
+        const xu = await fetchFxUser(handle);
+        if (xu) fetched.set(handle, xu);
+      }
+    })
+  );
+
+  // Fallback: official X API batch for handles the proxy missed.
+  const missing = rows.filter((u) => !fetched.has(u.x_handle.toLowerCase()));
+  if (missing.length > 0 && env.X_BEARER_TOKEN) {
+    const xIdToInternal = new Map(missing.map((u) => [u.x_user_id, u.id]));
+    const batch = await fetchXUsers([...xIdToInternal.keys()]);
+    for (const xu of batch) {
+      const internalId = xIdToInternal.get(xu.id);
+      if (!internalId) continue;
+      const row = missing.find((u) => u.id === internalId);
+      if (row) fetched.set(row.x_handle.toLowerCase(), xu);
+    }
+  }
+
   let updated = 0;
-
-  for (const xu of xUsers) {
-    const internalId = xIdToInternal.get(xu.id);
-    if (!internalId) continue;
+  for (const [handle, xu] of fetched) {
+    const row = byHandle.get(handle);
+    if (!row) continue;
 
     const patch: Record<string, string> = {};
     if (xu.username) patch.x_handle = xu.username.toLowerCase();
@@ -63,7 +122,7 @@ export async function refreshXProfiles(userIds: string[]): Promise<number> {
     if (avatar) patch.x_avatar = avatar;
     if (Object.keys(patch).length === 0) continue;
 
-    const { error } = await supabase.from("users").update(patch).eq("id", internalId);
+    const { error } = await supabase.from("users").update(patch).eq("id", row.id);
     if (!error) updated++;
   }
 
@@ -77,9 +136,9 @@ type AvatarRow = {
 };
 
 /// Self-heal stale avatars: pick the oldest-checked users whose avatar URL no
-/// longer resolves, refresh just those via the X API, and stamp the rest as
-/// checked. Bounded by design (max ~30 HEAD checks + 1 X batch per call) so it
-/// safely fits in the tail of the refresh-scores cron without touching the
+/// longer resolves, refresh just those, and stamp the rest as checked.
+/// Bounded by design (max ~30 HEAD checks + a small lookup pool per call) so
+/// it safely fits in the tail of the refresh-scores cron without touching the
 /// Vercel 270s kill. Returns counts for the cron summary.
 export async function healStaleAvatars(limit = 30): Promise<{
   checked: number;
@@ -90,7 +149,7 @@ export async function healStaleAvatars(limit = 30): Promise<{
   const result = { checked: 0, refreshed: 0, dead: 0 };
 
   // avatar_checked_at may not exist yet if the migration hasn't been applied
-  // (dashboard SQL). Fall back to created_at ordering so the heal still runs.
+  // (dashboard SQL). Fall back to unordered selection so the heal still runs.
   let rows: AvatarRow[] = [];
   const ordered = await supabase
     .from("users")
