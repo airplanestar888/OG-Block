@@ -33,7 +33,13 @@ export default async function HomePage() {
           paddingBottom: "var(--hero-pb)",
         }}
       >
-        <div className="reveal reveal-d1">
+        <div className="reveal reveal-d1 flex gap-4 sm:gap-6">
+          {/* Liquid rail — blue metallic flow that follows the headline height */}
+          <div
+            aria-hidden="true"
+            className="liquid-rail w-3 shrink-0 self-stretch rounded-full sm:w-4"
+          />
+          <div className="min-w-0">
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
             Own Gang on Blockchain
           </p>
@@ -56,6 +62,7 @@ export default async function HomePage() {
             Your NFT history becomes a score, rank, and proof of culture —
             verified on-chain, ranked live, visible on X.
           </p>
+          </div>
         </div>
 
         <div className="reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
