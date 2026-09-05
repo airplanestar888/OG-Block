@@ -72,9 +72,9 @@ export default async function HomePage() {
                   <Image
                     src="/mascot.png"
                     alt="OG BLOCK mascot"
-                    width={451}
-                    height={655}
-                    sizes="(max-width: 1023px) 70vw, 451px"
+                    width={1005}
+                    height={1368}
+                    sizes="(max-width: 1023px) 70vw, 1005px"
                     className="mascot-img h-[min(36svh,240px)] w-auto max-w-[70vw]"
                   />
                 </div>
@@ -111,15 +111,15 @@ export default async function HomePage() {
             </div>
 
             {/* RIGHT — mascot hugging the right edge, in front, locked to its
-                natural 451:655 ratio (never upscaled past the source). */}
+                natural 1005:1368 ratio (never upscaled past the source). */}
             <div className="mascot-stage relative hidden lg:block">
               <Image
                 src="/mascot.png"
                 alt="OG BLOCK mascot"
-                width={451}
-                height={655}
-                sizes="(min-width: 1024px) 40vw, 451px"
-                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(80svh,582px)] w-auto max-w-none [aspect-ratio:451/655] object-contain"
+                width={1005}
+                height={1368}
+                sizes="(min-width: 1024px) 40vw, 1005px"
+                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(80svh,582px)] w-auto max-w-none [aspect-ratio:1005/1368] object-contain"
                 priority
               />
             </div>
