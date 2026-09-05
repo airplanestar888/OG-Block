@@ -48,13 +48,13 @@ export default function AgentGuidePage() {
         <section>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Agent onboarding</p>
           <div className="mt-2 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
-            <div>
-              <PageHeading outline="AI agents joining OG BLOCK.">
+            <div className="min-w-0">
+              <PageHeading className="break-words" outline="AI agents joining OG BLOCK.">
                 Clear instructions for
               </PageHeading>
             </div>
-            <div className="max-w-2xl lg:-mt-[11px] lg:pb-2">
-              <p className="text-justify text-base leading-8 text-black/70">
+            <div className="min-w-0 lg:max-w-2xl lg:-mt-[11px] lg:pb-2">
+              <p className="text-left text-base leading-8 text-black/70 lg:text-justify">
                 This page is public on purpose. Any AI agent that scans it can register into a profile&apos;s agent wallet slot: get a one-time code from the operator, sign the challenge with its own wallet, POST it to the link endpoint — and its NFTs count into the combined OG Score, without ever touching the operator&apos;s main wallet.
               </p>
             </div>
@@ -70,10 +70,10 @@ export default function AgentGuidePage() {
               <h2 className="mt-4 text-lg font-semibold text-ink">{step.title}</h2>
               <p className="mt-2 text-sm leading-6 text-black/70">{step.copy}</p>
               {index === 2 ? (
-                <pre className="mt-3 overflow-x-auto rounded-xl border border-black/10 bg-[#fbfcff] p-3 text-xs leading-6 text-ink">{challengeMessage}</pre>
+                <pre className="mt-3 max-w-full overflow-x-auto rounded-xl border border-black/10 bg-[#fbfcff] p-3 text-xs leading-6 text-ink whitespace-pre-wrap break-words">{challengeMessage}</pre>
               ) : null}
               {index === 3 ? (
-                <pre className="mt-3 overflow-x-auto rounded-xl border border-black/10 bg-[#fbfcff] p-3 text-xs leading-6 text-ink">{linkPayload}</pre>
+                <pre className="mt-3 max-w-full overflow-x-auto rounded-xl border border-black/10 bg-[#fbfcff] p-3 text-xs leading-6 text-ink whitespace-pre-wrap break-words">{linkPayload}</pre>
               ) : null}
             </article>
           ))}
@@ -103,7 +103,7 @@ export default function AgentGuidePage() {
               </ul>
             </div>
           </div>
-          <pre className="mt-4 overflow-x-auto rounded-xl bg-ink p-4 text-xs leading-6 text-white"><code>{`AGENT_TASK: OG_BLOCK_AGENT_REGISTER
+          <pre className="mt-4 max-w-full overflow-x-auto rounded-xl bg-ink p-4 text-xs leading-6 text-white"><code className="block max-w-full break-words whitespace-pre-wrap">{`AGENT_TASK: OG_BLOCK_AGENT_REGISTER
 SITE: joinog.xyz
 WALLET_SLOT: agent
 CHAIN: Base (8453)
