@@ -348,6 +348,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   <div className="flex items-center gap-1.5 text-xs text-black/45">
                     <span>{profile.nftCount.toLocaleString()} NFTs</span>
                     <span>·</span>
+                    <span>{profile.badgeCount.toLocaleString()} {profile.badgeCount === 1 ? "badge" : "badges"}</span>
+                    <span>·</span>
                     <span className="inline-flex items-center gap-0.5" title="Indexed on Base, ETH, Robinhood & Solana">
                       <span className="size-1.5 rounded-full bg-[#0000FF]" />
                       <span className="size-1.5 rounded-full bg-[#627EEA]" />
@@ -397,7 +399,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 <li
                   key={profile.xHandle || index}
                   onClick={() => profile.xHandle && router.push(`/u/${profile.xHandle}`)}
-                  className={`grid grid-cols-[auto_minmax(0,1fr)_auto_auto_auto] items-center gap-4 rounded-2xl border bg-white/90 px-5 py-3.5 shadow-[0_2px_10px_rgba(10,11,13,0.06)] backdrop-blur transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(10,11,13,0.10)] ${
+                  className={`grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 rounded-2xl border bg-white/90 px-5 py-3.5 shadow-[0_2px_10px_rgba(10,11,13,0.06)] backdrop-blur transition hover:-translate-y-px hover:shadow-[0_8px_24px_rgba(10,11,13,0.10)] ${
                     isMe
                       ? "border-[#0000FF]/30 ring-1 ring-inset ring-[#0000FF]/25"
                       : "border-black/[0.07]"
@@ -442,6 +444,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                       <div className="flex items-center gap-1.5 text-xs text-black/45">
                         <span>{profile.nftCount.toLocaleString()} NFTs</span>
                         <span>·</span>
+                        <span>{profile.badgeCount.toLocaleString()} {profile.badgeCount === 1 ? "badge" : "badges"}</span>
+                        <span>·</span>
                         <span className="inline-flex items-center gap-1" title="Indexed on Base, ETH, Robinhood & Solana">
                           <span className="size-1.5 rounded-full bg-[#0000FF]" />
                           <span className="size-1.5 rounded-full bg-[#627EEA]" />
@@ -451,18 +455,6 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                       </div>
                     </div>
                   </div>
-
-                  {/* NFT */}
-                  <span className="min-w-14 text-center font-semibold text-black/76">
-                    {profile.nftCount.toLocaleString()}
-                    <span className="block text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/35">NFT</span>
-                  </span>
-
-                  {/* Badge */}
-                  <span className="min-w-14 text-center font-semibold text-black/76">
-                    {profile.badgeCount.toLocaleString()}
-                    <span className="block text-[0.6rem] font-bold uppercase tracking-[0.1em] text-black/35">Badge</span>
-                  </span>
 
                   {/* Score & ▲ +X pts */}
                   <div className="flex min-w-28 items-center justify-end gap-2.5">
