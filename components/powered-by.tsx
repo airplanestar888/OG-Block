@@ -16,24 +16,24 @@ const STACK = [
 // second copy of the stack exists purely to make the loop seamless.
 export function PoweredBy() {
   return (
-    <section className="page-container relative flex min-h-[380px] flex-col justify-center py-8 sm:min-h-[500px] sm:py-12">
+    <section className="page-container relative flex min-h-[380px] flex-col justify-center overflow-x-clip py-8 sm:min-h-[500px] sm:py-12">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden"
       >
         <span
-          className="font-syne text-[min(45vw,17rem)] font-extrabold leading-none text-transparent"
+          className="font-syne max-w-full text-[min(45vw,17rem)] font-extrabold leading-none text-transparent"
           style={{ WebkitTextStroke: "1.5px rgba(0,0,255,0.11)" }}
         >
           OG
         </span>
       </div>
 
-      <p className="relative text-center text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#0A0B0D]/35">
+      <p className="relative text-center text-[0.6rem] font-bold uppercase tracking-[0.22em] text-[#0A0B0D]/65">
         Powered by
       </p>
       <div
-        className="relative mt-6 overflow-hidden"
+        className="marquee-viewport group relative mt-6 overflow-hidden"
         style={{
           maskImage:
             "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",

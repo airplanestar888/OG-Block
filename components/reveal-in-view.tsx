@@ -17,15 +17,22 @@ export function SlideIn({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    setMounted(true);
+
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      typeof IntersectionObserver === "undefined"
+    ) {
       setInView(true);
       return;
     }
+
     const obs = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -39,10 +46,13 @@ export function SlideIn({
     return () => obs.disconnect();
   }, []);
 
+  const animationClass = direction === "left" ? "reveal-left" : "reveal-right";
+  const visibilityClass = mounted && !inView ? "opacity-0" : inView ? animationClass : "";
+
   return (
     <div
       ref={ref}
-      className={`${inView ? (direction === "left" ? "reveal-left" : "reveal-right") : "opacity-0"} ${className}`}
+      className={`${visibilityClass} ${className}`}
       style={inView && delay > 0 ? { animationDelay: `${delay}s` } : undefined}
     >
       {children}

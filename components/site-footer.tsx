@@ -8,7 +8,7 @@ const linkClass =
 // echo poster lettering. No animation layer; the type is the visual.
 export function SiteFooter() {
   return (
-    <footer className="border-y border-white/20 bg-[#0000FF] text-white">
+    <footer className="overflow-x-clip border-y border-white/20 bg-[#0000FF] text-white">
       <div className="mx-auto max-w-6xl px-5 pb-6 pt-10 sm:pb-8 sm:pt-14">
         <p className="font-[family-name:var(--font-syne)] text-[clamp(2.75rem,9.5vw,8rem)] font-extrabold uppercase leading-[0.95] tracking-[-0.02em]">
           Own status.
@@ -50,7 +50,7 @@ export function SiteFooter() {
             Terms
           </Link>
         </nav>
-        <p className="mt-3 text-[0.625rem] text-white/70">© 2026 OG BLOCK All Rights Reserved</p>
+        <p className="mt-3 text-[0.625rem] text-white/80">© 2026 OG BLOCK All Rights Reserved</p>
       </div>
     </footer>
   );

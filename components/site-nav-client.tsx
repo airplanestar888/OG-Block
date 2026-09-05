@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
   { href: "/og-card", label: "Badge/NFT", isMint: true },
@@ -18,6 +18,7 @@ const NAV_LINKS = [
 export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: boolean }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const previousOverflow = useRef<string | null>(null);
 
   // /admin is intentionally hidden from the header nav. Access it directly at /admin.
   const navLinks = NAV_LINKS;
@@ -27,11 +28,39 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
   }, [pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    if (open) {
+      previousOverflow.current = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    } else if (previousOverflow.current !== null) {
+      document.body.style.overflow = previousOverflow.current;
+      previousOverflow.current = null;
+    }
+
     return () => {
-      document.body.style.overflow = "";
+      if (previousOverflow.current !== null) {
+        document.body.style.overflow = previousOverflow.current;
+        previousOverflow.current = null;
+      }
     };
   }, [open]);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (media.matches) setOpen(false);
+    };
+    const observer = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(closeOnDesktop)
+      : null;
+    observer?.observe(document.documentElement);
+    media.addEventListener("change", closeOnDesktop);
+    window.addEventListener("resize", closeOnDesktop);
+    return () => {
+      observer?.disconnect();
+      media.removeEventListener("change", closeOnDesktop);
+      window.removeEventListener("resize", closeOnDesktop);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 border-b border-[rgba(10,11,13,0.08)] bg-white/85 backdrop-blur-sm">
@@ -53,7 +82,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
           </span>
         </Link>
 
-        <nav className="nav-links hidden items-center gap-1 sm:flex">
+        <nav className="nav-links hidden items-center gap-1 lg:flex">
           {navLinks.map(({ href, label, isMint }) => (
             <Link
               key={href}
@@ -79,7 +108,7 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
         </nav>
 
         <button
-          className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg sm:hidden"
+          className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg lg:hidden"
           onClick={() => setOpen(!open)}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
@@ -98,8 +127,9 @@ export function SiteNavClient({ isLoggedIn }: { isLoggedIn: boolean; isAdmin?: b
       </div>
 
       {open ? (
-        <div className="border-t border-[rgba(10,11,13,0.07)] bg-white sm:hidden">
-          <nav className="page-container flex flex-col py-3">
+        <div className="border-t border-[rgba(10,11,13,0.07)] bg-white lg:hidden">
+            <nav className="page-container flex flex-col py-3" aria-label="Mobile navigation">
+
             {navLinks.map(({ href, label, isMint }) => (
               <Link
                 key={href}

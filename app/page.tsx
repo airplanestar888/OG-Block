@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getLeaderboard } from "@/lib/public-profiles";
@@ -35,9 +36,9 @@ export default async function HomePage() {
         }}
       >
         <div className="page-container flex flex-1 flex-col">
-          <div className="grid w-full my-auto gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:gap-14">
+          <div className="grid min-w-0 w-full my-auto gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:gap-14">
             {/* LEFT — liquid rail + statement + CTA (behind the mascot) */}
-            <div className="reveal reveal-d1 flex gap-4 sm:gap-6">
+            <div className="reveal reveal-d1 flex min-w-0 gap-4 sm:gap-6">
               {/* Liquid rail — blue metallic flow that follows the headline height */}
               <div
                 aria-hidden="true"
@@ -68,14 +69,17 @@ export default async function HomePage() {
                 </p>
                 {/* Mascot on mobile — between the copy and the CTA */}
                 <div className="mt-6 flex justify-center lg:hidden">
-                  <img
+                  <Image
                     src="/mascot.png"
                     alt="OG BLOCK mascot"
-                    className="mascot-img w-[min(60vw,260px)] h-auto"
+                    width={451}
+                    height={655}
+                    sizes="(max-width: 1023px) 70vw, 451px"
+                    className="mascot-img h-[min(36svh,240px)] w-auto max-w-[70vw]"
                   />
                 </div>
 
-                <div className="hero-cta reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
+                <div className="hero-cta reveal reveal-d2 mt-6 flex flex-wrap items-center gap-3 sm:mt-8">
                   <Link href="/try" className="btn-primary btn-grain">
                     Try yours — no sign-in
                   </Link>
@@ -109,10 +113,14 @@ export default async function HomePage() {
             {/* RIGHT — mascot hugging the right edge, in front, locked to its
                 natural 451:655 ratio (never upscaled past the source). */}
             <div className="mascot-stage relative hidden lg:block">
-              <img
+              <Image
                 src="/mascot.png"
                 alt="OG BLOCK mascot"
+                width={451}
+                height={655}
+                sizes="(min-width: 1024px) 40vw, 451px"
                 className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(80svh,582px)] w-auto max-w-none [aspect-ratio:451/655] object-contain"
+                priority
               />
             </div>
           </div>
@@ -123,7 +131,7 @@ export default async function HomePage() {
       <PoweredBy />
 
       {/* ── SECTION 3 · FEATURES — title left, numbered grid right ── */}
-      <section className="page-container relative flex min-h-[81svh] items-center py-20 sm:py-24">
+      <section className="page-container relative flex min-h-[81svh] items-center overflow-x-clip py-20 sm:py-24">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           {/* Title block — slides in from the left on scroll */}
           <SlideIn direction="left" className="h-full">
@@ -131,7 +139,7 @@ export default async function HomePage() {
               What you get
             </p>
             <h2 className="font-syne mt-3 leading-[0.98] text-[#0A0B0D]" style={{ fontSize: "clamp(2.3rem, 4.6vw, 3.6rem)" }}>
-              <span className="block text-[#0A0B0D]/35">Built for</span>
+              <span className="block text-[#0A0B0D]/60">Built for</span>
               culture.
             </h2>
             <div className="mt-6 h-[3px] w-20 bg-[#0A0B0D]" />
@@ -250,7 +258,7 @@ export default async function HomePage() {
 function HeroFigure({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#0A0B0D]/45">{label}</p>
+      <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#0A0B0D]/65">{label}</p>
       <p className="font-orbitron mt-1 text-2xl font-bold leading-none tracking-tight text-[#0A0B0D] sm:text-3xl">
         {value}
       </p>
