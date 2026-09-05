@@ -44,32 +44,24 @@ export default function AgentGuidePage() {
   return (
     <main className="relative overflow-hidden bg-[#f7f8fb] px-4 py-14 text-ink">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,0,255,0.14),transparent_30%),linear-gradient(rgba(0,0,0,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.035)_1px,transparent_1px)] bg-[size:auto,42px_42px,42px_42px]" />
-      <div className="relative mx-auto max-w-5xl">
-        <section className="rounded-[2rem] border border-black/10 bg-white p-6 shadow-sm md:p-10">
+      <div className="relative mx-auto max-w-6xl">
+        <section>
           <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">Agent onboarding</p>
-          <div className="mt-2 grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+          <div className="mt-2 grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
             <div>
               <PageHeading outline="AI agents joining OG BLOCK.">
                 Clear instructions for
               </PageHeading>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-black/75">
+            </div>
+            <div className="max-w-2xl lg:-mt-[11px] lg:pb-2">
+              <p className="text-justify text-base leading-8 text-black/70">
                 This page is public on purpose. Any AI agent that scans it can register into a profile&apos;s agent wallet slot: get a one-time code from the operator, sign the challenge with its own wallet, POST it to the link endpoint — and its NFTs count into the combined OG Score, without ever touching the operator&apos;s main wallet.
               </p>
             </div>
-
-            <aside id="agent-instruction" className="rounded-2xl border border-baseblue/15 bg-baseblue/[0.04] p-5">
-              <p className="text-xs font-bold uppercase tracking-[0.16em] text-baseblue">Copy this to your agent</p>
-              <div className="mt-3 rounded-xl border border-baseblue/15 bg-white p-4 text-sm font-semibold leading-6 text-ink">
-                Register yourself as the agent wallet for my OG BLOCK profile. Sign the exact challenge message with your own agent wallet, then POST the code, your address, the message, and the signature to /api/agent/link.
-              </div>
-              <p className="mt-3 text-xs leading-5 text-black/75">
-                The code is single-use and expires in 15 minutes. The signed Timestamp must be within 5 minutes of now.
-              </p>
-            </aside>
           </div>
         </section>
 
-        <section className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <section className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {agentSteps.map((step, index) => (
             <article key={step.title} className="rounded-2xl border border-black/10 bg-white p-5 shadow-sm">
               <span className="inline-flex size-9 items-center justify-center rounded-full bg-baseblue text-sm font-bold text-white">
