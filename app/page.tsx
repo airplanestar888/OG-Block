@@ -56,8 +56,8 @@ export default async function HomePage() {
             </span>
           </h1>
           <p
-            className="mt-6 text-[0.95rem] leading-[1.6] text-[#0A0B0D]/65 sm:text-base"
-            style={{ letterSpacing: "-0.01em", maxWidth: "42ch" }}
+            className="mt-6 text-justify text-[0.95rem] font-semibold uppercase leading-[1.7] tracking-[0.04em] text-[#0A0B0D]/65 sm:text-base"
+            style={{ maxWidth: "42ch" }}
           >
             Your NFT history becomes a score, rank, and proof of culture —
             verified on-chain, ranked live, visible on X.
