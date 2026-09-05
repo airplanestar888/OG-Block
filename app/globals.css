@@ -177,20 +177,13 @@ img, video {
 }
 
 /* ─── Mascot — stands directly on the page (transparent PNG), no frame,
-       no aura. A soft blue drop-shadow just grounds him. */
+       no aura, no float. Feet aligned to the CTA row by the hero grid.
+       A soft blue drop-shadow just grounds him. */
 .mascot-stage {
   background: none;
 }
 .mascot-img {
   filter: drop-shadow(0 30px 50px rgba(0, 0, 255, 0.28));
-  animation: mascot-float 7s ease-in-out infinite;
-}
-@keyframes mascot-float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-12px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .mascot-img { animation: none; }
 }
 
 /* ─── Page container ─────────────────────────────── */

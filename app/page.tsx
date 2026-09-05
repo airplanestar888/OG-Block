@@ -25,73 +25,79 @@ export default async function HomePage() {
   return (
     <main className="relative min-h-screen overflow-hidden bg-white">
 
-      {/* ── HERO — typography talks; the mascot floats in a seamless dark aura ── */}
+      {/* ── SECTION 1 · HERO — exactly one full screen. Typography left,
+             mascot standing on the right, feet level with the CTA row. ── */}
       <section
-        className="relative overflow-x-clip"
+        className="relative flex min-h-[100svh] flex-col"
         style={{
           paddingTop:    "var(--hero-pt)",
           paddingBottom: "var(--hero-pb)",
         }}
       >
-        {/* Mascot stage — dark aura bleeding off the right edge, no frame.
-            The image's own black melts into the stage via lighten blend. */}
-        <div className="mascot-stage pointer-events-none absolute inset-y-0 right-0 hidden w-[46vw] max-w-[760px] lg:block" aria-hidden="true">
-          <img
-            src="/mascot.png"
-            alt=""
-            className="mascot-img absolute bottom-8 right-[12%] h-[84%] w-auto max-w-none"
-          />
-        </div>
-
-        <div className="page-container relative">
-          <div className="reveal reveal-d1 flex gap-4 sm:gap-6 lg:max-w-[56%]">
-            {/* Liquid rail — blue metallic flow that follows the headline height */}
-            <div
-              aria-hidden="true"
-              className="liquid-rail w-3 shrink-0 self-stretch rounded-full sm:w-4"
-            />
-            <div className="min-w-0">
-              <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
-                Own Gang on Blockchain
-              </p>
-              <h1
-                className="font-syne mt-4 leading-[0.95] text-[#0A0B0D]"
-                style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}
-              >
-                Own status.
-                <span
-                  className="block text-transparent"
-                  style={{ WebkitTextStroke: "2px rgba(10,11,13,0.9)" }}
+        <div className="page-container flex flex-1 flex-col">
+          <div className="grid w-full my-auto gap-10 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)] lg:gap-14">
+            {/* LEFT — liquid rail + statement + CTA (behind the mascot) */}
+            <div className="reveal reveal-d1 flex gap-4 sm:gap-6">
+              {/* Liquid rail — blue metallic flow that follows the headline height */}
+              <div
+                aria-hidden="true"
+                className="liquid-rail w-3 shrink-0 self-stretch rounded-full sm:w-4"
+              />
+              <div className="min-w-0">
+                <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-baseblue">
+                  Own Gang on Blockchain
+                </p>
+                <h1
+                  className="font-syne mt-4 leading-[0.95] text-[#0A0B0D]"
+                  style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}
                 >
-                  Prove culture.
-                </span>
-              </h1>
-              <p
-                className="mt-6 text-justify text-[0.95rem] font-semibold uppercase leading-[1.7] tracking-[0.04em] text-[#0A0B0D]/65 sm:text-base"
-                style={{ maxWidth: "42ch" }}
-              >
-                Your NFT history becomes a score, rank, and proof of culture —
-                verified on-chain, ranked live, visible on X.
-              </p>
-              <div className="reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
-                <Link href="/try" className="btn-primary btn-grain">
-                  Try yours — no sign-in
-                </Link>
-                {session ? (
-                  <Link href="/og-card" className="btn-secondary">
-                    Get your badge
+                  Own status.
+                  <span
+                    className="block text-transparent"
+                    style={{ WebkitTextStroke: "2px rgba(10,11,13,0.9)" }}
+                  >
+                    Prove culture.
+                  </span>
+                </h1>
+                <p
+                  className="mt-6 text-justify text-[0.95rem] font-semibold uppercase leading-[1.7] tracking-[0.04em] text-[#0A0B0D]/65 sm:text-base"
+                  style={{ maxWidth: "42ch" }}
+                >
+                  Your NFT history becomes a score, rank, and proof of culture —
+                  verified on-chain, ranked live, visible on X.
+                </p>
+                <div className="reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
+                  <Link href="/try" className="btn-primary btn-grain">
+                    Try yours — no sign-in
                   </Link>
-                ) : (
-                  <Link href="/leaderboard" className="btn-secondary">
-                    View leaderboard
-                  </Link>
-                )}
+                  {session ? (
+                    <Link href="/og-card" className="btn-secondary">
+                      Get your badge
+                    </Link>
+                  ) : (
+                    <Link href="/leaderboard" className="btn-secondary">
+                      View leaderboard
+                    </Link>
+                  )}
+                </div>
               </div>
+            </div>
+
+            {/* RIGHT — mascot in front, locked to its natural 451:655 ratio
+                (width-driven, never upscaled past the source), feet level
+                with the CTA row, overlapping the headline tail slightly. */}
+            <div className="mascot-stage relative hidden lg:block">
+              <img
+                src="/mascot.png"
+                alt="OG BLOCK mascot"
+                className="mascot-img absolute bottom-0 left-[-16%] z-10 h-auto max-w-none [aspect-ratio:451/655] object-contain"
+                style={{ width: "min(clamp(300px, 32vw, 436px), calc(70vh * 0.6887))" }}
+              />
             </div>
           </div>
 
-          {/* ── Live figures — hairline row, no boxes ── */}
-          <div className="reveal reveal-d3 mt-12 flex flex-wrap items-end gap-x-10 gap-y-5 border-t border-[rgba(10,11,13,0.1)] pt-6">
+          {/* ── Live figures — hairline row pinned to the hero floor ── */}
+          <div className="reveal reveal-d3 mt-10 flex flex-wrap items-end gap-x-10 gap-y-5 border-t border-[rgba(10,11,13,0.1)] pt-6">
             <HeroFigure label="Gangs" value={profiles.toLocaleString()} />
             <HeroFigure label="Total score" value={formatCompactNumber(totalScore)} />
             <HeroFigure label="NFTs" value={formatCompactNumber(totalNfts)} />
@@ -106,11 +112,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── POWERED BY ───────────────────────────────── */}
+      {/* ── SECTION 2 · POWERED BY ───────────────────── */}
       <PoweredBy />
 
-      {/* ── FEATURES — title left, numbered grid right; no forced full screen ── */}
-      <section className="page-container relative py-20 sm:py-24">
+      {/* ── SECTION 3 · FEATURES — title left, numbered grid right ── */}
+      <section className="page-container relative flex min-h-[86svh] items-center py-20 sm:py-24">
         <div className="grid w-full items-center gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
           {/* Title block — slides in from the left on scroll */}
           <SlideIn direction="left" className="h-full">
