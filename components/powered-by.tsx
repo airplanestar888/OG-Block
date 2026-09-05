@@ -16,7 +16,7 @@ const STACK = [
 // second copy of the stack exists purely to make the loop seamless.
 export function PoweredBy() {
   return (
-    <section className="page-container relative flex min-h-[81svh] flex-col justify-center py-10 sm:py-12">
+    <section className="page-container relative flex min-h-[500px] flex-col justify-center py-10 sm:py-12">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 flex select-none items-center justify-center overflow-hidden"

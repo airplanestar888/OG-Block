@@ -66,6 +66,15 @@ export default async function HomePage() {
                   Your NFT history becomes a score, rank, and proof of culture —
                   verified on-chain, ranked live, visible on X.
                 </p>
+                {/* Mascot on mobile — between the copy and the CTA */}
+                <div className="mt-6 flex justify-center lg:hidden">
+                  <img
+                    src="/mascot.png"
+                    alt="OG BLOCK mascot"
+                    className="mascot-img w-[min(60vw,260px)] h-auto"
+                  />
+                </div>
+
                 <div className="hero-cta reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
                   <Link href="/try" className="btn-primary btn-grain">
                     Try yours — no sign-in
