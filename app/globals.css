@@ -185,6 +185,18 @@ img, video {
   filter: none;
 }
 
+/* ─── Hero compact mode — short viewports (laptop screens with browser
+       chrome ≈ 655px inner). Tightens the hero so every element stays
+       above the fold; desktop (>720px height) is untouched. */
+@media (max-height: 720px) {
+  .hero-compact h1 {
+    font-size: clamp(2.4rem, 9svh, 5.5rem) !important;
+  }
+  .hero-compact .hero-copy { margin-top: 1rem; }
+  .hero-compact .hero-cta { margin-top: 1.25rem; }
+  .hero-compact .hero-figures { margin-top: 1.25rem; padding-top: 1rem; }
+}
+
 /* ─── Page container ─────────────────────────────── */
 .page-container {
   width: 100%;

@@ -28,7 +28,7 @@ export default async function HomePage() {
       {/* ── SECTION 1 · HERO — the one exception: full screen so every
              element fits. All other sections match the footer height. ── */}
       <section
-        className="relative flex min-h-[calc(100svh-4.25rem)] flex-col overflow-x-clip"
+        className="hero-compact relative flex min-h-[calc(100svh-4.25rem)] flex-col overflow-x-clip"
         style={{
           paddingTop:    "clamp(0.75rem, 2vw, 1.5rem)",
           paddingBottom: "var(--hero-pb)",
@@ -49,7 +49,7 @@ export default async function HomePage() {
                 </p>
                 <h1
                   className="font-syne mt-4 leading-[0.95] text-[#0A0B0D]"
-                  style={{ fontSize: "clamp(2.4rem, 6vw, 5.5rem)" }}
+                  style={{ fontSize: "clamp(2.4rem, min(6vw, 11svh), 5.5rem)" }}
                 >
                   Own status.
                   <span
@@ -60,13 +60,13 @@ export default async function HomePage() {
                   </span>
                 </h1>
                 <p
-                  className="mt-6 text-justify text-[0.95rem] font-semibold uppercase leading-[1.7] tracking-[0.04em] text-[#0A0B0D]/65 sm:text-base"
+                  className="hero-copy mt-6 text-justify text-[0.95rem] font-semibold uppercase leading-[1.7] tracking-[0.04em] text-[#0A0B0D]/65 sm:text-base"
                   style={{ maxWidth: "42ch" }}
                 >
                   Your NFT history becomes a score, rank, and proof of culture —
                   verified on-chain, ranked live, visible on X.
                 </p>
-                <div className="reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
+                <div className="hero-cta reveal reveal-d2 mt-8 flex flex-wrap items-center gap-3">
                   <Link href="/try" className="btn-primary btn-grain">
                     Try yours — no sign-in
                   </Link>
@@ -82,7 +82,7 @@ export default async function HomePage() {
                 </div>
 
                 {/* ── Live figures — inside the hero block, under the CTA ── */}
-                <div className="reveal reveal-d3 mt-8 flex flex-wrap items-end gap-x-8 gap-y-4 border-t border-[rgba(10,11,13,0.1)] pt-5">
+                <div className="hero-figures reveal reveal-d3 mt-8 flex flex-wrap items-end gap-x-8 gap-y-4 border-t border-[rgba(10,11,13,0.1)] pt-5">
                   <HeroFigure label="Gangs" value={profiles.toLocaleString()} />
                   <HeroFigure label="Total score" value={formatCompactNumber(totalScore)} />
                   <HeroFigure label="NFTs" value={formatCompactNumber(totalNfts)} />
@@ -103,7 +103,7 @@ export default async function HomePage() {
               <img
                 src="/mascot.png"
                 alt="OG BLOCK mascot"
-                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(88svh,582px)] w-auto max-w-none [aspect-ratio:451/655] object-contain"
+                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(80svh,582px)] w-auto max-w-none [aspect-ratio:451/655] object-contain"
               />
             </div>
           </div>
