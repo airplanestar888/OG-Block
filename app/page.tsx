@@ -49,7 +49,7 @@ export default async function HomePage() {
                 </p>
                 <h1
                   className="font-syne mt-4 leading-[0.95] text-[#0A0B0D]"
-                  style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)" }}
+                  style={{ fontSize: "clamp(2.4rem, 6vw, 5.5rem)" }}
                 >
                   Own status.
                   <span
