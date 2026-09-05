@@ -28,7 +28,7 @@ export default async function HomePage() {
       {/* ── SECTION 1 · HERO — the one exception: full screen so every
              element fits. All other sections match the footer height. ── */}
       <section
-        className="relative flex min-h-[100svh] flex-col overflow-x-clip"
+        className="relative flex min-h-[calc(100svh-4.25rem)] flex-col overflow-x-clip"
         style={{
           paddingTop:    "clamp(0.75rem, 2vw, 1.5rem)",
           paddingBottom: "var(--hero-pb)",
