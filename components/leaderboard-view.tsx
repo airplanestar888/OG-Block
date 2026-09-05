@@ -20,26 +20,22 @@ const PLACE_STYLES: Record<
   {
     chip: string;
     avatarRing: string;
-    avatarSize: number;
     nameSize: string;
   }
 > = {
   1: {
     chip: "bg-gradient-to-b from-[#F7D77A] to-[#E5B54A] text-[#0A0B0D]",
     avatarRing: "ring-white/70",
-    avatarSize: 88,
     nameSize: "text-xl",
   },
   2: {
     chip: "bg-gradient-to-b from-[#EAEEF3] to-[#C9D1DB] text-[#0A0B0D]",
     avatarRing: "ring-white/50",
-    avatarSize: 68,
     nameSize: "text-lg",
   },
   3: {
     chip: "bg-gradient-to-b from-[#F0D2B2] to-[#D8A26A] text-[#0A0B0D]",
     avatarRing: "ring-white/50",
-    avatarSize: 68,
     nameSize: "text-lg",
   }
 };
@@ -181,7 +177,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                 >
                 <article
                   onClick={() => openProfile(profile.xHandle)}
-                  className={`group relative flex flex-col items-center overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] px-5 pb-6 pt-9 text-center text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10 ${PEDESTAL_HEIGHT[place]} ${
+                  className={`group relative flex flex-col overflow-hidden rounded-[1.4rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] px-5 pb-6 pt-5 text-left text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10 ${PEDESTAL_HEIGHT[place]} ${
                     profile.xHandle ? "cursor-pointer" : ""
                   }`}
                 >
@@ -190,52 +186,55 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
                   <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#0000C8]/40 to-transparent" />
                   {/* inner top highlight — the 1px light line that makes it feel printed, not flat */}
                   <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
-                  <span
-                    className={`absolute left-1/2 top-3 grid size-10 -translate-x-1/2 place-items-center rounded-xl ${styles.chip}`}
-                  >
-                    <TrophyIcon />
-                  </span>
-                  <span className={`relative rounded-full bg-white p-0.5 ring-2 ${styles.avatarRing}`}>
-                    <XAvatar
-                      src={profile.xAvatar}
-                      handle={profile.xHandle}
-                      size={styles.avatarSize}
-                    />
-                  </span>
-                  <div className="relative mt-3 flex items-center gap-1.5">
-                    <h2 className={`font-semibold tracking-tight ${styles.nameSize}`}>
-                      {profile.xHandle ? (
-                        <Link
-                          href={`/u/${profile.xHandle}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="transition hover:underline"
-                        >
-                          {profile.xName || `@${profile.xHandle}`}
-                        </Link>
-                      ) : (
-                        `@${profile.xHandle}`
-                      )}
-                    </h2>
-                    {profile.profileRole === "agent" ? (
-                      <span className="rounded bg-white/20 px-1.5 py-0.5 text-[0.62rem] font-bold uppercase tracking-wide text-white">
-                        Agent
-                      </span>
-                    ) : null}
+                  {/* Top row — rank + name left, avatar right */}
+                  <div className="relative flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.08em] ${styles.chip}`}>
+                        <TrophyIcon />
+                        {place === 1 ? "Champion" : place === 2 ? "Runner-up" : "Third"}
+                      </p>
+                      <h2 className={`mt-2 font-semibold leading-tight tracking-tight ${styles.nameSize}`}>
+                        {profile.xHandle ? (
+                          <Link
+                            href={`/u/${profile.xHandle}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="transition hover:underline"
+                          >
+                            {profile.xName || `@${profile.xHandle}`}
+                          </Link>
+                        ) : (
+                          `@${profile.xHandle}`
+                        )}
+                      </h2>
+                      <p className="mt-0.5 truncate text-xs text-white/70">
+                        {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
+                        {profile.profileRole === "agent" ? " · Agent" : ""}
+                      </p>
+                    </div>
+                    <span className={`relative shrink-0 rounded-full bg-white p-0.5 ring-2 ${styles.avatarRing}`}>
+                      <XAvatar
+                        src={profile.xAvatar}
+                        handle={profile.xHandle}
+                        size={place === 1 ? 56 : 48}
+                      />
+                    </span>
                   </div>
-                  <p className="relative text-xs text-white/70">
-                    {profile.xName ? `@${profile.xHandle}` : "Wallet verified"}
-                  </p>
-
-                  <p className="font-orbitron relative mt-4 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white/60">
-                    Score
-                  </p>
-                  <p className="font-orbitron relative mt-1 text-3xl font-bold leading-none tracking-tight">
-                    {formatCompactNumber(profile.score)}
-                  </p>
-                  <div className="relative mt-3 flex items-center gap-4 text-xs font-semibold text-white/80">
-                    <span>{profile.nftCount.toLocaleString()} NFT</span>
-                    <span className="h-3 w-px bg-white/30" aria-hidden="true" />
-                    <span>{profile.badgeCount.toLocaleString()} badge</span>
+                  {/* Score hero — the on-chain number owns the card */}
+                  <div className="relative mt-4">
+                    <p className="font-orbitron mt-1 text-4xl font-bold leading-none tracking-tight">
+                      {formatCompactNumber(profile.score)}
+                    </p>
+                    <p className="mt-1.5 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/60">
+                      Score · {profile.nftCount.toLocaleString()} NFT · {profile.badgeCount.toLocaleString()} badge
+                    </p>
+                  </div>
+                  {/* OG BLOCK strip — card footer, echoes the profile slab */}
+                  <div className="relative mt-auto flex items-center justify-between border-t border-white/15 pt-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="inline-block size-3 rounded-[4px] bg-white" />
+                      <p className="text-[0.6rem] font-bold uppercase tracking-[0.16em]">OG BLOCK</p>
+                    </div>
+                    <p className="text-[0.6rem] text-white/50">Own Gang on Blockchain</p>
                   </div>
                 </article>
                 </SlideIn>
