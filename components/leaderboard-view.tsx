@@ -130,7 +130,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
   const openProfile = (handle: string) => handle && router.push(`/u/${handle}`);
 
   return (
-    <div className="space-y-8">
+    <div>
       {/* Top Header & live strip — no card, the blue podium is the only solid */}
       <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
@@ -160,7 +160,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       {/* Featured Top 3 Podium */}
       {podiumVisible ? (
         <>
-          <section className="grid items-end gap-5 pt-6 sm:grid-cols-3 sm:gap-4 lg:gap-6">
+          <section className="grid items-end gap-5 pt-10 sm:grid-cols-3 sm:gap-4 lg:gap-6">
             {podium.map((profile, position) => {
               if (!profile) return null;
               const place = ((position === 1 ? 1 : position === 0 ? 2 : 3) as PodiumPlace);
@@ -245,8 +245,8 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
             })}
           </section>
 
-          {/* Personal standing pill — same rhythm above and below */}
-          <div className="flex justify-center py-2">
+          {/* Personal standing pill — breathing gap from podium, tight join into the board */}
+          <div className="flex justify-center pb-2 pt-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/85 px-5 py-2.5 text-sm text-black/70 shadow-[0_10px_28px_rgba(10,11,13,0.12)] backdrop-blur">
               <span className="inline-block size-2 rounded-full bg-baseblue" aria-hidden="true" />
               {myProfile?.rank ? (
@@ -268,7 +268,7 @@ export function LeaderboardView({ leaderboard }: LeaderboardViewProps) {
       {/* Main Culture Board — floating cards, lavender gaps so each row pops in 3D */}
       <section>
         {/* Table Header Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-3 px-1 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-1 pb-4 pt-1">
           <div>
             <h2 className="font-semibold text-black/88">Culture board</h2>
             <p className="mt-1 text-sm text-black/65">
