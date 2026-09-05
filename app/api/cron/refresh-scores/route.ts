@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { env } from "@/lib/env";
 import { calculateScoreForWallets, persistScore, recalculateRanks } from "@/lib/scoring";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
+import { healStaleAvatars } from "@/lib/x-profiles";
 
  type WalletRow = {
   user_id: string;
@@ -125,9 +126,20 @@ export async function GET(request: NextRequest) {
     if (count && count > 0) await recalculateRanks();
   }
 
-  // NOTE: X profile refresh is intentionally disabled to avoid consuming X API
-  // credits. Profile data (handle/name/avatar) is captured on each user login.
-  // To re-enable, set X_PROFILE_REFRESH=true and call refreshXProfiles(...) here.
+  // NOTE: Full X profile refresh stays disabled to avoid consuming X API
+  // credits (profile data is captured on each user login). The avatar
+  // self-heal below is the only exception: it fires at most 1 X batch per
+  // run, only for avatars already proven dead, so cost is ~zero.
+  // It runs in the tail — after ranks are done — with its own guard so it
+  // can never push the invocation into the Vercel ~270s kill.
+  let avatars = { checked: 0, refreshed: 0, dead: 0 };
+  if (Date.now() - startedAt < 200_000) {
+    try {
+      avatars = await healStaleAvatars(30);
+    } catch {
+      // Avatar hygiene must never fail the scoring run.
+    }
+  }
 
   return NextResponse.json({
     ok: true,
@@ -135,6 +147,7 @@ export async function GET(request: NextRequest) {
     refreshed: refreshed.length,
     failed: failed.length,
     skipped,
+    avatars,
     durationMs: Date.now() - startedAt,
     failures: failed.slice(0, 10)
   });
