@@ -119,7 +119,7 @@ export default async function HomePage() {
                 width={1005}
                 height={1368}
                 sizes="(min-width: 1024px) 40vw, 1005px"
-                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(80svh,582px)] w-auto max-w-none [aspect-ratio:1005/1368] object-contain"
+                className="mascot-img absolute bottom-0 right-[-5px] z-10 h-[min(80svh,582px)] w-auto max-w-none translate-y-[3.8%] [aspect-ratio:1005/1368] object-contain"
                 priority
               />
             </div>
