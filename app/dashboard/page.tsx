@@ -121,11 +121,11 @@ export default async function DashboardPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_10%,rgba(0,0,255,0.13),transparent_28%),linear-gradient(90deg,rgba(0,0,255,0.04)_1px,transparent_1px),linear-gradient(0deg,rgba(0,0,255,0.035)_1px,transparent_1px)] bg-[length:auto,42px_42px,42px_42px]" />
 
       <div className="relative mx-auto max-w-6xl space-y-6">
-        {/* ── Hero: web3 identity card — ink slab, neutral grey glow ── */}
-        <section className="relative overflow-hidden rounded-[1.5rem] bg-[#0A0B0D] text-white shadow-[0_24px_60px_rgba(10,11,13,0.35)]">
-          {/* glow + grid */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_25%_0%,rgba(255,255,255,0.14),transparent_55%),radial-gradient(circle_at_90%_100%,rgba(255,255,255,0.07),transparent_50%)]" />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(0deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[length:32px_32px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_85%)]" />
+        {/* ── Hero: web3 identity card — footer-blue slab, matches public profile ── */}
+        <section className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-b from-[#2B3BFF] via-[#0000FF] to-[#0000C8] text-white shadow-[0_18px_40px_rgba(10,11,13,0.22)] ring-1 ring-black/10">
+          {/* top sheen + highlight */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.25),transparent_60%)]" />
+          <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
 
           <div className="relative flex flex-wrap items-center justify-between gap-4 px-6 pt-7 md:px-9 md:pt-8">
             <div className="flex items-center gap-4">
@@ -173,15 +173,15 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="relative grid grid-cols-3 divide-x divide-white/10 border-t border-white/10">
+          <div className="relative grid grid-cols-3 divide-x divide-white/15 border-t border-white/15">
             <HeroStatDark label="NFTs counted" value={score?.nft_count ?? 0} />
             <HeroStatDark label="Badges" value={badgeCount} />
             <HeroStatDark label="Rank" value={score?.rank ? `#${score.rank}` : "—"} />
           </div>
 
-          <div className="relative flex items-center justify-between border-t border-white/10 px-6 py-3.5 md:px-9">
+          <div className="relative flex items-center justify-between border-t border-white/15 px-6 py-3.5 md:px-9">
             <div className="flex items-center gap-2">
-              <span className="inline-block size-4 rounded-[5px] bg-[#2E4BFF]" />
+              <span className="inline-block size-4 rounded-[5px] bg-white" />
               <p className="text-xs font-bold uppercase tracking-[0.18em]">OG BLOCK</p>
             </div>
             <p className="text-xs text-white/40">Base culture score</p>

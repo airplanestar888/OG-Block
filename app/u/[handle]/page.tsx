@@ -169,19 +169,19 @@ export default async function PublicProfilePage(
 
             <div className="mt-5 grid grid-cols-3 divide-x divide-black/[0.07] border-t border-black/[0.07] pt-5">
               <OverviewStat
-                dot="bg-emerald-500"
+                dot="bg-[#0000FF]"
                 label="Verified"
                 value={profile.contractBreakdown.verified}
                 caption="counted toward score"
               />
               <OverviewStat
-                dot="bg-amber-500"
+                dot="bg-black/30"
                 label="Unverified"
                 value={profile.contractBreakdown.unverified}
                 caption="not counted"
               />
               <OverviewStat
-                dot="bg-rose-500"
+                dot="bg-black/15"
                 label="Spam"
                 value={profile.contractBreakdown.spam}
                 caption="excluded"
